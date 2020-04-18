@@ -3,14 +3,14 @@ using System.Collections;
 
 [RequireComponent (typeof (BoxCollider2D))]
 public class PlayerCollision : MonoBehaviour {
-
-	public LayerMask collisionMask;
-
 	const float skinWidth = .015f;
 	public int horizontalRayCount = 4;
 	public int verticalRayCount = 4;
 
-	float horizontalRaySpacing;
+    private LayerMask oneSideCollision;
+    private LayerMask hardCollision;
+
+    float horizontalRaySpacing;
 	float verticalRaySpacing;
 
 	BoxCollider2D collider;
@@ -21,7 +21,9 @@ public class PlayerCollision : MonoBehaviour {
 	void Start() {
 		collider = GetComponent<BoxCollider2D> ();
 		CalculateRaySpacing ();
-	}
+        oneSideCollision = CollisionManager.Instance.OneSideGound;
+        hardCollision = CollisionManager.Instance.HardBlock;
+    }
 
 	public void Move(Vector3 velocity) {
 		
@@ -46,8 +48,9 @@ public class PlayerCollision : MonoBehaviour {
 	void HorizontalCollisions(ref Vector3 velocity) {
 		float directionX = Mathf.Sign (velocity.x);
 		float rayLength = Mathf.Abs (velocity.x) + skinWidth;
-		
-		for (int i = 0; i < horizontalRayCount; i ++) {
+
+        LayerMask collisionMask = hardCollision;
+        for (int i = 0; i < horizontalRayCount; i ++) {
 			Vector2 rayOrigin = (directionX == -1)?raycastOrigins.bottomLeft:raycastOrigins.bottomRight;
 			rayOrigin += Vector2.up * (horizontalRaySpacing * i);
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
@@ -68,6 +71,7 @@ public class PlayerCollision : MonoBehaviour {
 		float directionY = Mathf.Sign (velocity.y);
 		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
 
+        LayerMask collisionMask = directionY > 0 ? hardCollision : oneSideCollision;
 		for (int i = 0; i < verticalRayCount; i ++) {
 			Vector2 rayOrigin = (directionY == -1)?raycastOrigins.bottomLeft:raycastOrigins.topLeft;
 			rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);

@@ -62,32 +62,41 @@ public class PlayerMovement : MonoBehaviour
 	void Update() 
     {
         HandleInput();
+	}
+
+    private void FixedUpdate()
+    {
         UpdateMovement();
 
-		// detects when on the ground
-		if (playerCollision.collisions.below) {
-			if(foot == true){
+        // detects when on the ground
+        if (playerCollision.collisions.below)
+        {
+            if (foot == true)
+            {
                 if (landing != null)
                 {
                     source.clip = landing;
                     source.Play();
                 }
-				anim.SetBool("isJumping", false);
-				foot = false;
-				Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
-				Instantiate(footEffect, pos, Quaternion.identity);
-			}
-			anim.SetBool("isJumping", false);
-			velocity.y = 0;
-			doubleJump = false;
+                anim.SetBool("isJumping", false);
+                foot = false;
+                Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
+                Instantiate(footEffect, pos, Quaternion.identity);
+            }
+            anim.SetBool("isJumping", false);
+            doubleJump = false;
             jumpNum = maxJumpNum;
-		} else if(playerCollision.collisions.below == false){
-			anim.SetBool("isJumping", true);
-			foot = true;
-		}
+        }
+        else
+        {
+            anim.SetBool("isJumping", true);
+            foot = true;
+        }
 
+        if (playerCollision.collisions.below || playerCollision.collisions.above)
+            velocity.y = 0;
 
-	}
+    }
 
     /// <summary>
     /// Handles the input. 
@@ -130,17 +139,17 @@ public class PlayerMovement : MonoBehaviour
         // handles moving and physics for jumping
         float targetVelocityX = deltaMovement.x * moveSpeed;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
-        velocity.y += gravity * Time.deltaTime;
+        velocity.y += gravity * Time.fixedDeltaTime;
 
         if (isDead)
         {
-            playerCollision.MoveIgnoreCollision(velocity * Time.deltaTime);
+            playerCollision.MoveIgnoreCollision(velocity * Time.fixedDeltaTime);
             return;
         }
 
 
 
-        playerCollision.Move(velocity * Time.deltaTime);
+        playerCollision.Move(velocity * Time.fixedDeltaTime);
         isRunning = (deltaMovement.x != 0);
         anim.SetBool("isRunning", isRunning);
 

@@ -4,19 +4,16 @@ using UnityEngine;
 
 public class Patrol : MonoBehaviour {
 
-	private float speed;
 	public float startSpeed;
 	public Transform checkPoint;
 
-
-	private bool movingRight = false;
-
+    private float speed;
+    private bool movingRight = false;
 
 	void Start(){
 
 		Physics2D.queriesStartInColliders = false;
 		speed = startSpeed;
-
 	}
 
 	void Update(){
@@ -24,7 +21,7 @@ public class Patrol : MonoBehaviour {
 		transform.Translate(Vector2.right * speed * Time.deltaTime);
 
 
-		RaycastHit2D hitInfo = Physics2D.Raycast(checkPoint.position, Vector2.down, 10f);
+		RaycastHit2D hitInfo = Physics2D.Raycast(checkPoint.position, Vector2.down, 1f);
 		if(hitInfo.collider == false){
 			if(movingRight == false){
 				transform.eulerAngles = new Vector3(0, 0, 0);

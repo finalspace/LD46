@@ -18,8 +18,8 @@ public class BoardManager : MonoBehaviour
             maximum = max;
         }
     }
-    public int columns = 8;
-    public int rows = 8;
+    public int columns;
+    public int rows;
     public Count platformCount = new Count(5, 9);
     public Count fuelCount = new Count(1, 5);
     public Count enemyCount = new Count(5, 9);
@@ -29,41 +29,54 @@ public class BoardManager : MonoBehaviour
     public GameObject[] platformTiles;
     public GameObject[] fuelTiles;
     public GameObject[] enemyTiles;
-    //public GameObject[] outerWallTiles;
+    public GameObject[] outerWallTiles;
     private Transform wallsHolder;
     private List<Vector3> gridPositions = new List<Vector3>();
+
+    private Vector3 bottomLeft, topRight, diff, gridX, gridY;
 
     void InitializeList()
     {
         gridPositions.Clear();
 
-        for (int x = 1; x < columns - 1; x++)
+        bottomLeft = new Vector3(-9f, -3f, 0f);
+        topRight = new Vector3(9f, 5f, 0f);
+        diff = topRight - bottomLeft;
+        gridX = new Vector3(diff.x / columns, 0f, 0f);
+        gridY = new Vector3(0f, diff.y / rows, 0f);
+
+        for (int x = 1; x < columns+1; x++)
         {
-            for (int y = 1; y < rows - 1; y++)
+            for (int y = 1; y < rows+1; y++)
             {
-                gridPositions.Add(new Vector3(x,y,0f));
+                gridPositions.Add(bottomLeft + x*gridX + y*gridY);
             }
         }
     }
 
-    //void WallsSetup()
-    //{
-    //    wallsHolder = new GameObject("Walls").transform;
+    void WallsSetup()
+    {
+        Instantiate(outerWallTiles[0], new Vector3(-9f, -3f, 0f), Quaternion.identity);
+        Instantiate(outerWallTiles[0], new Vector3(-9f, 5f, 0f), Quaternion.identity);
+        Instantiate(outerWallTiles[0], new Vector3(9f, 5f, 0f), Quaternion.identity);
+        Instantiate(outerWallTiles[0], new Vector3(9f, -3f, 0f), Quaternion.identity);
 
-    //    for (int x = -1; x < columns + 1; x++)
-    //    {
-    //        for (int y = -1; y < rows + 1; y++)
-    //        {
-    //            GameObject toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
-    //            if (x == -1 || x == -1 || x == columns || y == rows)
-    //            {
-    //                toInstantiate = outerWallTiles[Random.Range(0, outerWallTiles.Length)];
-    //            }
-    //            GameObject instance = Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity) as GameObject;
-    //            instance.transform.SetParent(wallsHolder);
-    //        }
-    //    }
-    //}
+        //wallsHolder = new GameObject("Walls").transform;
+
+        //for (int x = -1; x < columns + 1; x++)
+        //{
+        //    for (int y = -1; y < rows + 1; y++)
+        //    {
+        //        GameObject toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
+        //        if (x == -1 || x == -1 || x == columns || y == rows)
+        //        {
+        //            toInstantiate = outerWallTiles[Random.Range(0, outerWallTiles.Length)];
+        //        }
+        //        GameObject instance = Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity) as GameObject;
+        //        instance.transform.SetParent(wallsHolder);
+        //    }
+        //}
+    }
 
     Vector3 RandomPosition()
     {
@@ -110,14 +123,14 @@ public class BoardManager : MonoBehaviour
             GameObject randomPlatform = platforms[Random.Range(0, platforms.Length)];
             Vector3 randomPosition = randomPlatform.transform.position;
             // shift up so it's standing on platform (or use half of enemy's height)
-            randomPosition.y += 0.8f;
+            randomPosition.y += 1f;
             Instantiate(tileChoice, randomPosition, Quaternion.identity);
         }
     }
 
     public void SetupScene(int level)
     {
-        //WallsSetup();
+        WallsSetup();
         InitializeList();
         LayoutObjectAtRandom(platformTiles, "Platform", platformCount.minimum, platformCount.maximum);
         //LayoutObjectAtRandom(fuelTiles, "Fuel", fuelCount.minimum, fuelCount.maximum);

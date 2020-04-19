@@ -37,15 +37,18 @@ public class BoardManager : MonoBehaviour
 
     private Vector3 bottomLeft, topRight, diff, gridX, gridY;
 
-    void InitializeList()
+    void InitializeScreenGrid()
     {
-        gridPositions.Clear();
-
         bottomLeft = new Vector3(-9f, -3f, 0f);
         topRight = new Vector3(9f, 5f, 0f);
         diff = topRight - bottomLeft;
         gridX = new Vector3(diff.x / columns, 0f, 0f);
         gridY = new Vector3(0f, diff.y / rows, 0f);
+    }
+
+    void InitializeList()
+    {
+        gridPositions.Clear();
 
         for (int x = 1; x < columns+1; x++)
         {
@@ -56,12 +59,18 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    void NextScreenBlockBounds()
+    {
+        bottomLeft = new Vector3(bottomLeft.x, topRight.y, 0f);
+        topRight = bottomLeft + diff;
+    }
+
     void WallsSetup()
     {
-        Instantiate(outerWallTiles[0], new Vector3(-9f, -3f, 0f), Quaternion.identity);
-        Instantiate(outerWallTiles[0], new Vector3(-9f, 5f, 0f), Quaternion.identity);
-        Instantiate(outerWallTiles[0], new Vector3(9f, 5f, 0f), Quaternion.identity);
-        Instantiate(outerWallTiles[0], new Vector3(9f, -3f, 0f), Quaternion.identity);
+        Instantiate(outerWallTiles[0], bottomLeft, Quaternion.identity);
+        Instantiate(outerWallTiles[0], new Vector3(bottomLeft.x, topRight.y, 0f), Quaternion.identity);
+        Instantiate(outerWallTiles[0], topRight, Quaternion.identity);
+        Instantiate(outerWallTiles[0], new Vector3(topRight.x, bottomLeft.y, 0f), Quaternion.identity);
 
         //wallsHolder = new GameObject("Walls").transform;
 
@@ -151,13 +160,21 @@ public class BoardManager : MonoBehaviour
 
     public void SetupScene(int level)
     {
+        InitializeScreenGrid();
+        Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity);
+        GenerateBlock();
+        NextScreenBlockBounds();
+        GenerateBlock();
+    }
+
+    public void GenerateBlock()
+    {
         WallsSetup();
         InitializeList();
         LayoutPlatforms(platformTiles, "Platform", platformCount.minimum, platformCount.maximum);
         LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
-        Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity);
-        Instantiate(waypoint, new Vector3(Random.Range(bottomLeft.x, topRight.x), rows - 1, 0f), Quaternion.identity);
+        Instantiate(waypoint, new Vector3(Random.Range(bottomLeft.x, topRight.x), topRight.y + 1, 0f), Quaternion.identity);
     }
 
     // Start is called before the first frame update

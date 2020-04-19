@@ -1470,11 +1470,6 @@ PrefabInstance:
       propertyPath: aimingDots.Array.data[0]
       value: 
       objectReference: {fileID: 2074379333}
-    - target: {fileID: 6417434960338316852, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb, type: 3}
 --- !u!1 &851078588
@@ -2757,8 +2752,8 @@ MonoBehaviour:
     maximum: 5
     minimum: 1
   enemyCount:
-    maximum: 2
-    minimum: 0
+    maximum: 9
+    minimum: 5
   waypoint: {fileID: 852077390}
   campfire: {fileID: 929336594}
   platformTiles:

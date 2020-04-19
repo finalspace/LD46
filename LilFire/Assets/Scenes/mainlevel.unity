@@ -512,6 +512,12 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &217054335 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: d18be089162dc469b9e18bc3a19c02e3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1866097812}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &226000732 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 3649ba02795634b7cbb96d5da5be3e48,
@@ -2672,7 +2678,9 @@ MonoBehaviour:
   - {fileID: 932360825}
   - {fileID: 226000732}
   - {fileID: 1593789939}
-  fuelTiles: []
+  fuelTiles:
+  - {fileID: 217054335}
+  - {fileID: 2127888166}
   enemyTiles:
   - {fileID: 961844367}
   outerWallTiles:
@@ -3131,3 +3139,9 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &2127888166 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: cc16c1bdd1fe9488d9b831a550f941ef,
+    type: 3}
+  m_PrefabInstance: {fileID: 1188087028}
+  m_PrefabAsset: {fileID: 0}

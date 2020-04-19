@@ -93,22 +93,9 @@ public class BoardManager : MonoBehaviour
         {
             Vector3 randomPosition = RandomPosition();
             GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-            //tileChoice.tag = tag;
             Instantiate(tileChoice, randomPosition, Quaternion.identity).tag = tag;
         }
     }
-
-    //void LayoutPlatforms(GameObject[] tileArray, int minimum, int maximum)
-    //{
-    //    int objectCount = Random.Range(minimum, maximum + 1);
-    //    for (int i = 0; i < objectCount; i++)
-    //    {
-    //        Vector3 randomPosition = RandomPosition();
-    //        GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-    //        tileChoice.tag = "platform";
-    //        Instantiate(tileChoice, randomPosition, Quaternion.identity);
-    //    }
-    //}
 
     void LayoutEnemies(GameObject[] tileArray, int minimum, int maximum)
     {
@@ -128,15 +115,33 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    void LayoutFuel(GameObject[] tileArray, int minimum, int maximum)
+    {
+        // decide how many enemies we'll have
+        int objectCount = Random.Range(minimum, maximum + 1);
+        GameObject[] platforms = GameObject.FindGameObjectsWithTag("Platform");
+        for (int i = 0; i < objectCount; i++)
+        {
+            // pick a random fuel type
+            GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
+            // pick a random platform to put the fuel on
+            GameObject randomPlatform = platforms[Random.Range(0, platforms.Length)];
+            Vector3 randomPosition = randomPlatform.transform.position;
+            // shift up so it's standing on platform (or use half of fuel's height)
+            randomPosition.y += 1f;
+            Instantiate(tileChoice, randomPosition, Quaternion.identity);
+        }
+    }
+
     public void SetupScene(int level)
     {
         WallsSetup();
         InitializeList();
         LayoutObjectAtRandom(platformTiles, "Platform", platformCount.minimum, platformCount.maximum);
-        //LayoutObjectAtRandom(fuelTiles, "Fuel", fuelCount.minimum, fuelCount.maximum);
+        LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
         Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity);
-        Instantiate(waypoint, new Vector3(columns - 1, rows - 1, 0f), Quaternion.identity);
+        Instantiate(waypoint, new Vector3(Random.Range(bottomLeft.x, topRight.x), rows - 1, 0f), Quaternion.identity);
     }
 
     // Start is called before the first frame update

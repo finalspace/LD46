@@ -36,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
     public List<GameObject> aimingDots;
     private bool aiming = false;
     private int NumIterations = 8;
+    private float aimingLoopRange = 10;
+    private float aimingTime = 0;
     private Vector3 mousePosition;
 
     [Header("Skills")]
@@ -207,14 +209,23 @@ public class PlayerMovement : MonoBehaviour
 
     private void DrawTrajectory()
     {
+        Debug.Log("here");
+        aimingTime = aimingTime + Time.fixedDeltaTime;
+        float offTime = Mathf.Repeat(aimingTime, 1.0f);
+        Debug.Log(aimingTime);
+        offTime = offTime / 10f;
+        Debug.Log(aimingTime);
         float dt = Time.fixedDeltaTime * 5;
         Vector3 vel = ComputeInitialVelocity();
         Vector3 position = transform.position;
-        for (int i = 0; i < NumIterations; ++i)
+        vel.y += gravity * offTime;
+        position += vel * offTime;
+     
+        for (int i = 1; i < NumIterations; ++i)
         {
+            aimingDots[i].transform.position = position;
             vel.y += gravity * dt;
             position += vel * dt;
-            aimingDots[i].transform.position = position;
         }
     }
 
@@ -237,6 +248,7 @@ public class PlayerMovement : MonoBehaviour
         if (aiming == val)
             return;
         aiming = val;
+
         for (int i = 0; i < aimingDots.Count; i++)
         {
             if (aiming) aimingDots[i].transform.position = transform.position;

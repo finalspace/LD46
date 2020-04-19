@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 [RequireComponent (typeof (PlayerCollision))]
 public class PlayerMovement : MonoBehaviour
@@ -31,6 +32,12 @@ public class PlayerMovement : MonoBehaviour
     const int maxJumpNum = 1;
 	int jumpNum;
 
+    [Header("Aiming Effects")]
+    public List<GameObject> aimingDots;
+    private bool aiming = false;
+    private int NumIterations = 8;
+    private Vector3 mousePosition;
+
     [Header("Skills")]
     //public RangedWeapon rangeWeapon;
 
@@ -47,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
 	public AudioClip landing;
     private AudioSource source;
 
-	void Start() {
+    void Start() {
 		source = GetComponent<AudioSource>();
 		//health = GameObject.FindGameObjectWithTag("GM").GetComponent<PlayerHealth>();
 		anim = GetComponent<Animator>();
@@ -66,6 +73,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (aiming)
+            DrawTrajectory();
         UpdateMovement();
 
         // detects when on the ground
@@ -78,23 +87,28 @@ public class PlayerMovement : MonoBehaviour
                     source.clip = landing;
                     source.Play();
                 }
-                anim.SetBool("isJumping", false);
+                //anim.SetBool("isJumping", false);
                 foot = false;
                 Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
                 Instantiate(footEffect, pos, Quaternion.identity);
             }
-            anim.SetBool("isJumping", false);
+            //anim.SetBool("isJumping", false);
+            velocity.y = 0;
+            deltaMovement.x = 0;
             doubleJump = false;
             jumpNum = maxJumpNum;
         }
         else
         {
-            anim.SetBool("isJumping", true);
+            //anim.SetBool("isJumping", true);
             foot = true;
         }
 
-        if (playerCollision.collisions.below || playerCollision.collisions.above)
+        if (playerCollision.collisions.above)
+        {
             velocity.y = 0;
+            deltaMovement.x /= 2.0f;
+        }
 
     }
 
@@ -109,13 +123,41 @@ public class PlayerMovement : MonoBehaviour
         // detects if the player is holding the arrow keys to move
         if (!isDead)
         {
-            deltaMovement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            //deltaMovement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                SetAiming(true);
+                mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                //Debug.Log(Vector2.Distance(mousePosition, transform.position));
+                mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                if (Vector2.Distance(mousePosition, transform.position) > 0.5f)
+                    Launch();
+            }
+
 
             // jump and double jump and triple jump
+            /*
             if (Input.GetKey(KeyCode.Space) && playerCollision.collisions.below)
             {
                 Jump();
             }
+            */
+
+            /*
+            if (Input.GetKey(KeyCode.L) && playerCollision.collisions.below)
+            {
+                Launch();
+            }
+            */
             /*
             if (Input.GetKeyDown(KeyCode.Space) && doubleJump == false && !controller.collisions.below){
                 velocity.y = jumpVelocity;
@@ -147,11 +189,9 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-
-
         playerCollision.Move(velocity * Time.fixedDeltaTime);
         isRunning = (deltaMovement.x != 0);
-        anim.SetBool("isRunning", isRunning);
+        //anim.SetBool("isRunning", isRunning);
 
         isOnGround = playerCollision.collisions.below;
 
@@ -161,13 +201,48 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void DrawTrajectory()
+    {
+        float dt = Time.fixedDeltaTime * 5;
+        Vector3 vel = ComputeInitialVelocity();
+        Vector3 position = transform.position;
+        for (int i = 0; i < NumIterations; ++i)
+        {
+            vel.y += gravity * dt;
+            position += vel * dt;
+            aimingDots[i].transform.position = position;
+        }
+    }
 
 
-    /*****************************************
-     * 
-     * Actions
-     * 
-     *****************************************/
+    private Vector3 ComputeInitialVelocity()
+    {
+        Vector3 diff = transform.position - mousePosition;
+        diff.x = Mathf.Clamp(diff.x, -2, 2);
+        diff.y = Mathf.Clamp(diff.y, -1.2f, 1.2f);
+        diff.x *= 5.0f;
+        diff.y *= 20.0f;
+        return diff;
+    }
+
+    private void SetAiming(bool val)
+    {
+        if (aiming == val)
+            return;
+        aiming = val;
+        for (int i = 0; i < aimingDots.Count; i++)
+        {
+            if (aiming) aimingDots[i].transform.position = transform.position;
+            aimingDots[i].SetActive(aiming);
+        }
+    }
+
+
+   /*****************************************
+    * 
+    * Actions
+    * 
+    *****************************************/
 
     public void Dead()
     {
@@ -176,8 +251,6 @@ public class PlayerMovement : MonoBehaviour
 
         PlayerUtils.PlayerDeadOccur();
         velocity = new Vector2(-jumpVelocity / 8, jumpVelocity / 2);
-        //anim.SetBool("isDead", true);
-        //anim.Play("Dead");
         playerCollision.collisions.below = false;
         isDead = true;
     }
@@ -186,6 +259,14 @@ public class PlayerMovement : MonoBehaviour
     {
         foot = true;
         velocity.y = jumpVelocity;
+    }
+
+    private void Launch()
+    {
+        foot = true;
+        velocity = ComputeInitialVelocity();
+        deltaMovement.x = velocity.x;
+        SetAiming(false);
     }
 
     private void Attack()

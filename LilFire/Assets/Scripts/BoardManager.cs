@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class BoardManager : MonoBehaviour
+public class BoardManager : SingletonBehaviour<CollisionManager>
 {
     [Serializable]
     public class Count
@@ -163,6 +163,12 @@ public class BoardManager : MonoBehaviour
         InitializeScreenGrid();
         Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity);
         GenerateBlock();
+        WaypointReached();
+        //WaypointReached();
+    }
+
+    public void WaypointReached()
+    {
         NextScreenBlockBounds();
         GenerateBlock();
     }
@@ -174,7 +180,7 @@ public class BoardManager : MonoBehaviour
         LayoutPlatforms(platformTiles, "Platform", platformCount.minimum, platformCount.maximum);
         LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
-        Instantiate(waypoint, new Vector3(Random.Range(bottomLeft.x, topRight.x), topRight.y + 1, 0f), Quaternion.identity);
+        Instantiate(waypoint, new Vector3(Random.Range(bottomLeft.x, topRight.x), topRight.y - 4, 0f), Quaternion.identity);
     }
 
     // Start is called before the first frame update

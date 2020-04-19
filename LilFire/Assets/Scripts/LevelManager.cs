@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelManager : MonoBehaviour
+public class LevelManager : SingletonBehaviour<CollisionManager>
 {
     private BoardManager boardScript;
     private int level = 3;

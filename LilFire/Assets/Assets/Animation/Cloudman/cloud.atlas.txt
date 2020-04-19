@@ -1,0 +1,69 @@
+
+cloud.png
+size: 748,748
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+body
+  rotate: false
+  xy: 2, 505
+  size: 553, 241
+  orig: 553, 241
+  offset: 0, 0
+  index: -1
+eye_l
+  rotate: false
+  xy: 566, 141
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+eye_r
+  rotate: false
+  xy: 566, 141
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+eyebrow_l
+  rotate: false
+  xy: 539, 164
+  size: 60, 45
+  orig: 60, 45
+  offset: 0, 0
+  index: -1
+eyebrow_r
+  rotate: true
+  xy: 601, 149
+  size: 60, 45
+  orig: 60, 45
+  offset: 0, 0
+  index: -1
+mouth
+  rotate: true
+  xy: 539, 122
+  size: 40, 25
+  orig: 40, 25
+  offset: 0, 0
+  index: -1
+rain
+  rotate: false
+  xy: 2, 124
+  size: 535, 379
+  orig: 535, 379
+  offset: 0, 0
+  index: -1
+rainshine01
+  rotate: true
+  xy: 661, 211
+  size: 535, 85
+  orig: 535, 85
+  offset: 0, 0
+  index: -1
+rainshine02
+  rotate: true
+  xy: 557, 211
+  size: 535, 102
+  orig: 535, 102
+  offset: 0, 0
+  index: -1

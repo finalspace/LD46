@@ -1,0 +1,90 @@
+
+Fireboy.png
+size: 931,931
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Layer 2
+  rotate: false
+  xy: 2, 72
+  size: 583, 857
+  orig: 586, 857
+  offset: 2, 0
+  index: -1
+cheekL
+  rotate: false
+  xy: 587, 40
+  size: 114, 114
+  orig: 114, 114
+  offset: 0, 0
+  index: -1
+cheekR
+  rotate: true
+  xy: 587, 361
+  size: 121, 120
+  orig: 121, 120
+  offset: 0, 0
+  index: -1
+ember01
+  rotate: true
+  xy: 709, 431
+  size: 51, 64
+  orig: 51, 64
+  offset: 0, 0
+  index: -1
+ember02
+  rotate: true
+  xy: 753, 379
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: -1
+ember03
+  rotate: false
+  xy: 709, 382
+  size: 42, 47
+  orig: 42, 47
+  offset: 0, 0
+  index: -1
+eyeL_open
+  rotate: false
+  xy: 875, 400
+  size: 42, 82
+  orig: 42, 82
+  offset: 0, 0
+  index: -1
+eyeR_open
+  rotate: true
+  xy: 775, 413
+  size: 42, 82
+  orig: 42, 82
+  offset: 0, 0
+  index: -1
+mouth01
+  rotate: false
+  xy: 775, 457
+  size: 98, 25
+  orig: 98, 25
+  offset: 0, 0
+  index: -1
+mouth02
+  rotate: true
+  xy: 587, 484
+  size: 445, 342
+  orig: 445, 342
+  offset: 0, 0
+  index: -1
+teeth_bottom
+  rotate: false
+  xy: 680, 264
+  size: 202, 95
+  orig: 202, 95
+  offset: 0, 0
+  index: -1
+teeth_top
+  rotate: true
+  xy: 587, 156
+  size: 203, 91
+  orig: 203, 91
+  offset: 0, 0
+  index: -1

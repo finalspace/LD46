@@ -127,18 +127,21 @@ public class PlayerMovement : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
-                SetAiming(true);
                 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                if (Vector2.Distance(mousePosition, transform.position) > 1.0f)
+                    return;
+                SetAiming(true);
             }
 
             if (Input.GetMouseButton(0))
             {
-                //Debug.Log(Vector2.Distance(mousePosition, transform.position));
+                if (!aiming) return;
                 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             }
 
             if (Input.GetMouseButtonUp(0))
             {
+                if (!aiming) return;
                 if (Vector2.Distance(mousePosition, transform.position) > 0.5f)
                     Launch();
             }
@@ -218,8 +221,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 ComputeInitialVelocity()
     {
         Vector3 diff = transform.position - mousePosition;
-        diff.x = Mathf.Clamp(diff.x, -2, 2);
-        diff.y = Mathf.Clamp(diff.y, -1.2f, 1.2f);
+        diff.x = Mathf.Clamp(diff.x, -1.5f, 1.5f);
+        diff.y = Mathf.Clamp(diff.y, -0.8f, 0.8f);
         diff.x *= 5.0f;
         diff.y *= 20.0f;
         return diff;

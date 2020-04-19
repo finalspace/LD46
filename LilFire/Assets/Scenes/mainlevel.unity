@@ -1034,7 +1034,7 @@ PrefabInstance:
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: aimingDots.Array.size
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
@@ -1085,37 +1085,37 @@ PrefabInstance:
         type: 3}
       propertyPath: aimingDots.Array.data[6]
       value: 
-      objectReference: {fileID: 1010804448}
+      objectReference: {fileID: 1010804447}
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: aimingDots.Array.data[5]
       value: 
-      objectReference: {fileID: 1010804449}
+      objectReference: {fileID: 1010804448}
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: aimingDots.Array.data[4]
       value: 
-      objectReference: {fileID: 1010804450}
+      objectReference: {fileID: 1010804449}
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: aimingDots.Array.data[3]
       value: 
-      objectReference: {fileID: 1010804451}
+      objectReference: {fileID: 1010804450}
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: aimingDots.Array.data[2]
       value: 
-      objectReference: {fileID: 1010804452}
+      objectReference: {fileID: 1010804451}
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: aimingDots.Array.data[1]
       value: 
-      objectReference: {fileID: 1010804453}
+      objectReference: {fileID: 1010804452}
     - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: aimingDots.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1010804453}
     - target: {fileID: 6417434960338316852, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: m_Mesh

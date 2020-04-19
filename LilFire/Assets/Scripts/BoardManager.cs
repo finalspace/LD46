@@ -30,6 +30,8 @@ public class BoardManager : MonoBehaviour
     public GameObject[] fuelTiles;
     public GameObject[] enemyTiles;
     public GameObject[] outerWallTiles;
+    public GameObject[] pillarTiles;
+    private Vector3 pillarOffset = new Vector3(0f, -1.75f, 0f);
     private Transform wallsHolder;
     private List<Vector3> gridPositions = new List<Vector3>();
 
@@ -86,14 +88,28 @@ public class BoardManager : MonoBehaviour
         return randomPosition;
     }
 
-    void LayoutObjectAtRandom(GameObject[] tileArray, string tag, int minimum, int maximum)
+    //void LayoutObjectAtRandom(GameObject[] tileArray, string tag, int minimum, int maximum)
+    //{
+    //    int objectCount = Random.Range(minimum, maximum + 1);
+    //    for(int i = 0; i < objectCount; i++)
+    //    {
+    //        Vector3 randomPosition = RandomPosition();
+    //        GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
+    //        Instantiate(tileChoice, randomPosition, Quaternion.identity).tag = tag;
+    //    }
+    //}
+
+    void LayoutPlatforms(GameObject[] tileArray, string tag, int minimum, int maximum)
     {
         int objectCount = Random.Range(minimum, maximum + 1);
-        for(int i = 0; i < objectCount; i++)
+        for (int i = 0; i < objectCount; i++)
         {
             Vector3 randomPosition = RandomPosition();
             GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
             Instantiate(tileChoice, randomPosition, Quaternion.identity).tag = tag;
+            // put a rock pillar beneath the platform
+            GameObject pillarChoice = pillarTiles[Random.Range(0, pillarTiles.Length)];
+            Instantiate(pillarChoice, randomPosition + pillarOffset, Quaternion.identity);
         }
     }
 
@@ -117,7 +133,7 @@ public class BoardManager : MonoBehaviour
 
     void LayoutFuel(GameObject[] tileArray, int minimum, int maximum)
     {
-        // decide how many enemies we'll have
+        // decide how many fuels we'll have
         int objectCount = Random.Range(minimum, maximum + 1);
         GameObject[] platforms = GameObject.FindGameObjectsWithTag("Platform");
         for (int i = 0; i < objectCount; i++)
@@ -137,7 +153,7 @@ public class BoardManager : MonoBehaviour
     {
         WallsSetup();
         InitializeList();
-        LayoutObjectAtRandom(platformTiles, "Platform", platformCount.minimum, platformCount.maximum);
+        LayoutPlatforms(platformTiles, "Platform", platformCount.minimum, platformCount.maximum);
         LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
         Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity);

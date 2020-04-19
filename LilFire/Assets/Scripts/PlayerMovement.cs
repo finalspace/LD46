@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
 	private float accelerationTimeGrounded = .2f;
 	private float gravity;
 	private float jumpVelocity;
-	private Vector3 velocity;
+	private Vector2 velocity;
 	private float velocityXSmoothing;
 
     private PlayerCollision playerCollision;
@@ -209,15 +209,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void DrawTrajectory()
     {
-        Debug.Log("here");
         aimingTime = aimingTime + Time.fixedDeltaTime;
         float offTime = Mathf.Repeat(aimingTime, 1.0f);
-        Debug.Log(aimingTime);
         offTime = offTime / 10f;
-        Debug.Log(aimingTime);
         float dt = Time.fixedDeltaTime * 5;
-        Vector3 vel = ComputeInitialVelocity();
-        Vector3 position = transform.position;
+        Vector2 vel = ComputeInitialVelocity();
+        Vector2 position = transform.position;
         vel.y += gravity * offTime;
         position += vel * offTime;
      
@@ -230,9 +227,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private Vector3 ComputeInitialVelocity()
+    private Vector2 ComputeInitialVelocity()
     {
-        Vector3 diff = transform.position - mousePosition;
+        Vector2 diff = transform.position - mousePosition;
         float x = Mathf.InverseLerp(0, 6, Mathf.Abs(diff.x));
         x = Mathf.Sqrt(x);
         diff.x = Mathf.Lerp(0, 10f, x) * Mathf.Sign(diff.x);

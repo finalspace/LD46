@@ -15,7 +15,6 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 
 	private void Start()
 	{
-        SceneManager.LoadScene("MainLevel", LoadSceneMode.Additive);
 	}
 
 	private void Update()
@@ -32,15 +31,14 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 
 
 
-    private void GameStart()
+    public void GameStart()
     {
         if (gameState == GameState.Main)
             return;
         
         gameState = GameState.Main;
-
-
-    }
+		SceneManager.LoadScene("MainLevel", LoadSceneMode.Additive);
+	}
 
     private void GameLost()
     {

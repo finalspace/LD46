@@ -210,10 +210,12 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     {
         GameObject tileChoice = platformTiles[Random.Range(0, platformTiles.Length)];
         Quaternion twist = RandomRotation(20);
-        GameObject plat = Instantiate(tileChoice, here, twist);
+        //GameObject plat = Instantiate(tileChoice, here, twist);
+        GameObject plat = Instantiate(tileChoice, here, Quaternion.identity);
         plat.tag = "Platform";
         // randomly twist and stretch by up to 1.5 or 1.75
-        plat.gameObject.transform.localScale = RandomScaleVector(1.7f);
+        //plat.gameObject.transform.localScale = RandomScaleVector(1.7f);
+        plat.gameObject.transform.localScale = RandomScaleVector(1f);
         //plat.gameObject.transform.localScale = new Vector3(Random.Range(1f, 1.7f), Random.Range(1f, 1.7f), 1);
         //plat.transform.eulerAngles = Vector3.forward * Random.Range(0, 20); // rotate 0 to 20 degrees
 

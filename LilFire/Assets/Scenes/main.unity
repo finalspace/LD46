@@ -1138,6 +1138,9 @@ MonoBehaviour:
   HardBlock:
     serializedVersion: 2
     m_Bits: 1024
+  Interactable:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &839427799
 GameObject:
   m_ObjectHideFlags: 0
@@ -1460,6 +1463,12 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7200217227627858473, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
+        type: 3}
+      propertyPath: idle
+      value: 
+      objectReference: {fileID: 11400000, guid: b54337a9885714d4683e0b2cc5022571,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb, type: 3}
 --- !u!1 &1507633768

@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
-  m_Name: Fireboy_Atlas
+  m_Script: {fileID: 11500000, guid: 6e3e95a05e4c9774397eeeb7bdee8ccb, type: 3}
+  m_Name: landing_dim
   m_EditorClassIdentifier: 
-  atlasFile: {fileID: 4900000, guid: 5b8e72e21953c4d61ad77e4fb9b2ce05, type: 3}
-  materials:
-  - {fileID: 2100000, guid: f9bb379d9d2ba45369eef055dc3f3d8e, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 167c8186c69f44579a1f7f6efb2bcf07, type: 2}
+  animationName: landing_dim

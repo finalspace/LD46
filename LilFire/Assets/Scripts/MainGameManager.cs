@@ -38,7 +38,7 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
             return;
         
         gameState = GameState.Main;
-		SceneManager.LoadScene("MainLevel", LoadSceneMode.Additive);
+		SceneManager.LoadScene("MainLevel Art", LoadSceneMode.Additive);
 	}
 
     private void GameLost()

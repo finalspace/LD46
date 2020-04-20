@@ -9,7 +9,7 @@ public class HealthManager : SingletonBehaviour<HealthManager>
     public Image healthbar;
 
     private float lifebarWidth, lifebarHeight;
-    private bool playerStats;
+    private PlayerStats playerStats;
     private float playerlife;
     private float lifepercentage;
 
@@ -21,8 +21,8 @@ public class HealthManager : SingletonBehaviour<HealthManager>
 
     void Update()
     {
-        playerlife -= Time.deltaTime * 1;
-        lifepercentage = playerlife / 100.0f;
+        //playerlife = PlayerStats.Instance.
+        //lifepercentage = playerlife / 100.0f;
         //healthbar.rectTransform.sizeDelta = new Vector2(800 * lifepercentage, )
 
 

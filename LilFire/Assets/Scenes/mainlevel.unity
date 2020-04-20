@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311947, g: 0.38074005, b: 0.35872722, a: 1}
+  m_IndirectSpecularColor: {r: 0.3731196, g: 0.38074002, b: 0.35872713, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -902,6 +902,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4472603484457188833, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4472603484457188832, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
@@ -2059,6 +2064,8 @@ MonoBehaviour:
   maxHeight: -1000
   lives: 3
   score: 0
+  energy: 100
+  decreasingSpeed: 1
   player: {fileID: 0}
   lvl: {fileID: 0}
 --- !u!1001 &1845957909

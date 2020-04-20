@@ -27,8 +27,6 @@ public class EnemySpawner : MonoBehaviour
 
     void Spawn()
     {
-        SpawnMoth(); return;
-
         int num = Random.Range(0, 2);
         if (num == 0)
             SpawnCloud();

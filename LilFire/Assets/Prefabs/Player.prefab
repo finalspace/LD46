@@ -127,6 +127,7 @@ MonoBehaviour:
   jumpHeight: 3
   timeToJumpApex: 0.4
   moveSpeed: 6
+  root: {fileID: 4472603484395781405}
   aimingDots:
   - {fileID: 1359197884}
   - {fileID: 54994039}
@@ -197,6 +198,8 @@ MonoBehaviour:
   maxHeight: -1000
   lives: 3
   score: 0
+  highestWaypoint: 0
+  isStable: 1
   energy: 100
   player: {fileID: 0}
   lvl: {fileID: 0}
@@ -214,7 +217,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 6417434960338316850}
   idle: {fileID: 11400000, guid: b54337a9885714d4683e0b2cc5022571, type: 2}
-  walking: {fileID: 0}
+  jump: {fileID: 11400000, guid: 5ff66e57b47fd42908ae6c79985b5496, type: 2}
+  eat: {fileID: 11400000, guid: 18f6b9f3ca2f74904ad7d62a4729aedb, type: 2}
+  squish: {fileID: 11400000, guid: da098736e66fe47e1a230bfdbae65587, type: 2}
+  hurt: {fileID: 11400000, guid: aa23da51a7cd846e58db03e88f343bb2, type: 2}
   currentState: 
   speed: 0
   movement: 0
@@ -470,6 +476,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4472603484395781405}
     m_Modifications:
+    - target: {fileID: 8991435515022979317, guid: 439504ce596ec40e3a21f6f83f098e38,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6474556886346719411, guid: 439504ce596ec40e3a21f6f83f098e38,
         type: 3}
       propertyPath: m_Name

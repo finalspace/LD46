@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
 	public float jumpHeight = 4;
 	public float timeToJumpApex = .4f;
 	public float moveSpeed = 6;
+    public Transform root;
 
     private Vector2 deltaMovement;
     private float accelerationTimeAirborne = .4f;

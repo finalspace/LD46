@@ -94,6 +94,8 @@ public class PlayerMovement : MonoBehaviour
                 foot = false;
                 Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
                 Instantiate(footEffect, pos, Quaternion.identity);
+                root.rotation = Quaternion.Euler(0, 0, 0);
+                Player.Instance.animator.PlayLanding();
             }
             //anim.SetBool("isJumping", false);
             velocity.y = 0;
@@ -105,6 +107,13 @@ public class PlayerMovement : MonoBehaviour
         {
             //anim.SetBool("isJumping", true);
             foot = true;
+            //root.rotation = Quaternion.Euler(0.0f, 0.0f, (Mathf.Repeat(m_phase, 2.0f) < 1.0f ? -25.0f : 25.0f));
+            //root.rotation = Quaternion.LookRotation(velocity);
+
+            float ang = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90;
+            // ang = Mathf.LerpAngle(transform.eulerAngles.z, ang, Time.deltaTime * rotateSpeed);
+            root.rotation = Quaternion.Euler(0, 0, ang);
+            Debug.DrawRay(transform.position, velocity, Color.green);
         }
 
         if (playerCollision.collisions.above)
@@ -146,8 +155,11 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetMouseButtonUp(0))
             {
                 if (!aiming) return;
+
+                SetAiming(false);
                 if (Vector2.Distance(mousePosition, transform.position) > 0.5f)
                     Launch();
+                else LaunchFailed();
             }
 
 
@@ -252,6 +264,9 @@ public class PlayerMovement : MonoBehaviour
             if (aiming) aimingDots[i].transform.position = transform.position;
             aimingDots[i].SetActive(aiming);
         }
+
+        if (aiming)
+            Player.Instance.animator.PlaySquish();
     }
 
 
@@ -283,7 +298,13 @@ public class PlayerMovement : MonoBehaviour
         foot = true;
         velocity = ComputeInitialVelocity();
         deltaMovement.x = velocity.x;
-        SetAiming(false);
+        
+        Player.Instance.animator.PlayJump();
+    }
+
+    private void LaunchFailed()
+    {
+        Player.Instance.animator.PlayIdle();
     }
 
     private void Attack()

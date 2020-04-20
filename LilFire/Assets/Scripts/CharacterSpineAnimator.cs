@@ -7,34 +7,39 @@ using Spine;
 public class CharacterSpineAnimator : MonoBehaviour
 {
 	public SkeletonAnimation skeletonAnimation;
-	public AnimationReferenceAsset idle, jump, eat, squish, hurt;
+	public AnimationReferenceAsset idle, jump, eat, squish, hurt, transition;
 	public string currentState;
 	public float speed;
 	public float movement;
 
     void Start()
 	{
-        skeletonAnimation.state.End += OnStateEnd;
+        skeletonAnimation.state.Complete += OnStateComplete;
 
 		currentState = "Idle";
         PlayIdle();
     }
 
-    private void OnStateEnd(TrackEntry te)
+    private void OnStateComplete(TrackEntry te)
     {
-        if (te.Animation.Name.StartsWith("eat"))
+        if (te.Animation.Name.StartsWith("eat", System.StringComparison.CurrentCultureIgnoreCase))
         {
-            PlayIdle();
+			PlayIdle();
         }
-        else if (te.Animation.Name.StartsWith("eat"))
+        else if (te.Animation.Name.StartsWith("squish_transition", System.StringComparison.CurrentCultureIgnoreCase))
         {
-            PlayIdle();
+			PlayIdle();
         }
     }
 
     public void PlayEat()
     {
-        SetAnimatoin(eat, true, 1f);
+        SetAnimatoin(eat, false, 1f);
+    }
+
+    public void PlayHurt()
+    {
+        SetAnimatoin(hurt, false, 1f);
     }
 
     public void PlayJump()
@@ -50,6 +55,11 @@ public class CharacterSpineAnimator : MonoBehaviour
     public void PlaySquish()
     {
         SetAnimatoin(squish, true, 1f);
+    }
+
+    public void PlayLanding()
+    {
+        SetAnimatoin(transition, false, 1f);
     }
 
     public void SetAnimatoin(AnimationReferenceAsset animation, bool loop, float timeScale)

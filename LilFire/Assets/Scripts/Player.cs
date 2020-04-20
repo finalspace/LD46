@@ -5,9 +5,9 @@ using UnityEngine;
 public class Player : SingletonBehaviour<Player>
 {
     public LayerMask interactable;
+    public CharacterSpineAnimator animator;
 
-    private float distance = 2.5f;
-    private CharacterSpineAnimator animator;
+    private float distance = 1.0f;
 
     private void Start()
     {

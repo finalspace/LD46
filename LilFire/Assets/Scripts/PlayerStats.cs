@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour
+public class PlayerStats : SingletonBehaviour<PlayerStats>
 {
     public float maxHeight = -1000;
     public int lives = 3;
     public int score = 0;
     public int highestWaypoint = 0;
-    public int energy = 100;
     public bool isStable = true;
-    private GameObject player;
-    private BoardManager lvl;
+    public float energy = 100;
+    private float decreasingSpeed = 5;
+    public GameObject player;
+    public BoardManager lvl;
 
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+        player = Player.Instance.gameObject;
         lvl = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
     }
 
@@ -29,5 +30,38 @@ public class PlayerStats : MonoBehaviour
             score = Mathf.FloorToInt(maxHeight - lvl.bottomLeft.y);
             highestWaypoint = lvl.blocksCreated - 1;
         }
+        if (energy > 0)
+        {
+            energy -= Time.deltaTime * decreasingSpeed;
+
+            if (energy <= 0)
+                Die();
+        }
+
     }
+
+    public void UpdateEnergy(float value)
+    {
+        energy += value;
+        energy = Mathf.Clamp(energy, 0, 100);
+    }
+
+
+
+    public void CollectItem()
+    {
+
+    }
+
+    public void Die()
+    {
+
+    }
+
+    public void Respawn()
+    {
+
+    }
+
+
 }

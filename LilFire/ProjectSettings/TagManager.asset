@@ -8,6 +8,10 @@ TagManager:
   - Platform
   - Enemy
   - Fuel
+  - Pick Up
+  - DeadZone
+  - Cloud
+  - Moth
   layers:
   - Default
   - TransparentFX
@@ -20,7 +24,7 @@ TagManager:
   - PostProcessing
   - Ground
   - Obstacle
-  - 
+  - Interactable
   - 
   - 
   - 

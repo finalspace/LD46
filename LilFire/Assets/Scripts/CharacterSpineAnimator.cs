@@ -4,4 +4,8 @@ using UnityEngine;
 
 public class CharacterSpineAnimator : MonoBehaviour
 {
+    public void PlayEat()
+    {
+
+    }
 }

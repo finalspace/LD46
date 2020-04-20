@@ -1181,7 +1181,7 @@ GameObject:
   - component: {fileID: 888180122}
   - component: {fileID: 888180123}
   m_Layer: 5
-  m_Name: HealthManager
+  m_Name: UIManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

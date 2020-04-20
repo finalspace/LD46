@@ -8,7 +8,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public int lives = 3;
     public int score = 0;
     public float energy = 100;
-    public float decreasingSpeed = 3;
+    private float decreasingSpeed = 5;
     public GameObject player;
     public BoardManager lvl;
 
@@ -27,11 +27,20 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
             maxHeight = player.transform.position.y;
             score = Mathf.FloorToInt(maxHeight - lvl.bottomLeft.y);
         }
+        if (energy > 0)
+        {
+            energy -= Time.deltaTime * decreasingSpeed;
 
-        energy -= Time.deltaTime * decreasingSpeed;
-        if (energy <= 0)
-            Die();
+            if (energy <= 0)
+                Die();
+        }
 
+    }
+
+    public void UpdateEnergy(float value)
+    {
+        energy += value;
+        energy = Mathf.Clamp(energy, 0, 100);
     }
 
 

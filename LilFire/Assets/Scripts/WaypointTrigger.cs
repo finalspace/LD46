@@ -8,9 +8,9 @@ public class WaypointTrigger : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("WAYPOINT REACHED");
-        Debug.Log("REACHED BEFORE?" + reached);
-        Debug.Log("OTHER TAG:" + other.tag);
+        //Debug.Log("WAYPOINT REACHED");
+        //Debug.Log("REACHED BEFORE?" + reached);
+        //Debug.Log("OTHER TAG:" + other.tag);
         if (!reached && other.tag == "Player")
         {
             Debug.Log("AND TRIGGERED");

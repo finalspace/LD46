@@ -9,7 +9,6 @@ public class UIManager : SingletonBehaviour<UIManager>
     public Image healthbar;
 
     private float lifebarWidth, lifebarHeight;
-    private PlayerStats playerStats;
     private float playerEnergy;
     private float energyPercentage;
 
@@ -21,6 +20,9 @@ public class UIManager : SingletonBehaviour<UIManager>
 
     void Update()
     {
+        if (MainGameManager.Instance.gameState != GameState.Main)
+            return;
+
         playerEnergy = PlayerStats.Instance.energy;
         energyPercentage = playerEnergy / 100.0f;
         healthbar.rectTransform.sizeDelta = new Vector2(lifebarWidth * energyPercentage, lifebarHeight);

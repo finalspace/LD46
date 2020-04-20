@@ -162,6 +162,10 @@ public class PlayerMovement : MonoBehaviour
                 else LaunchFailed();
             }
 
+            if (Input.GetKey(KeyCode.Space))
+            {
+                GoToHighestWaypoint();
+            }
 
             // jump and double jump and triple jump
             /*
@@ -291,6 +295,12 @@ public class PlayerMovement : MonoBehaviour
     {
         foot = true;
         velocity.y = jumpVelocity;
+    }
+
+    private void GoToHighestWaypoint()
+    {
+        BoardManager brd = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
+        Player.Instance.transform.position = brd.HighestWaypoint() + 2*Vector3.up;
     }
 
     private void Launch()

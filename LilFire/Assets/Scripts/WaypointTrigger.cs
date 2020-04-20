@@ -13,6 +13,7 @@ public class WaypointTrigger : MonoBehaviour
             // Fire the method that extends the level upwards
             BoardManager lvl = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
             lvl.WaypointReached();
+            lvl.SetHighestWaypoint(gameObject);
             reached = true;
         }
     }

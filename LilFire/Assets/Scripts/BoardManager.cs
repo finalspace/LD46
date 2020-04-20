@@ -56,6 +56,28 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     private Vector3 pillarOffset = new Vector3(0f, -1f, 2f);
     public int blocksCreated = 0;
 
+    // current waypoint
+    Vector3 currWay;
+    // next waypoint
+    Vector3 nextWay;
+    // highest waypoint character has reached
+    Vector3 highWay;
+    GameObject hWay;
+    // desired number of steps between waypoints
+    //int stairs;
+    // max radius of each step (guesstimate, needs to be <= actual value)
+    float jumpDist;
+    Vector3 jump;
+    Vector3 currPos;
+    Vector3 oldPos;
+    GameObject oldPlat;
+    GameObject currPlat;
+
+    public Vector3 HighestWaypoint()
+    {
+        return highWay;
+    }
+
     public void SetupScene(int level)
     {
         InitializeScreenGrid();
@@ -84,7 +106,7 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
 
     private void GenerateBlock()
     {
-        //WallsSetup();
+        //ShowCorners();
         InitializeList();
         nextWay = Instantiate(waypoint,
             new Vector3(Random.Range(newBottomLeft.x, newTopRight.x),
@@ -104,7 +126,13 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
         GenerateBlock();
     }
 
-    private void WallsSetup()
+    public void SetHighestWaypoint(GameObject g)
+    {
+        hWay = g;
+        highWay = g.transform.position;
+    }
+
+    private void ShowCorners()
     {
         Instantiate(outerWallTiles[0], newBottomLeft, Quaternion.identity);
         Instantiate(outerWallTiles[0], new Vector3(newBottomLeft.x, newTopRight.y, 0f), Quaternion.identity);
@@ -201,20 +229,6 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     // seems to be proportional to sin(2*theta)
     // https://answers.unity.com/questions/973058/calculate-ai-jumping-the-gap.html
 
-    // current waypoint
-    Vector3 currWay;
-    // next waypoint
-    Vector3 nextWay;
-    // desired number of steps between waypoints
-    //int stairs;
-    // max radius of each step (guesstimate, needs to be <= actual value)
-    float jumpDist;
-    Vector3 jump;
-    Vector3 currPos;
-    Vector3 oldPos;
-    GameObject oldPlat;
-    GameObject currPlat;
-
     private void LayoutPath()
     {
         // waypoint - current position
@@ -268,6 +282,9 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
 
             // FUTURE
             // could simply verify that there's a path in the random stuff, patch over where not
+
+            // waypoint - current position
+            separation = nextWay - currPos;
         }
     }
 

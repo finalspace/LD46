@@ -35,13 +35,15 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     private Transform wallsHolder;
     private List<Vector3> gridPositions = new List<Vector3>();
 
-    private Vector3 bottomLeft, topRight, diff, gridX, gridY;
+    public Vector3 bottomLeft, topRight;
+    public Vector3 newBottomLeft, newTopRight;
+    private Vector3 diff, gridX, gridY;
 
     void InitializeScreenGrid()
     {
-        bottomLeft = new Vector3(-9f, -3f, 0f);
-        topRight = new Vector3(9f, 5f, 0f);
-        diff = topRight - bottomLeft;
+        newBottomLeft = new Vector3(-9f, -3f, 0f);
+        newTopRight = new Vector3(9f, 5f, 0f);
+        diff = newTopRight - newBottomLeft;
         gridX = new Vector3(diff.x / columns, 0f, 0f);
         gridY = new Vector3(0f, diff.y / rows, 0f);
     }
@@ -54,23 +56,23 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
         {
             for (int y = 1; y < rows+1; y++)
             {
-                gridPositions.Add(bottomLeft + x*gridX + y*gridY);
+                gridPositions.Add(newBottomLeft + x*gridX + y*gridY);
             }
         }
     }
 
     void NextScreenBlockBounds()
     {
-        bottomLeft = new Vector3(bottomLeft.x, topRight.y, 0f);
-        topRight = bottomLeft + diff;
+        newBottomLeft = new Vector3(newBottomLeft.x, newTopRight.y, 0f);
+        newTopRight = newBottomLeft + diff;
     }
 
     void WallsSetup()
     {
-        Instantiate(outerWallTiles[0], bottomLeft, Quaternion.identity);
-        Instantiate(outerWallTiles[0], new Vector3(bottomLeft.x, topRight.y, 0f), Quaternion.identity);
-        Instantiate(outerWallTiles[0], topRight, Quaternion.identity);
-        Instantiate(outerWallTiles[0], new Vector3(topRight.x, bottomLeft.y, 0f), Quaternion.identity);
+        Instantiate(outerWallTiles[0], newBottomLeft, Quaternion.identity);
+        Instantiate(outerWallTiles[0], new Vector3(newBottomLeft.x, newTopRight.y, 0f), Quaternion.identity);
+        Instantiate(outerWallTiles[0], newTopRight, Quaternion.identity);
+        Instantiate(outerWallTiles[0], new Vector3(newTopRight.x, newBottomLeft.y, 0f), Quaternion.identity);
 
         //wallsHolder = new GameObject("Walls").transform;
 
@@ -180,7 +182,7 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
         LayoutPlatforms(platformTiles, "Platform", platformCount.minimum, platformCount.maximum);
         LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
-        Instantiate(waypoint, new Vector3(Random.Range(bottomLeft.x, topRight.x), topRight.y - 4, 0f), Quaternion.identity);
+        Instantiate(waypoint, new Vector3(Random.Range(newBottomLeft.x, newTopRight.x), newTopRight.y - 4, 0f), Quaternion.identity);
     }
 
     // Start is called before the first frame update

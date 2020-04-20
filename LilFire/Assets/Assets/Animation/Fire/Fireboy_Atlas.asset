@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
   m_Name: Fireboy_Atlas
   m_EditorClassIdentifier: 
-  atlasFile: {fileID: 4900000, guid: 90e166f43bdd6476f975443d1266cfe9, type: 3}
+  atlasFile: {fileID: 4900000, guid: 5b8e72e21953c4d61ad77e4fb9b2ce05, type: 3}
   materials:
-  - {fileID: 2100000, guid: a7747d7911d874d0fba72b246b0b2f6d, type: 2}
+  - {fileID: 2100000, guid: f9bb379d9d2ba45369eef055dc3f3d8e, type: 2}

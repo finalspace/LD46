@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Fireboy_SkeletonData
   m_EditorClassIdentifier: 
   atlasAssets:
-  - {fileID: 11400000, guid: 8db5c4bfa02a14d66b50de7bacf8ce45, type: 2}
+  - {fileID: 11400000, guid: 4003e19592737484dbe25d0e2fd6cff1, type: 2}
   scale: 0.01
-  skeletonJSON: {fileID: 4900000, guid: d6e31b922734c4545aa130227996a0dc, type: 3}
+  skeletonJSON: {fileID: 4900000, guid: 0917832e8987643158e903980835f6ad, type: 3}
   skeletonDataModifiers: []
   fromAnimation: []
   toAnimation: []

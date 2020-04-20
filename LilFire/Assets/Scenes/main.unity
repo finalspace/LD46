@@ -1560,8 +1560,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource_BG: {fileID: 1587376434}
-  audioClip_BG: {fileID: 0}
-  audioClip_Title: {fileID: 0}
+  audioClip_BG: {fileID: 8300000, guid: 5cb6f74e10d3448c190711051e599ed9, type: 3}
+  audioClip_Title: {fileID: 8300000, guid: b854b76f2ed76462991f0a179446845a, type: 3}
   audioSource_SE: {fileID: 35120898}
   audioClip_Jump: {fileID: 0}
   audioClip_Eat: {fileID: 0}
@@ -1669,7 +1669,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 5cb6f74e10d3448c190711051e599ed9, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

@@ -84,7 +84,7 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
 
     private void GenerateBlock()
     {
-        WallsSetup();
+        //WallsSetup();
         InitializeList();
         nextWay = Instantiate(waypoint,
             new Vector3(Random.Range(newBottomLeft.x, newTopRight.x),

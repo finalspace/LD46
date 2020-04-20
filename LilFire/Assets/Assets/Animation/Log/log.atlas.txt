@@ -1,0 +1,55 @@
+
+log.png
+size: 900,900
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+body
+  rotate: false
+  xy: 2, 643
+  size: 774, 255
+  orig: 774, 255
+  offset: 0, 0
+  index: -1
+branch
+  rotate: false
+  xy: 778, 750
+  size: 90, 148
+  orig: 90, 148
+  offset: 0, 0
+  index: -1
+eye_l
+  rotate: false
+  xy: 870, 785
+  size: 28, 28
+  orig: 28, 28
+  offset: 0, 0
+  index: -1
+eye_r
+  rotate: false
+  xy: 870, 785
+  size: 28, 28
+  orig: 28, 28
+  offset: 0, 0
+  index: -1
+leaf01
+  rotate: true
+  xy: 778, 680
+  size: 68, 75
+  orig: 69, 75
+  offset: 1, 0
+  index: -1
+leaf02
+  rotate: true
+  xy: 855, 719
+  size: 29, 41
+  orig: 29, 41
+  offset: 0, 0
+  index: -1
+mouth
+  rotate: true
+  xy: 870, 815
+  size: 83, 23
+  orig: 83, 23
+  offset: 0, 0
+  index: -1

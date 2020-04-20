@@ -39,6 +39,8 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     public Vector3 newBottomLeft, newTopRight;
     private Vector3 diff, gridX, gridY;
 
+    public int blocksCreated = 0;
+
     void InitializeScreenGrid()
     {
         newBottomLeft = new Vector3(-9f, -3f, 0f);
@@ -183,6 +185,7 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
         LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
         Instantiate(waypoint, new Vector3(Random.Range(newBottomLeft.x, newTopRight.x), newTopRight.y - 4, 0f), Quaternion.identity);
+        blocksCreated++;
     }
 
     // Start is called before the first frame update

@@ -15,7 +15,8 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 
 	private void Start()
 	{
-	}
+        SceneManager.LoadScene("Title", LoadSceneMode.Additive);
+    }
 
 	private void Update()
 	{

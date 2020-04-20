@@ -28,6 +28,9 @@ public class Floating : MonoBehaviour
     void Start()
     {
         // Store the starting position & rotation of the object
+        if (root == null)
+            root = transform;
+
         posOffset = root.transform.localPosition;
         baseRotate = root.transform.localRotation.eulerAngles;
     }

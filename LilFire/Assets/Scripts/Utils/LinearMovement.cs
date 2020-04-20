@@ -12,7 +12,10 @@ public class LinearMovement : MonoBehaviour
     private float progress = 0;
     private void Awake()
     {
-        progress = 0;
+		if (root == null)
+			root = transform;
+
+		progress = 0;
         DOTween.To(() => progress, x => progress = x, 1, time).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
     }
 

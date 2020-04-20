@@ -8,7 +8,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public int lives = 3;
     public int score = 0;
     public float energy = 100;
-    public float decreasingSpeed = 1;
+    public float decreasingSpeed = 3;
     public GameObject player;
     public BoardManager lvl;
 

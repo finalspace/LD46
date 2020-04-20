@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HealthManager : SingletonBehaviour<HealthManager>
+public class UIManager : SingletonBehaviour<UIManager>
 {
     public Text score;
     public Image healthbar;
 
     private float lifebarWidth, lifebarHeight;
     private PlayerStats playerStats;
-    private float playerlife;
-    private float lifepercentage;
+    private float playerEnergy;
+    private float energyPercentage;
 
     void Start()
     {
@@ -21,9 +21,11 @@ public class HealthManager : SingletonBehaviour<HealthManager>
 
     void Update()
     {
-        //playerlife = PlayerStats.Instance.
-        //lifepercentage = playerlife / 100.0f;
-        //healthbar.rectTransform.sizeDelta = new Vector2(800 * lifepercentage, )
+        playerEnergy = PlayerStats.Instance.energy;
+        energyPercentage = playerEnergy / 100.0f;
+        healthbar.rectTransform.sizeDelta = new Vector2(lifebarWidth * energyPercentage, lifebarHeight);
+
+        score.text = "" + PlayerStats.Instance.score;
 
 
     }

@@ -322,7 +322,8 @@ public class PlayerMovement : MonoBehaviour
         foot = true;
         velocity = ComputeInitialVelocity();
         deltaMovement.x = velocity.x;
-        
+
+        //MusicManager.Instance.PlayJump();
         Player.Instance.animator.PlayJump();
     }
 

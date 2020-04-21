@@ -30,7 +30,10 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
         }
 	}
 
-
+    public GameState CurrentState()
+    {
+        return gameState;
+    }
 
     public void GameStart()
     {
@@ -46,6 +49,7 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
         //SceneManager.LoadScene("GameOver", LoadSceneMode.Additive);
         //SceneManager.LoadScene("Main", LoadSceneMode.Single);
         gameState = GameState.Lose;
+        //PlayerUtils.PlayerDeadOccur();
         Debug.Log("Game set to Lost in MainGameManager");
         HandleInput_GameOver();
     }

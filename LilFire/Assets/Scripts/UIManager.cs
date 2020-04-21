@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : SingletonBehaviour<UIManager>
 {
@@ -21,14 +22,14 @@ public class UIManager : SingletonBehaviour<UIManager>
 
     void Update()
     {
-        Debug.Log(MainGameManager.Instance.gameState);
-        if (MainGameManager.Instance.gameState == GameState.Lose ||
-            MainGameManager.Instance.gameState == GameState.Win)
+        if (MainGameManager.Instance.CurrentState() == GameState.Lose ||
+            MainGameManager.Instance.CurrentState() == GameState.Win)
         {
             finalscore.gameObject.SetActive(true);
             finalscore.enabled = true;
-            finalscore.text = "" + PlayerStats.Instance.score;
-            //GameObject.Destroy(Player.Instance);
+            finalscore.text = "" + PlayerStats.Instance.score + "\n(space)";
+            //Debug.Break();
+            gameObject.SetActive(false); // freezes text on screen
         }
         if (MainGameManager.Instance.gameState != GameState.Main)
             return;

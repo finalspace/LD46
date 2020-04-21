@@ -8,7 +8,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public int lives = 3;
     public int score = 0;
     public int highestWaypoint = 0;
-    public bool isStable = true;
+    public bool losingEnergy = true;
     public float fatalHeightFalling = -14;
     public float energy = 100;
     private float decreasingSpeed = 5;
@@ -36,7 +36,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
             score = Mathf.FloorToInt(maxHeight);
             highestWaypoint = lvl.blocksCreated - 1;
         }
-        if (energy > 0)
+        if (energy > 0 && losingEnergy)
         {
             energy -= Time.deltaTime * decreasingSpeed;
 

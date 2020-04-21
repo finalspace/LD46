@@ -74,6 +74,7 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            //SceneManager.UnloadSceneAsync("MainLevel Art");
             SceneManager.LoadScene("Main", LoadSceneMode.Single);
         }
     }

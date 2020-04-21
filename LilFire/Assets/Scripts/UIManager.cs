@@ -27,7 +27,7 @@ public class UIManager : SingletonBehaviour<UIManager>
         {
             finalscore.gameObject.SetActive(true);
             finalscore.enabled = true;
-            finalscore.text = "" + PlayerStats.Instance.score + "\n(space)";
+            finalscore.text = "" + PlayerStats.Instance.score + "\nspace";
             //Debug.Break();
             gameObject.SetActive(false); // freezes text on screen
         }

@@ -18,6 +18,6 @@ public class Moth : MonoBehaviour
     {
         PlayerStats.Instance.UpdateEnergy(energy);
         Player.Instance.CollectItem();
-        Destroy(gameObject);
+        Destroy(transform.parent.gameObject);
     }
 }

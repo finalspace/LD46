@@ -44,7 +44,10 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
     public void GameLost()
     {
         //SceneManager.LoadScene("GameOver", LoadSceneMode.Additive);
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        //SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        gameState = GameState.Lose;
+        Debug.Log("Game set to Lost in MainGameManager");
+        HandleInput_GameOver();
     }
 
     private void HandleInput_Title()
@@ -59,11 +62,15 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            SceneManager.LoadScene("Main", LoadSceneMode.Single);
         }
     }
 
     private void HandleInput_GameOver()
     {
-
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        }
     }
 }

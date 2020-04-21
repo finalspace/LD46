@@ -45,6 +45,9 @@ public class Player : SingletonBehaviour<Player>
 
     public void Die()
     {
+        // Switch to GameLost state
+        // UIManager show FinalScore element which is hidden, then wait for input
+        Debug.Log("Game set to Lost from Player");
         MainGameManager.Instance.GameLost();
     }
 

@@ -56,6 +56,11 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Audio Effects")]
 	public AudioClip landing;
+    public AudioClip thunder;
+    public AudioClip jump;
+    public AudioClip refuel;
+    public AudioClip fire;
+    public AudioClip extinguished;
     private AudioSource source;
 
 
@@ -128,6 +133,7 @@ public class PlayerMovement : MonoBehaviour
         if (Player.Instance.transform.position.y < PlayerStats.Instance.fatalHeightFalling)
         {
             Player.Instance.Die();
+            Debug.Log("Player dies from falling");
         }
 
     }

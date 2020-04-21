@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 public class TitleManager : SingletonBehaviour<TitleManager>
 {
     public string titleSceneName;
+    public GameObject credits;
+    public GameObject tutorial;
+
     public void OnStartGameClicked()
 	{
         MainGameManager.Instance.GameStart();
@@ -14,8 +17,23 @@ public class TitleManager : SingletonBehaviour<TitleManager>
 
     public void OnCreditsClicked()
 	{
+        credits.SetActive(true);
+    }
 
-	}
+    public void DismissCredits()
+    {
+        credits.SetActive(false);
+    }
+
+    public void OnTutorialClicked()
+    {
+        tutorial.SetActive(true);
+    }
+
+    public void DismissTutorial()
+    {
+        tutorial.SetActive(false);
+    }
 
     public void Exit()
     {

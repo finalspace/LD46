@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerStats : SingletonBehaviour<PlayerStats>
 {
-    public float maxHeight = -1000;
+    public float maxHeight = 0;
     public int lives = 3;
     public int score = 0;
     public int highestWaypoint = 0;
@@ -14,12 +14,17 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     private float decreasingSpeed = 5;
     public GameObject player;
     public BoardManager lvl;
+    public float startingAltitude = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         player = Player.Instance.gameObject;
         lvl = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
+
+        startingAltitude = player.transform.position.y;
+        maxHeight = player.transform.position.y - startingAltitude;
+        score = 0;
     }
 
     // Update is called once per frame
@@ -27,8 +32,8 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     {
         if (player.transform.position.y > maxHeight)
         {
-            maxHeight = player.transform.position.y;
-            score = Mathf.FloorToInt(maxHeight - lvl.bottomLeft.y);
+            maxHeight = player.transform.position.y - startingAltitude;
+            score = Mathf.FloorToInt(maxHeight);
             highestWaypoint = lvl.blocksCreated - 1;
         }
         if (energy > 0)
@@ -56,7 +61,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
 
     public void Die()
     {
-
+        Player.Instance.Die();
     }
 
     public void Respawn()

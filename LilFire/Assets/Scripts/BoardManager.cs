@@ -106,6 +106,7 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
 
     private void GenerateBlock()
     {
+        blocksCreated++;
         //ShowCorners();
         InitializeList();
         nextWay = Instantiate(waypoint,
@@ -117,7 +118,6 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
         //LayoutRockBark();
         LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
-        blocksCreated++;
     }
 
     public void WaypointReached()

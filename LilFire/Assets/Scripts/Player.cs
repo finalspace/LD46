@@ -45,7 +45,7 @@ public class Player : SingletonBehaviour<Player>
 
     public void Die()
     {
-
+        MainGameManager.Instance.GameLost();
     }
 
     public void Respawn()

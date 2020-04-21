@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isRunning = false;
     private bool isOnGround = false;
     private bool foot = false;
+    private bool isFalling = false;
     const int maxJumpNum = 1;
 	int jumpNum;
 
@@ -121,6 +122,12 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y = 0;
             deltaMovement.x /= 2.0f;
+        }
+
+        // die if player height goes below the starting level; can update the fatal height as we got
+        if (Player.Instance.transform.position.y < PlayerStats.Instance.fatalHeightFalling)
+        {
+            Player.Instance.Die();
         }
 
     }

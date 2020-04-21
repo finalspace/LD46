@@ -9,6 +9,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public int score = 0;
     public int highestWaypoint = 0;
     public bool isStable = true;
+    public float fatalHeightFalling = -14;
     public float energy = 100;
     private float decreasingSpeed = 5;
     public GameObject player;

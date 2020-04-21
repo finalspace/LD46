@@ -41,9 +41,10 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 		SceneManager.LoadScene("MainLevel Art", LoadSceneMode.Additive);
 	}
 
-    private void GameLost()
+    public void GameLost()
     {
-        SceneManager.LoadScene("GameOver", LoadSceneMode.Additive);
+        //SceneManager.LoadScene("GameOver", LoadSceneMode.Additive);
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
     }
 
     private void HandleInput_Title()

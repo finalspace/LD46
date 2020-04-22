@@ -5523,6 +5523,8 @@ GameObject:
   - component: {fileID: 929336595}
   - component: {fileID: 929336596}
   - component: {fileID: 929336597}
+  - component: {fileID: 929336599}
+  - component: {fileID: 929336598}
   m_Layer: 9
   m_Name: starting campfire
   m_TagString: Untagged
@@ -5618,6 +5620,39 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 5.3191466, y: 0.5857234}
   m_EdgeRadius: 0
+--- !u!114 &929336598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929336594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 041526e36ea0c4155a44bf68f4b4ed6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!50 &929336599
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929336594}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 7
 --- !u!1 &932360825 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 3649ba02795634b7cbb96d5da5be3e48,
@@ -14705,32 +14740,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4972718004575901328, guid: 32ff62d6b2e134280ae4703e30404123,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4972718004575901328, guid: 32ff62d6b2e134280ae4703e30404123,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4972718004588179600, guid: 32ff62d6b2e134280ae4703e30404123,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 4aabdac42625d4ef19f6ca54f9d5358d,
-        type: 3}
-    - target: {fileID: 4972718004588179600, guid: 32ff62d6b2e134280ae4703e30404123,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 8d8431ae1350740bdb001aeff6820b00, type: 2}
-    - target: {fileID: 4972718004588179600, guid: 32ff62d6b2e134280ae4703e30404123,
-        type: 3}
-      propertyPath: m_SortingOrder
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 32ff62d6b2e134280ae4703e30404123, type: 3}

@@ -13,15 +13,15 @@ public class WaypointCollision : MonoBehaviour
     //        PlayerStats.Instance.losingEnergy = true;
     //    }
     //}
-    void OnCollisionEnter(Collision other)
+    void OnCollisionEnter2D(Collision2D other)
     {
         Debug.Log("Energy steady while at camp!");
         if (other.gameObject.tag == "Player")
         {
             // while player is here, energy doesn't run down
             // also, tentatively, we'll replenish it to 100%
-            PlayerStats.Instance.losingEnergy = false;
-            PlayerStats.Instance.energy = 100;
+            //PlayerStats.Instance.losingEnergy = false;
+            //PlayerStats.Instance.energy = 100;
         }
     }
 
@@ -30,7 +30,7 @@ public class WaypointCollision : MonoBehaviour
         Debug.Log("Losing energy again! 2D");
         if (other.gameObject.tag == "Player")
         {
-            PlayerStats.Instance.losingEnergy = true;
+            //PlayerStats.Instance.losingEnergy = true;
         }
     }
     //void OnCollisionEnter2D(Collision2D other)

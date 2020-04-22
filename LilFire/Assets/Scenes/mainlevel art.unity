@@ -6193,6 +6193,37 @@ PrefabInstance:
       propertyPath: finalscore
       value: 
       objectReference: {fileID: 1002443627}
+    - target: {fileID: 2983715453296725913, guid: 3a8f53e65ee2d46909c15c18766a7985,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c3afff3dc295c4a288346b72ecd2c699,
+        type: 3}
+    - target: {fileID: 2983715453296725913, guid: 3a8f53e65ee2d46909c15c18766a7985,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0.91372555
+      objectReference: {fileID: 0}
+    - target: {fileID: 2983715453296725913, guid: 3a8f53e65ee2d46909c15c18766a7985,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.29411766
+      objectReference: {fileID: 0}
+    - target: {fileID: 2983715453296725913, guid: 3a8f53e65ee2d46909c15c18766a7985,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.003921569
+      objectReference: {fileID: 0}
+    - target: {fileID: 2983715453296725912, guid: 3a8f53e65ee2d46909c15c18766a7985,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 5.73999
+      objectReference: {fileID: 0}
+    - target: {fileID: 2983715453296725912, guid: 3a8f53e65ee2d46909c15c18766a7985,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 11.48
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a8f53e65ee2d46909c15c18766a7985, type: 3}
 --- !u!224 &969241118 stripped
@@ -7167,6 +7198,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3606835194512306327, guid: 439504ce596ec40e3a21f6f83f098e38,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3606835194512306324, guid: 439504ce596ec40e3a21f6f83f098e38,
         type: 3}
       propertyPath: InitialModule.startSize.scalar
@@ -7181,11 +7217,6 @@ PrefabInstance:
         type: 3}
       propertyPath: InitialModule.gravityModifier.scalar
       value: -0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3606835194512306327, guid: 439504ce596ec40e3a21f6f83f098e38,
-        type: 3}
-      propertyPath: m_SortingOrder
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 439504ce596ec40e3a21f6f83f098e38, type: 3}

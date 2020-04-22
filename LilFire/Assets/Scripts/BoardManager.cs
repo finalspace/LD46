@@ -270,12 +270,18 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
             } else
             // at small distance, can point away in one both not both dimensions
             {
-                jump = RandomRotation(134f) * jump;
+                jump = RandomRotation(89f) * jump;
             }
 
             // make a new platform here, stash its position in the official pathway list
             prevPlatPos = currPlatPos;
             currPlatPos = currPlatPos + jump;
+
+            if (currPlatPos.x <= xValues.minimum || currPlatPos.x >= xValues.maximum)
+            {
+                currPlatPos.x -= 2 * jump.x;
+            }
+
             prevPlatObj = currPlatObj;
             pathVecs.Add(currPlatPos);
             currPlatObj = MakePlatform(currPlatPos);

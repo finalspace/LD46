@@ -47,14 +47,26 @@ public class Player : SingletonBehaviour<Player>
 
     public void Die()
     {
-        // Switch to GameLost state
-        // UIManager show FinalScore element which is hidden, then wait for input
-        Debug.Log("Game set to Lost from Player");
-        MainGameManager.Instance.GameLost();
+        PlayerStats.Instance.lives--;
+        if (PlayerStats.Instance.lives <= 0)
+        {
+            // Switch to GameLost state
+            // UIManager show FinalScore element which is hidden, then wait for input
+            Debug.Log("Game over, set to Lost from Player.cs");
+            MainGameManager.Instance.GameLost();
+        }
+        else
+        {
+            Respawn();
+        }
     }
 
     public void Respawn()
     {
-
+        // respawn at highest waypoint reached, showing corresponding number in log
+        Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
+        PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
+        // go to the vector
+        move.GoToHighestWaypoint();
     }
 }

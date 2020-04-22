@@ -132,8 +132,8 @@ public class PlayerMovement : MonoBehaviour
         // die if player height goes below the starting level; can update the fatal height as we got
         if (Player.Instance.transform.position.y < PlayerStats.Instance.fatalHeightFalling)
         {
-            Player.Instance.Die();
             Debug.Log("Player dies from falling");
+            Player.Instance.Die();
         }
 
     }
@@ -314,6 +314,7 @@ public class PlayerMovement : MonoBehaviour
     public void GoToHighestWaypoint()
     {
         BoardManager brd = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
+        // put player a little higher than achieved waypoint or will fall through
         Player.Instance.transform.position = brd.HighestWaypoint() + 2*Vector3.up;
     }
 
@@ -323,7 +324,7 @@ public class PlayerMovement : MonoBehaviour
         velocity = ComputeInitialVelocity();
         deltaMovement.x = velocity.x;
 
-        //MusicManager.Instance.PlayJump();
+        MusicManager.Instance.PlayJump();
         Player.Instance.animator.PlayJump();
     }
 

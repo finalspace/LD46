@@ -81,9 +81,8 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     {
         InitializeScreenGrid();
         // make campfire (first waypoint) and point all the references for generation here
-        currWayPos = currPlatPos = prevPlatPos = attainedWayPos =
-            Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity).transform.position;
-        currPlatObj = prevPlatObj = currPlatObj = waypoint;
+        currPlatObj = prevPlatObj = attainedWayObj = Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity);
+        currWayPos = currPlatPos = prevPlatPos = attainedWayPos = nextWayPos = currPlatObj.transform.position;
         // generate first block and waypoint after campfire, using initial bounds from xValues and yValues
         GenerateBlock();
         // generate second block and waypoint after campfire, which requires updating the bounds

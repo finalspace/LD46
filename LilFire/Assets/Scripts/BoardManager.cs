@@ -56,32 +56,34 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     private Vector3 pillarOffset = new Vector3(0f, -1f, 2f);
     public int blocksCreated = 0;
 
-    // current waypoint
-    Vector3 currWay;
-    // next waypoint
-    Vector3 nextWay;
-    // highest waypoint character has reached
-    Vector3 highWay;
-    GameObject hWay;
     // desired number of steps between waypoints
     //int stairs;
     // max radius of each step (guesstimate, needs to be <= actual value)
-    float jumpDist;
+    float jumpDist = 5f;
     Vector3 jump;
-    Vector3 currPos;
-    Vector3 oldPos;
-    GameObject oldPlat;
-    GameObject currPlat;
+    // track positions for generating platforms and waypoints
+    Vector3 currPlatPos;
+    Vector3 prevPlatPos;
+    GameObject prevPlatObj;
+    GameObject currPlatObj;
+    Vector3 currWayPos;
+    Vector3 nextWayPos;
+    // highest waypoint character has reached
+    Vector3 attainedWayPos;
+    GameObject attainedWayObj;
 
     public Vector3 HighestWaypoint()
     {
-        return highWay;
+        return attainedWayPos;
     }
 
     public void SetupScene(int level)
     {
         InitializeScreenGrid();
-        currWay = Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity).transform.position;
+        // make campfire (first waypoint) and point all the references for generation here
+        currWayPos = currPlatPos = prevPlatPos = attainedWayPos =
+            Instantiate(campfire, new Vector3(0f, -3f, 0f), Quaternion.identity).transform.position;
+        currPlatObj = prevPlatObj = currPlatObj = waypoint;
         // generate first block and waypoint after campfire, using initial bounds from xValues and yValues
         GenerateBlock();
         // generate second block and waypoint after campfire, which requires updating the bounds
@@ -107,14 +109,17 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     private void GenerateBlock()
     {
         blocksCreated++;
-        //ShowCorners();
+        ShowCorners();
         InitializeList();
-        nextWay = Instantiate(waypoint,
+        currWayPos = nextWayPos;
+        nextWayPos = Instantiate(waypoint,
             new Vector3(Random.Range(newBottomLeft.x, newTopRight.x),
                 newTopRight.y - Random.Range(-1, diff.x / 2), 0f),
             Quaternion.identity).transform.position;
-        //LayoutPath();
-        LayoutPlatforms();
+        //prev
+
+        LayoutPath();
+        //LayoutPlatforms();
         //LayoutRockBark();
         LayoutFuel(fuelTiles, fuelCount.minimum, fuelCount.maximum);
         LayoutEnemies(enemyTiles, enemyCount.minimum, enemyCount.maximum);
@@ -128,8 +133,8 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
 
     public void SetHighestWaypoint(GameObject g)
     {
-        hWay = g;
-        highWay = g.transform.position;
+        attainedWayObj = g;
+        attainedWayPos = g.transform.position;
     }
 
     private void ShowCorners()
@@ -233,14 +238,20 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
 
     private void LayoutPath()
     {
-        // waypoint - current position
-        Vector3 separation = nextWay - currPos;
-        int loops = 0; // tracking this so if we wander infinitely we can reign back in
-        while(separation.sqrMagnitude > jumpDist*jumpDist)
-        {
-            // cut length down to max
-            // scale from unit to that, randomly
-            jump = separation.normalized * Random.Range(1f, jumpDist);
+        Debug.Log("Lay out path");
+        // displacement from this waypoint to next one
+        Vector3 separation = nextWayPos - currWayPos;
+        int loops = 0; // tracking softly so if we wander too long we can reign back in
+        //for (int i = 0; i < 3; i++)
+        while (separation.sqrMagnitude > jumpDist * jumpDist)
+            {
+            Debug.Log("Path loop" + loops);
+            // scale unit vector randomly
+            Debug.Log("Distance to next waypoint: "+separation);
+            float randLength = Random.Range(1f, jumpDist);
+            Debug.Log("random length: " + randLength);
+            jump = separation.normalized * randLength;
+            Debug.Log("jump vector: " + jump);
 
             // rotate randomly, including angles that move away
             // but not both x&y directions, so never turn 135 or more -
@@ -263,11 +274,11 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
             }
 
             // make a new platform here, stash its position in the official pathway list
-            oldPos = currPos;
-            currPos = currPos + jump;
-            oldPlat = currPlat;
-            pathVecs.Add(currPos);
-            currPlat = MakePlatform(currPos);
+            prevPlatPos = currPlatPos;
+            currPlatPos = currPlatPos + jump;
+            prevPlatObj = currPlatObj;
+            pathVecs.Add(currPlatPos);
+            currPlatObj = MakePlatform(currPlatPos);
             // stash this platform in the official pathway platform list
             //pathPlats.Add(newPlat);
 
@@ -286,7 +297,8 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
             // could simply verify that there's a path in the random stuff, patch over where not
 
             // waypoint - current position
-            separation = nextWay - currPos;
+            loops++;
+            separation = nextWayPos - currPlatPos;
         }
     }
 

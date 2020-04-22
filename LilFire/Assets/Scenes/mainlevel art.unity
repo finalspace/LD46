@@ -10110,7 +10110,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   columns: 6
-  rows: 6
+  rows: 18
   platformCount:
     maximum: 5
     minimum: 3
@@ -10127,7 +10127,7 @@ MonoBehaviour:
     maximum: 5
     minimum: -5
   yValues:
-    maximum: 7
+    maximum: 23
     minimum: -1
   waypoint: {fileID: 851979756}
   campfire: {fileID: 929336594}

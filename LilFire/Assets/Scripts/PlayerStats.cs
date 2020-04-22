@@ -49,6 +49,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public void UpdateEnergy(float value)
     {
         energy += value;
+        if (energy <= 0) Die();
         energy = Mathf.Clamp(energy, 0, 100);
     }
 
@@ -61,7 +62,17 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
 
     public void Die()
     {
-        Player.Instance.Die();
+        lives--;
+        if (lives <= 0)
+        {
+            Player.Instance.Die();
+        }
+        else
+        {
+            // respawn at highest waypoint reached
+            PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
+            move.GoToHighestWaypoint();
+        }
     }
 
     public void Respawn()

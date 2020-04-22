@@ -311,7 +311,7 @@ public class PlayerMovement : MonoBehaviour
         velocity.y = jumpVelocity;
     }
 
-    private void GoToHighestWaypoint()
+    public void GoToHighestWaypoint()
     {
         BoardManager brd = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
         Player.Instance.transform.position = brd.HighestWaypoint() + 2*Vector3.up;

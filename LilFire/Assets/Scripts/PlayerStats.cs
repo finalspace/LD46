@@ -11,7 +11,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public bool losingEnergy = true;
     public float fatalHeightFalling = -14;
     public float energy = 100;
-    private float decreasingSpeed = 5;
+    private float decreasingSpeed = 2;
     public GameObject player;
     public BoardManager lvl;
     public float startingAltitude = 0;

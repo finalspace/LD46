@@ -60,7 +60,7 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         {
             GameMusic();
         }
-        UndampenMusic(); // set to normal gameplay volume
+        audioSource_BG.volume = 0.6f;
         audioSource_BG.Play();
         started = true;
         bgTime = DateTimeUtil.GetUnixTime();
@@ -84,8 +84,12 @@ public class MusicManager : SingletonBehaviour<MusicManager>
     public void PlayJump()
     {
         audioSource_SE.clip = audioClip_Jump;
+
         //audioSource_SE.pitch = 0.2f; // about the right pitch for flame
+
+
         //audioSource_SE.pitch = 0.1f; // about the right pitch for flame
+
         //audioSource_SE.volume = 0.3f;
         //audioSource_SE.volume = 0.7f;
         //audioSource_SE.volume = 1f;
@@ -103,26 +107,16 @@ public class MusicManager : SingletonBehaviour<MusicManager>
     public void PlayDamage()
     {
         audioSource_SE.clip = audioClip_Damage;
-        audioSource_SE.volume = 1f;
+        //audioSource_SE.volume = 0.7f;
         audioSource_SE.Play();
     }
 
     public void PlayCampfire()
     {
         audioSource_SE.clip = audioClip_Campfire;
-        DampenMusic();
-        audioSource_SE.volume = 1f;
-        audioSource_SE.Play();
-    }
-
-    public void DampenMusic()
-    {
         audioSource_BG.volume = 0.1f;
-    }
-
-    public void UndampenMusic()
-    {
-        audioSource_BG.volume = 0.6f;
+        audioSource_SE.volume = 2f;
+        audioSource_SE.Play();
     }
 
     public int GetBGTime()

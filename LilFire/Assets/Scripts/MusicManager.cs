@@ -24,7 +24,7 @@ public class MusicManager : SingletonBehaviour<MusicManager>
     // - actually noticed a slowdown with extra audiosource, so going back to using flag checks - //
     // using a separate audiosource for thunder to avoid the complication
     // of other sounds stopping the thunder before it's heard
-    //public AudioSource audioSource_thunder;
+    public AudioSource audioSource_thunder;
     public AudioClip audioClip_Thunder;
 
     public Text timeText;
@@ -36,6 +36,8 @@ public class MusicManager : SingletonBehaviour<MusicManager>
 
     private void Start()
     {
+        audioSource_thunder.clip = audioClip_Thunder;
+        audioSource_thunder.volume = 0.6f;
         //audioClip_Jump = MakeSubclip(audioClip_Jump, 0.8f, 0.942f);
 
         //audioClip_Jump = MakeSubclip(audioClip_Jump, 0.3f, 0.9f);
@@ -45,11 +47,12 @@ public class MusicManager : SingletonBehaviour<MusicManager>
 
     private void Update()
     {
-        if (thundering)
-        {
-            if (!audioSource_SE.isPlaying) thundering = false;
-            PlayCampfire();
-        }
+        //if (thundering)
+        //{
+        //    if (!audioSource_SE.isPlaying) thundering = false;
+            // should not assume playcampfire is still valid, actually, handling in WaypointCollision
+            //PlayCampfire();
+        //}
         //Debug.Log(audioSource_BG.time);
         if (started && !audioSource_BG.isPlaying)
             PlayBGMusic();
@@ -96,7 +99,7 @@ public class MusicManager : SingletonBehaviour<MusicManager>
 
     public void PlayJump()
     {
-        if (!thundering)
+        if (!thundering) // not used currently but thunder is false by default
         {
             audioSource_SE.clip = audioClip_Jump;
             //audioSource_SE.pitch = 0.2f; // about the right pitch for flame
@@ -155,14 +158,15 @@ public class MusicManager : SingletonBehaviour<MusicManager>
 
     public void PlayThunder()
     {
-        audioSource_SE.clip = audioClip_Thunder;
+        //audioSource_SE.clip = audioClip_Thunder;
+        //audioSource_thunder.volume = 0.6f;
         //audioSource_thunder.clip = audioClip_Thunder;
-        thundering = true;
+        //thundering = true;
         DampenMusic();
-        audioSource_SE.volume = 0.6f;
-        audioSource_SE.Play();
+        //audioSource_SE.volume = 0.6f;
+        //audioSource_SE.Play();
         //audioSource_thunder.volume = 1f;
-        //audioSource_thunder.Play();
+        audioSource_thunder.Play();
 
     }
 

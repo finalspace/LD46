@@ -36,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Aiming Effects")]
     public List<GameObject> aimingDots;
-    private bool aiming = false;
+    public bool aiming = false;
     private int NumIterations = 8;
     private float aimingLoopRange = 10;
     private float aimingTime = 0;
@@ -271,7 +271,7 @@ public class PlayerMovement : MonoBehaviour
         return diff;
     }
 
-    private void SetAiming(bool val)
+    public void SetAiming(bool val)
     {
         if (aiming == val)
             return;
@@ -339,6 +339,12 @@ public class PlayerMovement : MonoBehaviour
     private void LaunchFailed()
     {
         Player.Instance.animator.PlayIdle();
+    }
+
+    public void ResetAimingOnDeath()
+    {
+        SetAiming(false);
+        LaunchFailed();
     }
 
     private void Attack()

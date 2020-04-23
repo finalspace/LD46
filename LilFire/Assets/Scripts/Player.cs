@@ -71,6 +71,8 @@ public class Player : SingletonBehaviour<Player>
         // respawn at highest waypoint reached, showing corresponding number in log
         Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
         PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
+        // of currently aiming, release that
+        move.ResetAimingOnDeath();
         // go to the vector
         move.GoToHighestWaypoint();
     }

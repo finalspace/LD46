@@ -21,6 +21,7 @@ public class WaypointCollision : MonoBehaviour
     void OnCollisionExit2D(Collision2D other)
     {
         Debug.Log("Losing energy again! 2D");
+        MusicManager.Instance.UndampenMusic();
         if (other.gameObject.tag == "Player")
         {
             PlayerStats.Instance.losingEnergy = true;

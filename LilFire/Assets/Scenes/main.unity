@@ -1493,9 +1493,8 @@ MonoBehaviour:
   audioSource_SE: {fileID: 35120898}
   audioClip_Jump: {fileID: 8300000, guid: 93e39696274e544c2bc0c74b32e9316d, type: 3}
   audioClip_Eat: {fileID: 8300000, guid: a36ed81cba3084a3b8a85266c45ad1cd, type: 3}
-  audioClip_Damage: {fileID: 8300000, guid: acd719e4256df46f4812fa0f0220582e, type: 3}
+  audioClip_Damage: {fileID: 8300000, guid: cdfd86dbbf717499e91ad00cb2de6980, type: 3}
   audioClip_Campfire: {fileID: 8300000, guid: 3011fa8bf87a44f299cdde9931514ce8, type: 3}
-  audioSource_thunder: {fileID: 32887957}
   audioClip_Thunder: {fileID: 8300000, guid: c95ffdc3bec434c6c9905594d317079e, type: 3}
   timeText: {fileID: 0}
 --- !u!1 &1394978253

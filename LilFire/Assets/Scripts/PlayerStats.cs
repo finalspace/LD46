@@ -70,16 +70,14 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         }
         else
         {
-            // respawn at highest waypoint reached
-            PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
-            move.GoToHighestWaypoint();
+            Player.Instance.Respawn();
         }
     }
 
-    public void Respawn()
-    {
+    //public void Respawn()
+    //{
 
-    }
+    //}
 
 
 }

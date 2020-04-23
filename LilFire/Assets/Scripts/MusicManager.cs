@@ -21,9 +21,17 @@ public class MusicManager : SingletonBehaviour<MusicManager>
     public AudioClip audioClip_Damage;
     public AudioClip audioClip_Campfire;
 
+    // - actually noticed a slowdown with extra audiosource, so going back to using flag checks - //
+    // using a separate audiosource for thunder to avoid the complication
+    // of other sounds stopping the thunder before it's heard
+    //public AudioSource audioSource_thunder;
+    public AudioClip audioClip_Thunder;
+
     public Text timeText;
 
     private bool started = false;
+    private bool damped = false; // whether music has been ducked to low volume
+    private bool thundering = false; // so we don't start new sound effects until thunder is done
     private long bgTime;
 
     private void Start()
@@ -37,6 +45,11 @@ public class MusicManager : SingletonBehaviour<MusicManager>
 
     private void Update()
     {
+        if (thundering)
+        {
+            if (!audioSource_SE.isPlaying) thundering = false;
+            PlayCampfire();
+        }
         //Debug.Log(audioSource_BG.time);
         if (started && !audioSource_BG.isPlaying)
             PlayBGMusic();
@@ -60,7 +73,7 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         {
             GameMusic();
         }
-        UndampenMusic(); // set to normal gameplay volume
+        if (!damped) UndampenMusic(); // keep damped if on a campfire, else normal volume
         audioSource_BG.Play();
         started = true;
         bgTime = DateTimeUtil.GetUnixTime();
@@ -83,46 +96,74 @@ public class MusicManager : SingletonBehaviour<MusicManager>
 
     public void PlayJump()
     {
-        audioSource_SE.clip = audioClip_Jump;
-        //audioSource_SE.pitch = 0.2f; // about the right pitch for flame
-        //audioSource_SE.pitch = 0.1f; // about the right pitch for flame
-        //audioSource_SE.volume = 0.3f;
-        //audioSource_SE.volume = 0.7f;
-        //audioSource_SE.volume = 1f;
-        audioSource_SE.volume = 0.06f;
-        audioSource_SE.Play();
+        if (!thundering)
+        {
+            audioSource_SE.clip = audioClip_Jump;
+            //audioSource_SE.pitch = 0.2f; // about the right pitch for flame
+            //audioSource_SE.pitch = 0.1f; // about the right pitch for flame
+            //audioSource_SE.volume = 0.3f;
+            //audioSource_SE.volume = 0.7f;
+            //audioSource_SE.volume = 1f;
+            audioSource_SE.volume = 0.06f;
+            audioSource_SE.Play();
+        }
     }
 
     public void PlayEat()
     {
-        audioSource_SE.clip = audioClip_Eat;
-        audioSource_SE.volume = 0.9f;
-        audioSource_SE.Play();
+        if (!thundering)
+        {
+            audioSource_SE.clip = audioClip_Eat;
+            //audioSource_SE.clip = audioClip_Thunder;
+            audioSource_SE.volume = 0.9f;
+            audioSource_SE.Play();
+        }
     }
 
     public void PlayDamage()
     {
-        audioSource_SE.clip = audioClip_Damage;
-        audioSource_SE.volume = 1f;
-        audioSource_SE.Play();
+        if (!thundering)
+        {
+            audioSource_SE.clip = audioClip_Damage;
+            audioSource_SE.volume = 1f;
+            audioSource_SE.Play();
+        }
     }
 
     public void PlayCampfire()
     {
-        audioSource_SE.clip = audioClip_Campfire;
-        DampenMusic();
-        audioSource_SE.volume = 1f;
-        audioSource_SE.Play();
+        if (!thundering)
+        {
+            audioSource_SE.clip = audioClip_Campfire;
+            DampenMusic();
+            audioSource_SE.volume = 1f;
+            audioSource_SE.Play();
+        }
     }
 
     public void DampenMusic()
     {
         audioSource_BG.volume = 0.1f;
+        damped = true;
     }
 
     public void UndampenMusic()
     {
         audioSource_BG.volume = 0.6f;
+        damped = false;
+    }
+
+    public void PlayThunder()
+    {
+        audioSource_SE.clip = audioClip_Thunder;
+        //audioSource_thunder.clip = audioClip_Thunder;
+        thundering = true;
+        DampenMusic();
+        audioSource_SE.volume = 0.6f;
+        audioSource_SE.Play();
+        //audioSource_thunder.volume = 1f;
+        //audioSource_thunder.Play();
+
     }
 
     public int GetBGTime()

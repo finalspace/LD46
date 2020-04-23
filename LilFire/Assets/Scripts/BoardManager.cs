@@ -59,7 +59,7 @@ public class BoardManager : SingletonBehaviour<CollisionManager>
     // desired number of steps between waypoints
     //int stairs;
     // max radius of each step (guesstimate, needs to be <= actual value)
-    float jumpDist = 5f;
+    float jumpDist = 4.5f;
     Vector3 jump;
     // track positions for generating platforms and waypoints
     Vector3 currPlatPos;

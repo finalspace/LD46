@@ -68,6 +68,7 @@ public class Player : SingletonBehaviour<Player>
 
     public void Respawn()
     {
+        MusicManager.Instance.PlayThunder();
         // respawn at highest waypoint reached, showing corresponding number in log
         Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
         PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();

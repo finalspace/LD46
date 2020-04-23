@@ -74,4 +74,13 @@ public class Player : SingletonBehaviour<Player>
         // go to the vector
         move.GoToHighestWaypoint();
     }
+
+    public void CenterOnWaypoint()
+    {
+        // respawn at highest waypoint reached, showing corresponding number in log
+        Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
+        PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
+        // go to the vector
+        move.GoToHighestWaypoint();
+    }
 }

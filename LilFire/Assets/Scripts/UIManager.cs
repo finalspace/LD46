@@ -9,6 +9,7 @@ public class UIManager : SingletonBehaviour<UIManager>
     public Text score;
     //public Text finalscore;
     public Image healthbar;
+    public List<GameObject> lives;
     public GameObject GameOver;
     public TMPro.TextMeshProUGUI FinalScore;
     
@@ -39,5 +40,14 @@ public class UIManager : SingletonBehaviour<UIManager>
     {
         GameOver.SetActive(true);
         FinalScore.text = "" + PlayerStats.Instance.score;
+    }
+
+    public void UpdateLife(int value)
+    {
+        int i = 0;
+        for (; i < value; i++)
+            lives[i].SetActive(true);
+        for (; i < lives.Count; i++)
+            lives[i].SetActive(false);
     }
 }

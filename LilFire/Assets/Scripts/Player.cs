@@ -53,6 +53,7 @@ public class Player : SingletonBehaviour<Player>
     public void Die()
     {
         PlayerStats.Instance.lives--;
+        UIManager.Instance.UpdateLife(PlayerStats.Instance.lives);
         if (PlayerStats.Instance.lives <= 0)
         {
             MainGameManager.Instance.GameLost();

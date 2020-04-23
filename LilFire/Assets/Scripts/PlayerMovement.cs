@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 [RequireComponent (typeof (PlayerCollision))]
+//public class PlayerMovement : SingletonBehaviour<Player>
 public class PlayerMovement : MonoBehaviour
 {
 
@@ -26,19 +27,19 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isDead = false;
 	private bool facingRight = true;
-	private bool doubleJump = false;
+    private bool doubleJump = false;
     private bool isRunning = false;
     private bool isOnGround = false;
     private bool foot = false;
-    private bool isFalling = false;
+    //private bool isFalling = false;
     const int maxJumpNum = 1;
-	int jumpNum;
+    int jumpNum;
 
     [Header("Aiming Effects")]
     public List<GameObject> aimingDots;
     public bool aiming = false;
     private int NumIterations = 8;
-    private float aimingLoopRange = 10;
+    //private float aimingLoopRange = 10;
     private float aimingTime = 0;
     private Vector3 mousePosition;
 
@@ -54,18 +55,18 @@ public class PlayerMovement : MonoBehaviour
     public float startTrailEffectTime;
     private float trailEffectTime;
 
-    [Header("Audio Effects")]
-	public AudioClip landing;
-    public AudioClip thunder;
-    public AudioClip jump;
-    public AudioClip refuel;
-    public AudioClip fire;
-    public AudioClip extinguished;
-    private AudioSource source;
+ //   [Header("Audio Effects")]
+	//public AudioClip landing;
+ //   public AudioClip thunder;
+ //   public AudioClip jump;
+ //   public AudioClip refuel;
+ //   public AudioClip fire;
+ //   public AudioClip extinguished;
+ //   private AudioSource source;
 
 
     void Start() {
-		source = GetComponent<AudioSource>();
+		//source = GetComponent<AudioSource>();
 		//health = GameObject.FindGameObjectWithTag("GM").GetComponent<PlayerHealth>();
 		anim = GetComponent<Animator>();
         playerCollision = GetComponent<PlayerCollision> ();
@@ -92,11 +93,12 @@ public class PlayerMovement : MonoBehaviour
         {
             if (foot == true)
             {
-                if (landing != null)
-                {
-                    source.clip = landing;
-                    source.Play();
-                }
+                MusicManager.Instance.PlayLand();
+                //if (landing != null)
+                //{
+                //    source.clip = landing;
+                //    source.Play();
+                //}
                 //anim.SetBool("isJumping", false);
                 foot = false;
                 Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
@@ -173,7 +175,7 @@ public class PlayerMovement : MonoBehaviour
                 SetAiming(false);
                 if (Vector2.Distance(mousePosition, transform.position) > 0.5f)
                     Launch();
-                else LaunchFailed();
+                //else LaunchFailed(); // unnecessary now that animation is set to idle in SetAiming?
             }
 
             if (Input.GetKey(KeyCode.Space))
@@ -285,6 +287,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (aiming)
             Player.Instance.animator.PlaySquish();
+        else
+            Player.Instance.animator.PlayIdle();
     }
 
 
@@ -313,7 +317,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void GoToHighestWaypoint()
     {
-        BoardManager brd = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
+        BoardManager brd = BoardManager.Instance;
         // put player a little higher than achieved waypoint or will fall through
         Player.Instance.transform.position = brd.HighestWaypoint() + 2*Vector3.up;
     }
@@ -336,16 +340,10 @@ public class PlayerMovement : MonoBehaviour
         Player.Instance.animator.PlayJump();
     }
 
-    private void LaunchFailed()
-    {
-        Player.Instance.animator.PlayIdle();
-    }
-
-    public void ResetAimingOnDeath()
-    {
-        SetAiming(false);
-        LaunchFailed();
-    }
+    //private void LaunchFailed()
+    //{
+    //    Player.Instance.animator.PlayIdle();
+    //}
 
     private void Attack()
     {

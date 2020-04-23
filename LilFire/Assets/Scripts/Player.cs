@@ -7,7 +7,7 @@ public class Player : SingletonBehaviour<Player>
     public LayerMask interactable;
     public CharacterSpineAnimator animator;
 
-    private float distance = 1.0f;
+    //private float distance = 1.0f;
 
     private void Start()
     {
@@ -69,10 +69,10 @@ public class Player : SingletonBehaviour<Player>
     {
         MusicManager.Instance.PlayThunder();
         // respawn at highest waypoint reached, showing corresponding number in log
-        Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
+        //Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
         PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
-        // of currently aiming, release that
-        move.ResetAimingOnDeath();
+        // if currently aiming, release that
+        move.SetAiming(false);
         // go to the vector
         move.GoToHighestWaypoint();
     }
@@ -80,8 +80,10 @@ public class Player : SingletonBehaviour<Player>
     public void CenterOnWaypoint()
     {
         // respawn at highest waypoint reached, showing corresponding number in log
-        Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
+        //Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
         PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
+        // if currently aiming, release that
+        move.SetAiming(false);
         // go to the vector
         move.GoToHighestWaypoint();
     }

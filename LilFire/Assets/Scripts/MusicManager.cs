@@ -11,39 +11,35 @@ public class MusicManager : SingletonBehaviour<MusicManager>
     public AudioClip audioClip_Game;
     public AudioClip audioClip_Title;
 
-    private bool fadingInBG = false;
-    private float fadingInProgress;
-
     [Header("Sound Effect")]
     public AudioSource audioSource_SE;
     public AudioClip audioClip_Jump;
     public AudioClip audioClip_Eat;
     public AudioClip audioClip_Damage;
     public AudioClip audioClip_Campfire;
-
-    // - actually noticed a slowdown with extra audiosource, so going back to using flag checks - //
-    // using a separate audiosource for thunder to avoid the complication
-    // of other sounds stopping the thunder before it's heard
-    public AudioSource audioSource_thunder;
+    public AudioClip audioClip_Land;
     public AudioClip audioClip_Thunder;
+    // Could use separate audiosource OR flag checks for thunder.
+    // Flag checks may bring a speed boost, but they're more complicated.
+    // Other sounds were stopping the thunder before it's heard, etc.
+    public AudioSource audioSource_thunder;
 
-    public Text timeText;
-
-    private bool started = false;
+    private bool fadingInBG = false; // TODO music ducking
+    private float fadingInProgress;
     private bool damped = false; // whether music has been ducked to low volume
-    private bool thundering = false; // so we don't start new sound effects until thunder is done
     private long bgTime;
+    public Text timeText;
+    private bool started = false;
+    private bool thundering = false; // so we don't start new sound effects until thunder is done
 
     private void Start()
     {
         audioSource_thunder.clip = audioClip_Thunder;
         audioSource_thunder.volume = 0.6f;
+
+        // cropping sounds like this works but was slow, have to check later
         //audioClip_Jump = MakeSubclip(audioClip_Jump, 0.8f, 0.942f);
-
-        //audioClip_Jump = MakeSubclip(audioClip_Jump, 0.3f, 0.9f);
-        //audioClip_Jump = MakeSubclip(audioClip_Jump, 0.5f, 0.9f); // not bad at .7 vol
     }
-
 
     private void Update()
     {
@@ -60,6 +56,7 @@ public class MusicManager : SingletonBehaviour<MusicManager>
 
     public void PlayBGMusic()
     {
+        // TODO music ducking
         //fadingInProgress = 0;
         //DOTween.To(() => fadingInProgress, x => fadingInProgress = x, 1, 5).SetDelay(1).SetEase(Ease.Linear).OnComplete(OnFadeInBGMusicFinish);
         //fadingInBG = true;
@@ -92,59 +89,63 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         audioSource_BG.clip = audioClip_Game;
     }
 
-    public void OnFadeInBGMusicFinish()
-    {
-        fadingInBG = false;
-    }
-
     public void PlayJump()
     {
-        if (!thundering) // not used currently but thunder is false by default
-        {
-            audioSource_SE.clip = audioClip_Jump;
-            //audioSource_SE.pitch = 0.2f; // about the right pitch for flame
-            //audioSource_SE.pitch = 0.1f; // about the right pitch for flame
-            //audioSource_SE.volume = 0.3f;
-            //audioSource_SE.volume = 0.7f;
-            //audioSource_SE.volume = 1f;
-            audioSource_SE.volume = 0.06f;
-            audioSource_SE.Play();
-        }
+        if (thundering) return; // not used currently but thunder is false by default
+        audioSource_SE.clip = audioClip_Jump;
+        //audioSource_SE.pitch = 0.2f; // low pitch gives flame-like sound
+        //audioSource_SE.pitch = 0.1f;
+        //audioSource_SE.volume = 0.3f;
+        audioSource_SE.volume = 0.06f; // the wav is very loud, needs low vol
+        audioSource_SE.Play();
     }
 
     public void PlayEat()
     {
-        if (!thundering)
-        {
-            audioSource_SE.clip = audioClip_Eat;
-            //audioSource_SE.clip = audioClip_Thunder;
-            audioSource_SE.volume = 0.9f;
-            audioSource_SE.Play();
-        }
+        if (thundering) return;
+        audioSource_SE.clip = audioClip_Eat;
+        audioSource_SE.volume = 0.9f;
+        audioSource_SE.Play();
     }
 
     public void PlayDamage()
     {
-        if (!thundering)
-        {
-            audioSource_SE.clip = audioClip_Damage;
-            audioSource_SE.volume = 1f;
-            audioSource_SE.Play();
-        }
+        if (thundering) return;
+        audioSource_SE.clip = audioClip_Damage;
+        audioSource_SE.volume = 1f;
+        audioSource_SE.Play();
     }
 
     public void PlayCampfire()
     {
-        if (!thundering)
-        {
-            audioSource_SE.clip = audioClip_Campfire;
-            DampenMusic();
-            audioSource_SE.volume = 1f;
-            audioSource_SE.Play();
-        }
+        if (thundering) return;
+        audioSource_SE.clip = audioClip_Campfire;
+        DampenMusic();
+        audioSource_SE.volume = 1f;
+        audioSource_SE.Play();
     }
 
-    public void DampenMusic()
+    public void PlayThunder()
+    {
+        //DampenMusic();
+
+        //audioSource_SE.clip = audioClip_Thunder;
+        //audioSource_SE.volume = 0.6f;
+        //audioSource_SE.Play();
+        //thundering = true;
+
+        audioSource_thunder.volume = 0.6f;
+        //audioSource_thunder.volume = 1f;
+        audioSource_thunder.Play();
+
+    }
+
+    public void PlayLand()
+    {
+
+    }
+
+    public void DampenMusic() // TODO: gradual volume ducking/tweening
     {
         audioSource_BG.volume = 0.1f;
         damped = true;
@@ -156,18 +157,9 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         damped = false;
     }
 
-    public void PlayThunder()
+    public void OnFadeInBGMusicFinish()
     {
-        //audioSource_SE.clip = audioClip_Thunder;
-        //audioSource_thunder.volume = 0.6f;
-        //audioSource_thunder.clip = audioClip_Thunder;
-        //thundering = true;
-        DampenMusic();
-        //audioSource_SE.volume = 0.6f;
-        //audioSource_SE.Play();
-        //audioSource_thunder.volume = 1f;
-        audioSource_thunder.Play();
-
+        fadingInBG = false;
     }
 
     public int GetBGTime()
@@ -175,7 +167,6 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         //return DateTimeUtil.MillisecondsElapse(bgTime);
         return (int)(audioSource_BG.time * 1000);
     }
-
 
     /**
      * Creates a sub clip from an audio clip based off of the start time

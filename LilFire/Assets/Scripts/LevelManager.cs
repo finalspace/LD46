@@ -7,7 +7,7 @@ public class LevelManager : SingletonBehaviour<LevelManager>
 {
     private BoardManager boardScript;
     private int level = 3;
-    private string sceneName = "mainlevel art";
+    //private string sceneName = "mainlevel art";
 
     // Use this for initialization 
     void Awake()

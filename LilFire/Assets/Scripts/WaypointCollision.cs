@@ -9,7 +9,7 @@ public class WaypointCollision : MonoBehaviour
     private float landedtime;
     private bool landed = false;
     private bool fireburning = false;
-    private bool centered = false;
+    //private bool centered = false;
 
     void OnCollisionEnter2D(Collision2D other)
     {

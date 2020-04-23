@@ -53,12 +53,11 @@ public class Player : SingletonBehaviour<Player>
     public void Die()
     {
         PlayerStats.Instance.lives--;
+        UIManager.Instance.UpdateLife(PlayerStats.Instance.lives);
         if (PlayerStats.Instance.lives <= 0)
         {
-            // Switch to GameLost state
-            // UIManager show FinalScore element which is hidden, then wait for input
-            Debug.Log("Game over, set to Lost from Player.cs");
             MainGameManager.Instance.GameLost();
+            Destroy(gameObject);
         }
         else
         {

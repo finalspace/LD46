@@ -9,6 +9,7 @@ public class UIManager : SingletonBehaviour<UIManager>
     public Text score;
     //public Text finalscore;
     public Image healthbar;
+    public List<GameObject> lives;
     public GameObject GameOver;
     public TMPro.TextMeshProUGUI FinalScore;
     
@@ -25,15 +26,6 @@ public class UIManager : SingletonBehaviour<UIManager>
 
     void Update()
     {
-        if (MainGameManager.Instance.CurrentState() == GameState.Lose ||
-            MainGameManager.Instance.CurrentState() == GameState.Win)
-        {
-            GameOver.SetActive(true);
-            FinalScore.text = "" + PlayerStats.Instance.score;
-            //Debug.Break();
-            gameObject.SetActive(false); // freezes text on screen
-            LevelManager.Instance.Exit();
-        }
         if (MainGameManager.Instance.gameState != GameState.Main)
             return;
 
@@ -42,7 +34,20 @@ public class UIManager : SingletonBehaviour<UIManager>
         healthbar.rectTransform.sizeDelta = new Vector2(lifebarWidth * energyPercentage, lifebarHeight);
 
         score.text = "" + PlayerStats.Instance.score;
+    }
 
-     
+    public void PushGameEnd()
+    {
+        GameOver.SetActive(true);
+        FinalScore.text = "" + PlayerStats.Instance.score;
+    }
+
+    public void UpdateLife(int value)
+    {
+        int i = 0;
+        for (; i < value; i++)
+            lives[i].SetActive(true);
+        for (; i < lives.Count; i++)
+            lives[i].SetActive(false);
     }
 }

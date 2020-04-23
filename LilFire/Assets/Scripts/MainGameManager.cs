@@ -15,9 +15,7 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 
 	private void Start()
 	{
-        SceneManager.LoadScene("Title", LoadSceneMode.Additive);
-        MusicManager.Instance.TitleMusic();
-        MusicManager.Instance.PlayBGMusic();
+        GoToTitleScene();
     }
 
 	private void Update()
@@ -37,6 +35,13 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
         return gameState;
     }
 
+    public void GoToTitleScene()
+    {
+        SceneManager.LoadScene("Title", LoadSceneMode.Additive);
+        MusicManager.Instance.TitleMusic();
+        MusicManager.Instance.PlayBGMusic();
+    }
+
     public void GameStart()
     {
         if (gameState == GameState.Main)
@@ -50,12 +55,9 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 
     public void GameLost()
     {
-        //SceneManager.LoadScene("GameOver", LoadSceneMode.Additive);
-        //SceneManager.LoadScene("Main", LoadSceneMode.Single);
         gameState = GameState.Lose;
         //PlayerUtils.PlayerDeadOccur();
-        Debug.Log("Game set to Lost in MainGameManager");
-        HandleInput_GameOver();
+        UIManager.Instance.PushGameEnd();
     }
 
     private void HandleInput_Title()
@@ -76,10 +78,6 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 
     private void HandleInput_GameOver()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //SceneManager.UnloadSceneAsync("MainLevel Art");
-            SceneManager.LoadScene("Main", LoadSceneMode.Single);
-        }
     }
+
 }

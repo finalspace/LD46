@@ -320,10 +320,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void Launch()
     {
+        float energy = PlayerStats.Instance.energy;
+        if (energy < 5) return;
+
         foot = true;
         velocity = ComputeInitialVelocity();
+        float power = velocity.magnitude / 3;
+        float adjustedPower = Mathf.Min(power, energy - 5);
+        velocity = velocity * (adjustedPower / power);  //adjusted velocity
+
         deltaMovement.x = velocity.x;
 
+        PlayerStats.Instance.UpdateEnergy(-adjustedPower);
         MusicManager.Instance.PlayJump();
         Player.Instance.animator.PlayJump();
     }

@@ -35,6 +35,6 @@ public class Cloud : MonoBehaviour
         timer = 0;
 
         PlayerStats.Instance.UpdateEnergy(energy);
-        Player.Instance.CollectItem();
+        Player.Instance.Hurt();
     }
 }

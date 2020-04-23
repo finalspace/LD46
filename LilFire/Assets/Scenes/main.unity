@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3731196, g: 0.38074002, b: 0.35872713, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311947, g: 0.38074005, b: 0.35872722, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1360,12 +1360,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource_BG: {fileID: 1587376434}
-  audioClip_BG: {fileID: 8300000, guid: 5cb6f74e10d3448c190711051e599ed9, type: 3}
+  audioClip_Game: {fileID: 8300000, guid: 5cb6f74e10d3448c190711051e599ed9, type: 3}
   audioClip_Title: {fileID: 8300000, guid: b854b76f2ed76462991f0a179446845a, type: 3}
   audioSource_SE: {fileID: 35120898}
-  audioClip_Jump: {fileID: 0}
-  audioClip_Eat: {fileID: 0}
-  audioClip_Damage: {fileID: 0}
+  audioClip_Jump: {fileID: 8300000, guid: 93e39696274e544c2bc0c74b32e9316d, type: 3}
+  audioClip_Eat: {fileID: 8300000, guid: a36ed81cba3084a3b8a85266c45ad1cd, type: 3}
+  audioClip_Damage: {fileID: 8300000, guid: acd719e4256df46f4812fa0f0220582e, type: 3}
+  audioClip_Campfire: {fileID: 8300000, guid: 3011fa8bf87a44f299cdde9931514ce8, type: 3}
   timeText: {fileID: 0}
 --- !u!1 &1394978253
 GameObject:
@@ -1469,7 +1470,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 5cb6f74e10d3448c190711051e599ed9, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

@@ -14,6 +14,7 @@ public class WaypointCollision : MonoBehaviour
             // also, tentatively, we'll replenish it to 100%
             PlayerStats.Instance.losingEnergy = false;
             PlayerStats.Instance.energy = 100;
+            MusicManager.Instance.PlayCampfire();
         }
     }
 

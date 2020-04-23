@@ -40,8 +40,13 @@ public class Player : SingletonBehaviour<Player>
 
     public void CollectItem()
     {
-        // currently this sound would also play when touching a cloud
-        //MusicManager.Instance.PlayEat();
+        MusicManager.Instance.PlayEat();
+        animator.PlayEat();
+    }
+
+    public void Hurt()
+    {
+        MusicManager.Instance.PlayDamage();
         animator.PlayEat();
     }
 

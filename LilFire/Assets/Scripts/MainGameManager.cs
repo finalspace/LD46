@@ -16,6 +16,8 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 	private void Start()
 	{
         SceneManager.LoadScene("Title", LoadSceneMode.Additive);
+        MusicManager.Instance.TitleMusic();
+        MusicManager.Instance.PlayBGMusic();
     }
 
 	private void Update()
@@ -42,7 +44,9 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
         
         gameState = GameState.Main;
 		SceneManager.LoadScene("MainLevel Art", LoadSceneMode.Additive);
-	}
+        MusicManager.Instance.GameMusic();
+        MusicManager.Instance.PlayBGMusic();
+    }
 
     public void GameLost()
     {

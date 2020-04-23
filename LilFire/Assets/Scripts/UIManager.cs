@@ -7,8 +7,11 @@ using UnityEngine.SceneManagement;
 public class UIManager : SingletonBehaviour<UIManager>
 {
     public Text score;
-    public Text finalscore;
+    //public Text finalscore;
     public Image healthbar;
+    public GameObject GameOver;
+    public TMPro.TextMeshProUGUI FinalScore;
+    
 
     private float lifebarWidth, lifebarHeight;
     private float playerEnergy;
@@ -25,11 +28,11 @@ public class UIManager : SingletonBehaviour<UIManager>
         if (MainGameManager.Instance.CurrentState() == GameState.Lose ||
             MainGameManager.Instance.CurrentState() == GameState.Win)
         {
-            finalscore.gameObject.SetActive(true);
-            finalscore.enabled = true;
-            finalscore.text = "" + PlayerStats.Instance.score + "\nspace";
+            GameOver.SetActive(true);
+            FinalScore.text = "" + PlayerStats.Instance.score;
             //Debug.Break();
             gameObject.SetActive(false); // freezes text on screen
+            LevelManager.Instance.Exit();
         }
         if (MainGameManager.Instance.gameState != GameState.Main)
             return;
@@ -39,5 +42,7 @@ public class UIManager : SingletonBehaviour<UIManager>
         healthbar.rectTransform.sizeDelta = new Vector2(lifebarWidth * energyPercentage, lifebarHeight);
 
         score.text = "" + PlayerStats.Instance.score;
+
+     
     }
 }

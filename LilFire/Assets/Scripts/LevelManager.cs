@@ -12,6 +12,8 @@ public class LevelManager : SingletonBehaviour<LevelManager>
     // Use this for initialization 
     void Awake()
     {
+        //SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
+
         boardScript = GetComponent<BoardManager>();
         InitGame();
     }
@@ -26,8 +28,11 @@ public class LevelManager : SingletonBehaviour<LevelManager>
     {
         
     }
+
     public void Exit()
     {
-        SceneManager.UnloadSceneAsync(sceneName);
+        //SceneManager.UnloadSceneAsync(sceneName);
+        //MainGameManager.Instance.GoToTitleScene();
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
     }
 }

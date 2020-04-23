@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 
 // Eventually it would make sense to dynamically delete earlier blocks.
 
-public class BoardManager : SingletonBehaviour<CollisionManager>
+public class BoardManager : SingletonBehaviour<BoardManager>
 {
     [Serializable]
     public class Count

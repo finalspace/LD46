@@ -37,6 +37,7 @@ public class TitleManager : SingletonBehaviour<TitleManager>
 
     public void Exit()
     {
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("main"));
         SceneManager.UnloadSceneAsync(titleSceneName);
     }
 }

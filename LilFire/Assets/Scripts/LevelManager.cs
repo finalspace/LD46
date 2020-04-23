@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class LevelManager : SingletonBehaviour<CollisionManager>
+public class LevelManager : SingletonBehaviour<LevelManager>
 {
     private BoardManager boardScript;
     private int level = 3;
+    private string sceneName = "mainlevel art";
 
     // Use this for initialization 
     void Awake()
@@ -23,5 +25,9 @@ public class LevelManager : SingletonBehaviour<CollisionManager>
     void Update()
     {
         
+    }
+    public void Exit()
+    {
+        SceneManager.UnloadSceneAsync(sceneName);
     }
 }

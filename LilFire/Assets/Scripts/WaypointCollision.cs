@@ -15,7 +15,7 @@ public class WaypointCollision : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            Debug.Log("Energy steady while at camp!");
+            //Debug.Log("Energy steady while at camp!");
             // while player is here, energy doesn't run down
             // also, tentatively, we'll replenish it to 100%
             PlayerStats.Instance.losingEnergy = false;
@@ -46,7 +46,7 @@ public class WaypointCollision : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            Debug.Log("Losing energy again! 2D");
+            //Debug.Log("Losing energy again! 2D");
             MusicManager.Instance.UndampenMusic();
             fireburning = false;
             landed = false;

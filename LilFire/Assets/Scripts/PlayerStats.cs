@@ -62,7 +62,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
 
     public void Die()
     {
-        Debug.Log("Player dies from running out of energy");
+        //Debug.Log("Player dies from running out of energy");
         lives--;
         UIManager.Instance.UpdateLife(lives);
         if (lives <= 0)

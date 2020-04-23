@@ -237,20 +237,20 @@ public class BoardManager : SingletonBehaviour<BoardManager>
 
     private void LayoutPath()
     {
-        Debug.Log("Lay out path");
+        //Debug.Log("Lay out path");
         // displacement from this waypoint to next one
         Vector3 separation = nextWayPos - currWayPos;
         int loops = 0; // tracking softly so if we wander too long we can reign back in
         //for (int i = 0; i < 3; i++)
         while (separation.sqrMagnitude > jumpDist * jumpDist)
             {
-            Debug.Log("Path loop" + loops);
+            //Debug.Log("Path loop" + loops);
             // scale unit vector randomly
-            Debug.Log("Distance to next waypoint: "+separation);
+            //Debug.Log("Distance to next waypoint: "+separation);
             float randLength = Random.Range(1f, jumpDist);
-            Debug.Log("random length: " + randLength);
+            //Debug.Log("random length: " + randLength);
             jump = separation.normalized * randLength;
-            Debug.Log("jump vector: " + jump);
+            //Debug.Log("jump vector: " + jump);
 
             // rotate randomly, including angles that move away
             // but not both x&y directions, so never turn 135 or more -

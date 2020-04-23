@@ -24,6 +24,7 @@ public class WaypointCollision : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             PlayerStats.Instance.losingEnergy = true;
+            MusicManager.Instance.UndampenMusic();
         }
     }
 }

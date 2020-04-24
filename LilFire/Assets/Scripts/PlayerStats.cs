@@ -16,9 +16,24 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public BoardManager lvl;
     public float startingAltitude = 0;
 
+    private PlayerCollision playercollision;
+    private bool dying = false;
+
+    private void OnEnable()
+    {
+        EventManager.OnPlayerLand += OnPlayerLand;
+    }
+
+    private void OnDisable()
+    {
+        EventManager.OnPlayerLand -= OnPlayerLand;
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
+        playercollision = GetComponent<PlayerCollision>();
         player = Player.Instance.gameObject;
         lvl = BoardManager.Instance;
 
@@ -39,9 +54,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         if (energy > 0 && losingEnergy)
         {
             energy -= Time.deltaTime * decreasingSpeed;
-
-            if (energy <= 0)
-                Die();
+            if (energy <= 0) TryDie();
         }
 
     }
@@ -49,13 +62,28 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public void UpdateEnergy(float value)
     {
         energy += value;
-        if (energy <= 0) Die();
-        energy = Mathf.Clamp(energy, 0, 100);
+        if (energy <= 0)
+        {
+            energy = 0;
+            TryDie();
+        }
+        energy = Mathf.Clamp(energy, 0, 120);
     }
 
     public void CollectItem()
     {
 
+    }
+
+    public void TryDie()
+    {
+        if (playercollision.collisions.below)
+        {
+            Die();
+            return;
+        }
+
+        dying = true;
     }
 
     public void Die()
@@ -71,5 +99,19 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         {
             Player.Instance.Respawn();
         }
+        dying = false;
     }
+
+
+   /*****************************************
+    * 
+    * Events
+    * 
+    *****************************************/
+    private void OnPlayerLand()
+    {
+        if (dying)
+            Die();
+    }
+
 }

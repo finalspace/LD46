@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
     private bool doubleJump = false;
     private bool isRunning = false;
     private bool isOnGround = false;
-    private bool foot = false;
+    private bool isJumping = false;
     //private bool isFalling = false;
     const int maxJumpNum = 1;
     int jumpNum;
@@ -50,63 +50,42 @@ public class PlayerMovement : MonoBehaviour
 	public GameObject damageEffect;
 	public GameObject footEffect;
 	public Animator hurtPanel;
-	//private PlayerHealth health;
     public GameObject trailEffect;
     public float startTrailEffectTime;
     private float trailEffectTime;
 
- //   [Header("Audio Effects")]
-	//public AudioClip landing;
- //   public AudioClip thunder;
- //   public AudioClip jump;
- //   public AudioClip refuel;
- //   public AudioClip fire;
- //   public AudioClip extinguished;
- //   private AudioSource source;
-
-
     void Start() {
-		//source = GetComponent<AudioSource>();
-		//health = GameObject.FindGameObjectWithTag("GM").GetComponent<PlayerHealth>();
 		anim = GetComponent<Animator>();
         playerCollision = GetComponent<PlayerCollision> ();
 		gravity = -(2 * jumpHeight) / Mathf.Pow (timeToJumpApex, 2);
 		jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
-        //health.noDam = false;
-
         jumpNum = maxJumpNum;
 	}
 
 	void Update() 
     {
         HandleInput();
-	}
+        if (aiming)
+            DrawTrajectory();
+    }
 
     private void FixedUpdate()
     {
-        if (aiming)
-            DrawTrajectory();
         UpdateMovement();
 
         // detects when on the ground
         if (playerCollision.collisions.below)
         {
-            if (foot == true)
+            if (isJumping == true)
             {
+                EventManager.Event_PlayerLand();
                 MusicManager.Instance.PlayLand();
-                //if (landing != null)
-                //{
-                //    source.clip = landing;
-                //    source.Play();
-                //}
-                //anim.SetBool("isJumping", false);
-                foot = false;
+                isJumping = false;
                 Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
                 Instantiate(footEffect, pos, Quaternion.identity);
                 root.rotation = Quaternion.Euler(0, 0, 0);
                 Player.Instance.animator.PlayLanding();
             }
-            //anim.SetBool("isJumping", false);
             velocity.y = 0;
             deltaMovement.x = 0;
             doubleJump = false;
@@ -115,20 +94,21 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             //anim.SetBool("isJumping", true);
-            foot = true;
+            isJumping = true;
             //root.rotation = Quaternion.Euler(0.0f, 0.0f, (Mathf.Repeat(m_phase, 2.0f) < 1.0f ? -25.0f : 25.0f));
             //root.rotation = Quaternion.LookRotation(velocity);
 
             float ang = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90;
             // ang = Mathf.LerpAngle(transform.eulerAngles.z, ang, Time.deltaTime * rotateSpeed);
             root.rotation = Quaternion.Euler(0, 0, ang);
-            Debug.DrawRay(transform.position, velocity, Color.green);
+            Debug.DrawRay(transform.position, velocity * 2, Color.green);
         }
 
+        //when blocked by ceiling
         if (playerCollision.collisions.above)
         {
             velocity.y = 0;
-            deltaMovement.x /= 2.0f;
+            deltaMovement.x *= 0.9f;
         }
 
         // die if player height goes below the starting level; can update the fatal height as we got
@@ -151,12 +131,13 @@ public class PlayerMovement : MonoBehaviour
         // detects if the player is holding the arrow keys to move
         if (!isDead)
         {
+            //keyboard control
             //deltaMovement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
             if (Input.GetMouseButtonDown(0))
             {
                 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                if (Vector2.Distance(mousePosition, transform.position) > 1.0f)
+                if (Vector2.Distance(mousePosition, transform.position) > 2.0f)
                     return;
 
                 SetAiming(true);
@@ -175,7 +156,7 @@ public class PlayerMovement : MonoBehaviour
                 SetAiming(false);
                 if (Vector2.Distance(mousePosition, transform.position) > 0.5f)
                     Launch();
-                //else LaunchFailed(); // unnecessary now that animation is set to idle in SetAiming?
+                else LaunchFailed();
             }
 
             if (Input.GetKey(KeyCode.Space))
@@ -262,15 +243,16 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 ComputeInitialVelocity()
     {
-        Vector2 diff = transform.position - mousePosition;
+        Vector2 power;
+        Vector2 diff = transform.position + new Vector3(0, 0.5f, 0) - mousePosition;
         float x = Mathf.InverseLerp(0, 6, Mathf.Abs(diff.x));
         x = Mathf.Sqrt(x);
-        diff.x = Mathf.Lerp(0, 10f, x) * Mathf.Sign(diff.x);
+        power.x = Mathf.Lerp(0, 10f, x) * Mathf.Sign(diff.x);
 
-        float y = Mathf.InverseLerp(0, 2, Mathf.Abs(diff.y));
-        y *= y * y;
-        diff.y = Mathf.Lerp(0, 20f, y) * Mathf.Sign(diff.y);
-        return diff;
+        float y = Mathf.InverseLerp(0, 1.5f, Mathf.Abs(diff.y));
+        y = Mathf.Sqrt(y);
+        power.y = Mathf.Lerp(0, 20f, y) * Mathf.Sign(diff.y);
+        return power;
     }
 
     public void SetAiming(bool val)
@@ -298,6 +280,7 @@ public class PlayerMovement : MonoBehaviour
     * 
     *****************************************/
 
+      
     public void Dead()
     {
         if (isDead)
@@ -311,7 +294,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        foot = true;
+        isJumping = true;
         velocity.y = jumpVelocity;
     }
 
@@ -331,39 +314,37 @@ public class PlayerMovement : MonoBehaviour
     private void Launch()
     {
         float energy = PlayerStats.Instance.energy;
-        if (energy < 5) return;
+        if (energy < 3) return;
 
-        foot = true;
+        isJumping = true;
         velocity = ComputeInitialVelocity();
         float power = velocity.magnitude / 3;
-        float adjustedPower = Mathf.Min(power, energy - 5);
+        float adjustedPower = Mathf.Min(power, energy);
         velocity = velocity * (adjustedPower / power);  //adjusted velocity
 
         deltaMovement.x = velocity.x;
 
+        Debug.Log(power);
         PlayerStats.Instance.UpdateEnergy(-adjustedPower);
         MusicManager.Instance.PlayJump();
         Player.Instance.animator.PlayJump();
     }
 
-    //private void LaunchFailed()
-    //{
-    //    Player.Instance.animator.PlayIdle();
-    //}
+    private void LaunchFailed()
+    {
+        Player.Instance.animator.PlayIdle();
+    }
 
     private void Attack()
-    {
-        
+    { 
     }
 
     private void AttackMelee()
-    {
-        
+    { 
     }
 
     private void AttackRange()
     {
-        
     }
 
     void UpdateTrailEffect()

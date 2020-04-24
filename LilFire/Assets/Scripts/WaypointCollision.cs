@@ -42,7 +42,7 @@ public class WaypointCollision : MonoBehaviour
             }
             else if (state == WaypointState.Landed)
             {
-                Player.Instance.CenterOnWaypoint();
+                //Player.Instance.CenterOnWaypoint();  //it breaks the consistency of the world physics
                 //bouncetime = Time.time;
                 state = WaypointState.Bounced;
             }

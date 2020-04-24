@@ -6,18 +6,26 @@ using UnityEngine;
 public class WaypointCollision : MonoBehaviour
 {
 
-    private float landedtime;
-    private bool landed = false;
-    private bool fireburning = false;
-    //private bool centered = false;
+    private enum WaypointState { Empty, Landed, Bounced, Burning }
+
+    private float landingtime;
+    //private float takeofftime;
+    private float bouncetime;
+
+    WaypointState state = WaypointState.Empty;
 
     void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.tag == "Player")
         {
+            if(state == WaypointState.Empty)
+            {
+                state = WaypointState.Landed;
+                landingtime = Time.time;
+            }
             //Debug.Log("Energy steady while at camp!");
             // while player is here, energy doesn't run down
-            // also, tentatively, we'll replenish it to 100%
+            // also we'll replenish it to 100% (tentatively)
             PlayerStats.Instance.losingEnergy = false;
             PlayerStats.Instance.energy = 100;
         }
@@ -27,17 +35,16 @@ public class WaypointCollision : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            if (!landed && !fireburning)
+            if (state == WaypointState.Bounced && Time.time - landingtime >= 0.5f)
             {
-                landed = true;
-                landedtime = Time.time;
-            }
-            else if (!fireburning && Time.time - landedtime >= 0.5f)
-            {
-                //Player.Instance.CenterOnWaypoint();
                 MusicManager.Instance.PlayCampfire();
-                fireburning = true;
-                //centered = true;
+                state = WaypointState.Burning;
+            }
+            else if (state == WaypointState.Landed)
+            {
+                Player.Instance.CenterOnWaypoint();
+                //bouncetime = Time.time;
+                state = WaypointState.Bounced;
             }
         }
     }
@@ -46,10 +53,13 @@ public class WaypointCollision : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
+            if (state == WaypointState.Burning)
+            {
+                MusicManager.Instance.UndampenMusic();
+                state = WaypointState.Empty;
+            }
             //Debug.Log("Losing energy again! 2D");
-            MusicManager.Instance.UndampenMusic();
-            fireburning = false;
-            landed = false;
+            //takeofftime = Time.time;
             PlayerStats.Instance.losingEnergy = true;
         }
     }

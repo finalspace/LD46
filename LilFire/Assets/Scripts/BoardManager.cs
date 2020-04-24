@@ -237,6 +237,9 @@ public class BoardManager : SingletonBehaviour<BoardManager>
 
     private void LayoutPath()
     {
+        // first step should get us away from the fire
+        // also we should make sure no other steps bring us too close to it
+
         //Debug.Log("Lay out path");
         // displacement from this waypoint to next one
         Vector3 separation = nextWayPos - currWayPos;
@@ -272,9 +275,13 @@ public class BoardManager : SingletonBehaviour<BoardManager>
                 jump = RandomRotation(89f) * jump;
             }
 
+            Vector3 testpos = currPlatPos + jump;
+
+            if ((testpos - currWayPos).sqrMagnitude < 1.5f) testpos = testpos + 2*Vector3.up;
+
+            currPlatPos = testpos;
             // make a new platform here, stash its position in the official pathway list
             prevPlatPos = currPlatPos;
-            currPlatPos = currPlatPos + jump;
 
             if (currPlatPos.x <= xValues.minimum || currPlatPos.x >= xValues.maximum)
             {

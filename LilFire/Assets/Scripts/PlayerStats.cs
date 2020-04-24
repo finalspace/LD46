@@ -20,7 +20,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     void Start()
     {
         player = Player.Instance.gameObject;
-        lvl = GameObject.FindObjectOfType<LevelManager>().GetComponent<BoardManager>();
+        lvl = BoardManager.Instance;
 
         startingAltitude = player.transform.position.y;
         maxHeight = player.transform.position.y - startingAltitude;
@@ -53,8 +53,6 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         energy = Mathf.Clamp(energy, 0, 100);
     }
 
-
-
     public void CollectItem()
     {
 
@@ -74,11 +72,4 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
             Player.Instance.Respawn();
         }
     }
-
-    //public void Respawn()
-    //{
-
-    //}
-
-
 }

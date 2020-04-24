@@ -275,24 +275,26 @@ public class BoardManager : SingletonBehaviour<BoardManager>
                 jump = RandomRotation(89f) * jump;
             }
 
-            Vector3 testpos = currPlatPos + jump;
-
-            if ((testpos - currWayPos).sqrMagnitude < 1.5f) testpos = testpos + 2*Vector3.up;
-
-            currPlatPos = testpos;
-            // make a new platform here, stash its position in the official pathway list
             prevPlatPos = currPlatPos;
+            currPlatPos = currPlatPos + jump;
 
+            // don't go off the screen; just reflect the x change if so
             if (currPlatPos.x <= xValues.minimum || currPlatPos.x >= xValues.maximum)
             {
                 currPlatPos.x -= 2 * jump.x;
             }
 
-            prevPlatObj = currPlatObj;
+            // make sure there's enough room so the last waypoint is accessible
+            if ((currPlatPos - currWayPos).sqrMagnitude < 3f) currPlatPos += 2 * Vector3.up;
+
+            // stash position in the official pathway list
             pathVecs.Add(currPlatPos);
+
+            // instance a new platform here, remembering the old one
+            prevPlatObj = currPlatObj;
             currPlatObj = MakePlatform(currPlatPos);
-            // stash this platform in the official pathway platform list
-            //pathPlats.Add(newPlat);
+            // stash the new platform in the official pathway platform list
+            //pathPlats.Add(currPlatObj);
 
             // don't forget THERE WAS A WEIRD BUG WITH ALIGNMENT... but the pathing should get around that
             // and the way to test it is to write code to generate many many blocks at once, don't try to

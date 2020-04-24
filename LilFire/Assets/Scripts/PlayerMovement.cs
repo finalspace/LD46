@@ -318,8 +318,14 @@ public class PlayerMovement : MonoBehaviour
     public void GoToHighestWaypoint()
     {
         BoardManager brd = BoardManager.Instance;
+
+        Player.Instance.gameObject.SetActive(false);
+
         // put player a little higher than achieved waypoint or will fall through
-        Player.Instance.transform.position = brd.HighestWaypoint() + 1.5f*Vector3.up;
+        Player.Instance.transform.position = brd.HighestWaypoint() + 1.3f * Vector3.up;
+        velocity = Vector2.zero;
+        Player.Instance.gameObject.SetActive(true);
+        Player.Instance.animator.PlayIdle();
     }
 
     private void Launch()

@@ -1,90 +1,97 @@
 
 Fireboy.png
-size: 931,931
+size: 878,878
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 Layer 2
   rotate: false
-  xy: 2, 72
-  size: 583, 857
-  orig: 586, 857
-  offset: 2, 0
+  xy: 2, 233
+  size: 438, 643
+  orig: 440, 643
+  offset: 1, 0
+  index: -1
+body_ball
+  rotate: false
+  xy: 442, 442
+  size: 434, 434
+  orig: 434, 434
+  offset: 0, 0
   index: -1
 cheekL
   rotate: false
-  xy: 587, 40
-  size: 114, 114
-  orig: 114, 114
+  xy: 95, 146
+  size: 85, 85
+  orig: 85, 85
   offset: 0, 0
   index: -1
 cheekR
-  rotate: true
-  xy: 587, 361
-  size: 121, 120
-  orig: 121, 120
+  rotate: false
+  xy: 2, 141
+  size: 91, 90
+  orig: 91, 90
   offset: 0, 0
   index: -1
 ember01
-  rotate: true
-  xy: 709, 431
-  size: 51, 64
-  orig: 51, 64
+  rotate: false
+  xy: 95, 96
+  size: 38, 48
+  orig: 38, 48
   offset: 0, 0
   index: -1
 ember02
-  rotate: true
-  xy: 753, 379
-  size: 32, 34
-  orig: 32, 34
+  rotate: false
+  xy: 2, 51
+  size: 24, 25
+  orig: 24, 25
   offset: 0, 0
   index: -1
 ember03
-  rotate: false
-  xy: 709, 382
-  size: 42, 47
-  orig: 42, 47
+  rotate: true
+  xy: 36, 108
+  size: 31, 35
+  orig: 31, 35
   offset: 0, 0
   index: -1
 eyeL_open
   rotate: false
-  xy: 875, 400
-  size: 42, 82
-  orig: 42, 82
+  xy: 2, 78
+  size: 32, 61
+  orig: 32, 61
   offset: 0, 0
   index: -1
 eyeR_open
   rotate: true
-  xy: 775, 413
-  size: 42, 82
-  orig: 42, 82
+  xy: 36, 63
+  size: 31, 62
+  orig: 31, 62
   offset: 0, 0
   index: -1
 mouth01
-  rotate: false
-  xy: 775, 457
-  size: 98, 25
-  orig: 98, 25
+  rotate: true
+  xy: 182, 88
+  size: 73, 19
+  orig: 73, 19
   offset: 0, 0
   index: -1
 mouth02
   rotate: true
-  xy: 587, 484
-  size: 445, 342
-  orig: 445, 342
+  xy: 442, 106
+  size: 334, 256
+  orig: 334, 256
   offset: 0, 0
   index: -1
 teeth_bottom
-  rotate: false
-  xy: 680, 264
-  size: 202, 95
-  orig: 202, 95
+  rotate: true
+  xy: 336, 80
+  size: 151, 71
+  orig: 151, 71
   offset: 0, 0
   index: -1
 teeth_top
-  rotate: true
-  xy: 587, 156
-  size: 203, 91
-  orig: 203, 91
+  rotate: false
+  xy: 182, 163
+  size: 152, 68
+  orig: 152, 68
   offset: 0, 0
   index: -1

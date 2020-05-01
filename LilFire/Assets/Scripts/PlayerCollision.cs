@@ -48,10 +48,11 @@ public class PlayerCollision : MonoBehaviour {
 	void HorizontalCollisions(ref Vector3 velocity) {
 		float directionX = Mathf.Sign (velocity.x);
 		float rayLength = Mathf.Abs (velocity.x) + skinWidth;
+        bool left = (directionX == -1);
 
         LayerMask collisionMask = hardCollision;
         for (int i = 0; i < horizontalRayCount; i ++) {
-			Vector2 rayOrigin = (directionX == -1)?raycastOrigins.bottomLeft:raycastOrigins.bottomRight;
+			Vector2 rayOrigin = left ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
 			rayOrigin += Vector2.up * (horizontalRaySpacing * i);
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
 
@@ -61,19 +62,24 @@ public class PlayerCollision : MonoBehaviour {
 				velocity.x = (hit.distance - skinWidth) * directionX;
 				rayLength = hit.distance;
 
-				collisions.left = directionX == -1;
-				collisions.right = directionX == 1;
-			}
+				collisions.left = left;
+				collisions.right = !left;
+
+                if (left)
+                    collisions.leftTransform = hit.transform;
+                else collisions.rightTransform = hit.transform;
+            }
 		}
 	}
 
 	void VerticalCollisions(ref Vector3 velocity) {
 		float directionY = Mathf.Sign (velocity.y);
 		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
+        bool below = (directionY == -1);
 
         LayerMask collisionMask = directionY > 0 ? hardCollision : oneSideCollision;
 		for (int i = 0; i < verticalRayCount; i ++) {
-			Vector2 rayOrigin = (directionY == -1)?raycastOrigins.bottomLeft:raycastOrigins.topLeft;
+			Vector2 rayOrigin = below ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
 			rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
 
@@ -83,9 +89,14 @@ public class PlayerCollision : MonoBehaviour {
 				velocity.y = (hit.distance - skinWidth) * directionY;
 				rayLength = hit.distance;
 
-				collisions.below = directionY == -1;
-				collisions.above = directionY == 1;
-			}
+                collisions.below = below;
+				collisions.above = !below;
+
+                if (below)
+                    collisions.belowTransform = hit.transform;
+                else collisions.aboveTransform = hit.transform;
+
+            }
 		}
 	}
 
@@ -119,10 +130,14 @@ public class PlayerCollision : MonoBehaviour {
 		public bool above, below;
 		public bool left, right;
 
+        public Transform aboveTransform, belowTransform, leftTransform, rightTransform;
+
 		public void Reset() {
 			above = below = false;
 			left = right = false;
-		}
+            aboveTransform = belowTransform = leftTransform = rightTransform = null;
+
+        }
 	}
 
 }

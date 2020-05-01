@@ -77,6 +77,11 @@ public class BoardManager : SingletonBehaviour<BoardManager>
         return attainedWayPos;
     }
 
+    public GameObject GetCurrentWaypoint()
+    {
+        return attainedWayObj;
+    }
+
     public void SetupScene(int level)
     {
         InitializeScreenGrid();

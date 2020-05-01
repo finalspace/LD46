@@ -12,6 +12,21 @@ public class CharacterSpineAnimator : MonoBehaviour
 	public float speed;
 	public float movement;
 
+    private void OnEnable()
+    {
+        EventManager.OnPlayerLand += PlayLanding;
+        EventManager.OnPlayerJump += PlayJump;
+        EventManager.OnPlayerJumpFailed += PlayIdle;
+
+    }
+
+    private void OnDisable()
+    {
+        EventManager.OnPlayerLand -= PlayLanding;
+        EventManager.OnPlayerJump -= PlayJump;
+        EventManager.OnPlayerJumpFailed -= PlayIdle;
+    }
+
     void Start()
 	{
         skeletonAnimation.state.Complete += OnStateComplete;
@@ -42,7 +57,7 @@ public class CharacterSpineAnimator : MonoBehaviour
         SetAnimatoin(hurt, false, 1f);
     }
 
-    public void PlayJump()
+    public void PlayJump(float power)
     {
         SetAnimatoin(jump, true, 1f);
     }

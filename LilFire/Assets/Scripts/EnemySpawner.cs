@@ -31,6 +31,7 @@ public class EnemySpawner : MonoBehaviour
     void Spawn()
     {
         int num = Random.Range(0, 2);
+        num = 2;
         if (num == 0)
             SpawnCloud();
         else if (num == 1)

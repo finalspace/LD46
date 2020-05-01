@@ -72,21 +72,26 @@ public class Player : SingletonBehaviour<Player>
         PlayerStats.Instance.energy = 100;
         // respawn at highest waypoint reached, showing corresponding number in log
         //Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
-        PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
-        // if currently aiming, release that
-        move.SetAiming(false);
-        // go to the vector
-        move.GoToHighestWaypoint();
+        PlayerMovement move = GetComponent<PlayerMovement>();
+
+        move.Reset();
+
+        BoardManager brd = BoardManager.Instance;
+        GameObject respawnPoint = brd.GetCurrentWaypoint();
+
+        // put player a little higher than achieved waypoint or will fall through
+        transform.position = respawnPoint.transform.position + 1.3f * Vector3.up;
+        animator.PlayIdle();
     }
 
     public void CenterOnWaypoint()
     {
         // respawn at highest waypoint reached, showing corresponding number in log
         //Debug.Log("Respawning at waypoint " + PlayerStats.Instance.highestWaypoint);
-        PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
+        //PlayerMovement move = GameObject.FindObjectOfType<PlayerMovement>();
         // if currently aiming, release that
-        move.SetAiming(false);
+        //move.SetAiming(false);
         // go to the vector
-        move.GoToHighestWaypoint();
+        //move.GoToHighestWaypoint();
     }
 }

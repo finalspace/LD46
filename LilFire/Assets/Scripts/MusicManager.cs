@@ -32,6 +32,18 @@ public class MusicManager : SingletonBehaviour<MusicManager>
     private bool started = false;
     private bool thundering = false; // so we don't start new sound effects until thunder is done
 
+    private void OnEnable()
+    {
+        EventManager.OnPlayerLand += PlayLanding;
+        EventManager.OnPlayerJump += PlayJump;
+    }
+
+    private void OnDisable()
+    {
+        EventManager.OnPlayerLand -= PlayLanding;
+        EventManager.OnPlayerJump -= PlayJump;
+    }
+
     private void Start()
     {
         audioSource_thunder.clip = audioClip_Thunder;
@@ -89,7 +101,7 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         audioSource_BG.clip = audioClip_Game;
     }
 
-    public void PlayJump()
+    public void PlayJump(float power)
     {
         if (thundering) return; // not used currently but thunder is false by default
         audioSource_SE.clip = audioClip_Jump;
@@ -98,6 +110,11 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         //audioSource_SE.volume = 0.3f;
         audioSource_SE.volume = 0.06f; // the wav is very loud, needs low vol
         audioSource_SE.Play();
+    }
+
+    public void PlayLanding()
+    {
+
     }
 
     public void PlayEat()
@@ -137,11 +154,6 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         audioSource_thunder.volume = 0.6f;
         //audioSource_thunder.volume = 1f;
         audioSource_thunder.Play();
-
-    }
-
-    public void PlayLand()
-    {
 
     }
 

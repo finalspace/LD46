@@ -10,6 +10,7 @@ public class LinearMovement : MonoBehaviour
     public float time;
 
     private float progress = 0;
+    private Vector3 targetPosition;
     private void Awake()
     {
 		if (root == null)
@@ -21,7 +22,8 @@ public class LinearMovement : MonoBehaviour
 
     private void Update()
     {
-        root.transform.position = Vector3.Lerp(p1.position, p2.position, progress);
+        targetPosition = Vector3.Lerp(p1.position, p2.position, progress);
+        root.transform.position = targetPosition;
     }
 
 

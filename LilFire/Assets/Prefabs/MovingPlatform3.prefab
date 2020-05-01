@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4255960232757502157}
   - component: {fileID: 7291107080685292726}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2505456517874321546}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: p2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2505456518318189137}
   - component: {fileID: 596834024188180297}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MovingPlatform3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2505456518430193954}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: p1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: 2505456519020081656}
   - component: {fileID: 2505456519020081659}
   - component: {fileID: 4130767139816871430}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -247,7 +247,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.022886515, y: -0.010305166}
+  m_Offset: {x: -0.022886515, y: -0.18099952}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -258,5 +258,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.456468, y: 2.6282}
+  m_Size: {x: 3.456468, y: 2.2868114}
   m_EdgeRadius: 0

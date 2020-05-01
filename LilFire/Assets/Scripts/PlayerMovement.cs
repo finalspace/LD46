@@ -30,10 +30,14 @@ public class PlayerMovement : MonoBehaviour
     private bool doubleJump = false;
     private bool isRunning = false;
     private bool isOnGround = false;
-    private bool isJumping = false;
+    private bool isJumping = true;
     //private bool isFalling = false;
     const int maxJumpNum = 1;
     int jumpNum;
+
+    private Transform parentTransform;
+    private Vector2 parentLastPosition;
+    private Vector2 parentVelocity;
 
     [Header("Aiming Effects")]
     public List<GameObject> aimingDots;
@@ -73,18 +77,18 @@ public class PlayerMovement : MonoBehaviour
     {
         UpdateMovement();
 
-        // detects when on the ground
+        // on the ground or in the air
         if (playerCollision.collisions.below)
         {
             if (isJumping == true)
             {
                 EventManager.Event_PlayerLand();
-                MusicManager.Instance.PlayLand();
                 isJumping = false;
+                Attach(playerCollision.collisions.belowTransform);
+
                 Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
                 Instantiate(footEffect, pos, Quaternion.identity);
                 root.rotation = Quaternion.Euler(0, 0, 0);
-                Player.Instance.animator.PlayLanding();
             }
             velocity.y = 0;
             deltaMovement.x = 0;
@@ -93,10 +97,8 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            //anim.SetBool("isJumping", true);
             isJumping = true;
-            //root.rotation = Quaternion.Euler(0.0f, 0.0f, (Mathf.Repeat(m_phase, 2.0f) < 1.0f ? -25.0f : 25.0f));
-            //root.rotation = Quaternion.LookRotation(velocity);
+            parentTransform = null;
 
             float ang = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90;
             // ang = Mathf.LerpAngle(transform.eulerAngles.z, ang, Time.deltaTime * rotateSpeed);
@@ -108,13 +110,12 @@ public class PlayerMovement : MonoBehaviour
         if (playerCollision.collisions.above)
         {
             velocity.y = 0;
-            deltaMovement.x *= 0.9f;
+            deltaMovement.x *= 0.8f;
         }
 
         // die if player height goes below the starting level; can update the fatal height as we got
         if (Player.Instance.transform.position.y < PlayerStats.Instance.fatalHeightFalling)
         {
-            //Debug.Log("Player dies from falling");
             Player.Instance.Die();
         }
 
@@ -161,7 +162,7 @@ public class PlayerMovement : MonoBehaviour
 
             if (Input.GetKey(KeyCode.Space))
             {
-                GoToHighestWaypoint();
+                //Respawn();
             }
 
             // jump and double jump and triple jump
@@ -202,6 +203,11 @@ public class PlayerMovement : MonoBehaviour
         float targetVelocityX = deltaMovement.x * moveSpeed;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
         velocity.y += gravity * Time.fixedDeltaTime;
+
+        if (parentTransform != null)
+        {
+            //velocity += parentVelocity;
+        }
 
         if (isDead)
         {
@@ -280,6 +286,13 @@ public class PlayerMovement : MonoBehaviour
     * 
     *****************************************/
 
+    public void Reset()
+    {
+        root.rotation = Quaternion.Euler(0, 0, 0);
+        velocity = Vector2.zero;
+        SetAiming(false);
+        Detach();
+    }
       
     public void Dead()
     {
@@ -298,18 +311,6 @@ public class PlayerMovement : MonoBehaviour
         velocity.y = jumpVelocity;
     }
 
-    public void GoToHighestWaypoint()
-    {
-        BoardManager brd = BoardManager.Instance;
-
-        Player.Instance.gameObject.SetActive(false);
-
-        // put player a little higher than achieved waypoint or will fall through
-        Player.Instance.transform.position = brd.HighestWaypoint() + 1.3f * Vector3.up;
-        velocity = Vector2.zero;
-        Player.Instance.gameObject.SetActive(true);
-        Player.Instance.animator.PlayIdle();
-    }
 
     private void Launch()
     {
@@ -317,34 +318,20 @@ public class PlayerMovement : MonoBehaviour
         if (energy < 3) return;
 
         isJumping = true;
+        Detach();
+
         velocity = ComputeInitialVelocity();
         float power = velocity.magnitude / 3;
         float adjustedPower = Mathf.Min(power, energy);
         velocity = velocity * (adjustedPower / power);  //adjusted velocity
-
         deltaMovement.x = velocity.x;
 
-        Debug.Log(power);
-        PlayerStats.Instance.UpdateEnergy(-adjustedPower);
-        MusicManager.Instance.PlayJump();
-        Player.Instance.animator.PlayJump();
+        EventManager.Event_PlayerJump(adjustedPower);
     }
 
     private void LaunchFailed()
     {
-        Player.Instance.animator.PlayIdle();
-    }
-
-    private void Attack()
-    { 
-    }
-
-    private void AttackMelee()
-    { 
-    }
-
-    private void AttackRange()
-    {
+        EventManager.Event_PlayerJumpFail();
     }
 
     void UpdateTrailEffect()
@@ -372,6 +359,19 @@ public class PlayerMovement : MonoBehaviour
 			transform.localScale = theScale;
 		}
 	}
+
+    public void Attach(Transform trans)
+    {
+        parentTransform = trans;
+        parentLastPosition = parentTransform.position;
+        transform.SetParent(trans);
+    }
+
+    public void Detach()
+    {
+        parentTransform = null;
+        transform.SetParent(null);
+    }
 
 	public void Damage(){
         if (hurtPanel != null)

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8420515542840171072}
   - component: {fileID: 3090784701405918779}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 7858412326699338613}
   - component: {fileID: 7858412326699338614}
   - component: {fileID: 2813765919727831973}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -141,7 +141,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.022886515, y: -0.010305166}
+  m_Offset: {x: -0.022886515, y: -0.17962289}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -152,7 +152,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.456468, y: 2.6282}
+  m_Size: {x: 3.456468, y: 2.2895646}
   m_EdgeRadius: 0
 --- !u!1 &7858412326869602522
 GameObject:
@@ -164,7 +164,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7858412326869602524}
   - component: {fileID: 5153237757158329796}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MovingPlatform5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -209,7 +209,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7858412327012402095}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: p1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7858412327564079623}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: p2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

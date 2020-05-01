@@ -22,11 +22,13 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     private void OnEnable()
     {
         EventManager.OnPlayerLand += OnPlayerLand;
+        EventManager.OnPlayerJump += ConsumeEnergy;
     }
 
     private void OnDisable()
     {
         EventManager.OnPlayerLand -= OnPlayerLand;
+        EventManager.OnPlayerJump -= ConsumeEnergy;
     }
 
 
@@ -68,6 +70,11 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
             TryDie();
         }
         energy = Mathf.Clamp(energy, 0, 120);
+    }
+
+    public void ConsumeEnergy(float value)
+    {
+        UpdateEnergy(-value);
     }
 
     public void CollectItem()

@@ -32,8 +32,9 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnGround = false;
     private bool isJumping = true;
     //private bool isFalling = false;
-    const int maxJumpNum = 1;
-    int jumpNum;
+    const int maxJumpNum = 2;
+    private int jumpNum;
+    private bool powerMode = false;
 
     private Transform parentTransform;
     private Vector2 parentLastPosition;
@@ -63,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
         playerCollision = GetComponent<PlayerCollision> ();
 		gravity = -(2 * jumpHeight) / Mathf.Pow (timeToJumpApex, 2);
 		jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
-        jumpNum = maxJumpNum;
+        jumpNum = 0;
 	}
 
 	void Update() 
@@ -92,8 +93,8 @@ public class PlayerMovement : MonoBehaviour
             }
             velocity.y = 0;
             deltaMovement.x = 0;
-            doubleJump = false;
-            jumpNum = maxJumpNum;
+            jumpNum = 0;
+            powerMode = false;
         }
         else
         {
@@ -129,19 +130,20 @@ public class PlayerMovement : MonoBehaviour
     {
         deltaMovement = Vector2.zero;
 
-        // detects if the player is holding the arrow keys to move
         if (!isDead)
         {
             //keyboard control
             //deltaMovement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && AbleToJump())
             {
                 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 if (Vector2.Distance(mousePosition, transform.position) > 2.0f)
                     return;
 
                 SetAiming(true);
+                if (jumpNum == maxJumpNum - 1)
+                    TimeManager.Instance.SlowMotion();
             }
 
             if (Input.GetMouseButton(0))
@@ -155,6 +157,8 @@ public class PlayerMovement : MonoBehaviour
                 if (!aiming) return;
 
                 SetAiming(false);
+                TimeManager.Instance.Reset();
+
                 if (Vector2.Distance(mousePosition, transform.position) > 0.5f)
                     Launch();
                 else LaunchFailed();
@@ -164,30 +168,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 //Respawn();
             }
-
-            // jump and double jump and triple jump
-            /*
-            if (Input.GetKey(KeyCode.Space) && playerCollision.collisions.below)
-            {
-                Jump();
-            }
-            */
-
-            /*
-            if (Input.GetKey(KeyCode.L) && playerCollision.collisions.below)
-            {
-                Launch();
-            }
-            */
-            /*
-            if (Input.GetKeyDown(KeyCode.Space) && doubleJump == false && !controller.collisions.below){
-                velocity.y = jumpVelocity;
-                jumpNum--;
-                if(jumpNum <= 0){
-                    doubleJump = true;
-                }
-            } 
-            */
         }
     }
 
@@ -201,8 +181,16 @@ public class PlayerMovement : MonoBehaviour
 
         // handles moving and physics for jumping
         float targetVelocityX = deltaMovement.x * moveSpeed;
-        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
+        float accelerationTime = (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne;
+        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime);
+
+        if (!powerMode)
         velocity.y += gravity * Time.fixedDeltaTime;
+
+        if (powerMode)
+            velocity *= 0.88f;
+        if (velocity.magnitude < 5.0f)
+            powerMode = false;
 
         if (parentTransform != null)
         {
@@ -258,9 +246,10 @@ public class PlayerMovement : MonoBehaviour
         float y = Mathf.InverseLerp(0, 1.5f, Mathf.Abs(diff.y));
         y = Mathf.Sqrt(y);
         power.y = Mathf.Lerp(0, 20f, y) * Mathf.Sign(diff.y);
+
         return power;
     }
-
+      
     public void SetAiming(bool val)
     {
         if (aiming == val)
@@ -277,6 +266,11 @@ public class PlayerMovement : MonoBehaviour
             Player.Instance.animator.PlaySquish();
         else
             Player.Instance.animator.PlayIdle();
+    }
+
+    private bool AbleToJump()
+    {
+        return (jumpNum < maxJumpNum);
     }
 
 
@@ -318,12 +312,20 @@ public class PlayerMovement : MonoBehaviour
         if (energy < 3) return;
 
         isJumping = true;
+        jumpNum++;
+        powerMode = (jumpNum == maxJumpNum);
         Detach();
 
         velocity = ComputeInitialVelocity();
         float power = velocity.magnitude / 3;
         float adjustedPower = Mathf.Min(power, energy);
         velocity = velocity * (adjustedPower / power);  //adjusted velocity
+
+
+
+        if (powerMode)
+            velocity *= 2.5f;
+
         deltaMovement.x = velocity.x;
 
         EventManager.Event_PlayerJump(adjustedPower);

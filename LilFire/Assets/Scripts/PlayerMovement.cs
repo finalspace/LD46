@@ -15,12 +15,13 @@ public class PlayerMovement : MonoBehaviour
     public Transform root;
 
     private Vector2 deltaMovement;
-    private float accelerationTimeAirborne = .4f;
+    private float accelerationTimeAirborne = .9f;
 	private float accelerationTimeGrounded = .2f;
 	private float gravity;
 	private float jumpVelocity;
 	private Vector2 velocity;
 	private float velocityXSmoothing;
+    private float targetVelocityX;
 
     private PlayerCollision playerCollision;
 	private Animator anim;
@@ -41,12 +42,17 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 parentVelocity;
 
     [Header("Aiming Effects")]
+    public GameObject aimingRoot;
     public List<GameObject> aimingDots;
     public bool aiming = false;
-    private int NumIterations = 8;
+    private int NumIterations = 13;
     //private float aimingLoopRange = 10;
     private float aimingTime = 0;
+    private Vector3 camFirstPos;
+    private Vector3 mouseFirstPos;
     private Vector3 mousePosition;
+    private Vector3 startPosOffset = new Vector3(0, 0.5f, 0);
+    private float velXSmoothingTemp;
 
     //[Header("Skills")]
     //public RangedWeapon rangeWeapon;
@@ -65,6 +71,8 @@ public class PlayerMovement : MonoBehaviour
 		gravity = -(2 * jumpHeight) / Mathf.Pow (timeToJumpApex, 2);
 		jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         jumpNum = 0;
+
+        aimingRoot.transform.SetParent(null);
 	}
 
 	void Update() 
@@ -93,6 +101,7 @@ public class PlayerMovement : MonoBehaviour
             }
             velocity.y = 0;
             deltaMovement.x = 0;
+            targetVelocityX = 0;
             jumpNum = 0;
             powerMode = false;
         }
@@ -112,6 +121,7 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y = 0;
             deltaMovement.x *= 0.8f;
+            targetVelocityX *= 0.8f;
         }
 
         // die if player height goes below the starting level; can update the fatal height as we got
@@ -138,8 +148,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetMouseButtonDown(0) && AbleToJump())
             {
                 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                if (Vector2.Distance(mousePosition, transform.position) > 2.0f)
-                    return;
+                mouseFirstPos = mousePosition;
 
                 SetAiming(true);
                 if (jumpNum == maxJumpNum - 1)
@@ -159,7 +168,7 @@ public class PlayerMovement : MonoBehaviour
                 SetAiming(false);
                 TimeManager.Instance.Reset();
 
-                if (Vector2.Distance(mousePosition, transform.position) > 0.5f)
+                if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.5f)
                     Launch();
                 else LaunchFailed();
             }
@@ -180,9 +189,10 @@ public class PlayerMovement : MonoBehaviour
         Flip(deltaMovement);
 
         // handles moving and physics for jumping
-        float targetVelocityX = deltaMovement.x * moveSpeed;
+        //float targetVelocityX = deltaMovement.x * moveSpeed;
+        //targetVelocityX = deltaMovement.x;
         float accelerationTime = (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne;
-        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime);
+        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime, Mathf.Infinity, Time.fixedDeltaTime);
 
         if (!powerMode)
         velocity.y += gravity * Time.fixedDeltaTime;
@@ -204,8 +214,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         playerCollision.Move(velocity * Time.fixedDeltaTime);
-        isRunning = (deltaMovement.x != 0);
-        //anim.SetBool("isRunning", isRunning);
 
         isOnGround = playerCollision.collisions.below;
 
@@ -217,20 +225,25 @@ public class PlayerMovement : MonoBehaviour
 
     private void DrawTrajectory()
     {
-        aimingTime = aimingTime + Time.fixedDeltaTime;
+        Vector2 vel = ComputeInitialVelocity();
+        Vector2 dotPos = transform.position + startPosOffset;
+
+        aimingTime += Time.fixedDeltaTime;
         float offTime = Mathf.Repeat(aimingTime, 1.0f);
         offTime = offTime / 10f;
         float dt = Time.fixedDeltaTime * 5;
-        Vector2 vel = ComputeInitialVelocity();
-        Vector2 position = transform.position;
+
+        float targetVx = vel.x / 2;
+        vel.x = Mathf.SmoothDamp(vel.x, targetVx, ref velXSmoothingTemp, accelerationTimeAirborne, Mathf.Infinity, offTime);
         vel.y += gravity * offTime;
-        position += vel * offTime;
+        dotPos += vel * offTime;
      
-        for (int i = 1; i < NumIterations; ++i)
+        for (int i = 0; i < NumIterations; ++i)
         {
-            aimingDots[i].transform.position = position;
+            aimingDots[i].transform.position = dotPos;
+            vel.x = Mathf.SmoothDamp(vel.x, targetVx, ref velXSmoothingTemp, accelerationTimeAirborne, Mathf.Infinity, dt);
             vel.y += gravity * dt;
-            position += vel * dt;
+            dotPos += vel * dt;
         }
     }
 
@@ -238,10 +251,11 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 ComputeInitialVelocity()
     {
         Vector2 power;
-        Vector2 diff = transform.position + new Vector3(0, 0.5f, 0) - mousePosition;
+        Vector2 diff = mouseFirstPos + startPosOffset - mousePosition;
         float x = Mathf.InverseLerp(0, 6, Mathf.Abs(diff.x));
-        x = Mathf.Sqrt(x);
-        power.x = Mathf.Lerp(0, 10f, x) * Mathf.Sign(diff.x);
+        //x = Mathf.Sqrt(x);
+        x = Mathf.Sin(x * Mathf.PI / 2);
+        power.x = Mathf.Lerp(0, 15f, x) * Mathf.Sign(diff.x);
 
         float y = Mathf.InverseLerp(0, 1.5f, Mathf.Abs(diff.y));
         y = Mathf.Sqrt(y);
@@ -256,10 +270,14 @@ public class PlayerMovement : MonoBehaviour
             return;
         aiming = val;
 
-        for (int i = 0; i < aimingDots.Count; i++)
+        aimingRoot.SetActive(val);
+        if (!aiming)
         {
-            if (aiming) aimingDots[i].transform.position = transform.position;
-            aimingDots[i].SetActive(aiming);
+            for (int i = 0; i < aimingDots.Count; i++)
+            {
+                aimingDots[i].transform.position = transform.position;
+            }
+            aimingTime = 0;
         }
 
         if (aiming)
@@ -321,12 +339,11 @@ public class PlayerMovement : MonoBehaviour
         float adjustedPower = Mathf.Min(power, energy);
         velocity = velocity * (adjustedPower / power);  //adjusted velocity
 
-
-
         if (powerMode)
             velocity *= 2.5f;
 
-        deltaMovement.x = velocity.x;
+        //deltaMovement.x = velocity.x;
+        targetVelocityX = velocity.x / 2;
 
         EventManager.Event_PlayerJump(adjustedPower);
     }

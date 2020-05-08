@@ -13,6 +13,12 @@ public class EventManager
     public delegate void PlayerJumpFailed();
     public static event PlayerJumpFailed OnPlayerJumpFailed;
 
+    public delegate void Aiming();
+    public static event Aiming OnAiming;
+
+    public delegate void ReleaseAiming();
+    public static event ReleaseAiming OnReleaseAiming;
+
     public static void Event_PlayerLand()
     {
         OnPlayerLand();
@@ -28,6 +34,15 @@ public class EventManager
         OnPlayerJumpFailed();
     }
 
+    public static void Event_PlayerAiming()
+    {
+        OnAiming();
+    }
+
+    public static void Event_PlayerStopAiming()
+    {
+        OnReleaseAiming();
+    }
 
 
 

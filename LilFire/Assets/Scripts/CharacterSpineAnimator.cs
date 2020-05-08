@@ -41,7 +41,7 @@ public class CharacterSpineAnimator : MonoBehaviour
         {
 			PlayIdle();
         }
-        else if (te.Animation.Name.StartsWith("squish_transition", System.StringComparison.CurrentCultureIgnoreCase))
+        else if (te.Animation.Name.StartsWith("landing_transition", System.StringComparison.CurrentCultureIgnoreCase))
         {
 			PlayIdle();
         }

@@ -100,7 +100,6 @@ public class PlayerMovement : MonoBehaviour
                 root.rotation = Quaternion.Euler(0, 0, 0);
             }
             velocity.y = 0;
-            deltaMovement.x = 0;
             targetVelocityX = 0;
             jumpNum = 0;
             powerMode = false;
@@ -120,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
         if (playerCollision.collisions.above)
         {
             velocity.y = 0;
-            deltaMovement.x *= 0.8f;
+            velocity.x *= 0.8f;
             targetVelocityX *= 0.8f;
         }
 
@@ -190,7 +189,6 @@ public class PlayerMovement : MonoBehaviour
 
         // handles moving and physics for jumping
         //float targetVelocityX = deltaMovement.x * moveSpeed;
-        //targetVelocityX = deltaMovement.x;
         float accelerationTime = (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime, Mathf.Infinity, Time.fixedDeltaTime);
 
@@ -342,7 +340,6 @@ public class PlayerMovement : MonoBehaviour
         if (powerMode)
             velocity *= 2.5f;
 
-        //deltaMovement.x = velocity.x;
         targetVelocityX = velocity.x / 2;
 
         EventManager.Event_PlayerJump(adjustedPower);

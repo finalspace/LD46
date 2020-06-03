@@ -7,27 +7,23 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public float maxHeight = 0;
     public int lives = 3;
     public int score = 0;
-    public int highestWaypoint = 0;
     public bool losingEnergy = true;
     public float fatalHeightFalling = -14;
     public float energy = 100;
-    private float decreasingSpeed = 2;
-    public GameObject player;
+    private float decreasingSpeed = 0;
+    public Player player;
     public BoardManager lvl;
     public float startingAltitude = 0;
 
-    private PlayerCollision playercollision;
-    private bool dying = false;
+    public bool dying = false;
 
     private void OnEnable()
     {
-        EventManager.OnPlayerLand += OnPlayerLand;
         EventManager.OnPlayerJump += ConsumeEnergy;
     }
 
     private void OnDisable()
     {
-        EventManager.OnPlayerLand -= OnPlayerLand;
         EventManager.OnPlayerJump -= ConsumeEnergy;
     }
 
@@ -35,8 +31,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     // Start is called before the first frame update
     void Start()
     {
-        playercollision = GetComponent<PlayerCollision>();
-        player = Player.Instance.gameObject;
+        player = Player.Instance;
         lvl = BoardManager.Instance;
 
         startingAltitude = player.transform.position.y;
@@ -51,12 +46,11 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         {
             maxHeight = player.transform.position.y - startingAltitude;
             score = Mathf.FloorToInt(maxHeight);
-            highestWaypoint = lvl.blocksCreated - 1;
         }
         if (energy > 0 && losingEnergy)
         {
             energy -= Time.deltaTime * decreasingSpeed;
-            if (energy <= 0) TryDie();
+            if (energy <= 0) player.TryDie();
         }
 
     }
@@ -67,58 +61,15 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         if (energy <= 0)
         {
             energy = 0;
-            TryDie();
+            player.TryDie();
         }
         energy = Mathf.Clamp(energy, 0, 120);
     }
 
     public void ConsumeEnergy(float value)
     {
+        value = 0;
         UpdateEnergy(-value);
-    }
-
-    public void CollectItem()
-    {
-
-    }
-
-    public void TryDie()
-    {
-        if (playercollision.collisions.below)
-        {
-            Die();
-            return;
-        }
-
-        dying = true;
-    }
-
-    public void Die()
-    {
-        //Debug.Log("Player dies from running out of energy");
-        lives--;
-        UIManager.Instance.UpdateLife(lives);
-        if (lives <= 0)
-        {
-            Player.Instance.Die();
-        }
-        else
-        {
-            Player.Instance.Respawn();
-        }
-        dying = false;
-    }
-
-
-   /*****************************************
-    * 
-    * Events
-    * 
-    *****************************************/
-    private void OnPlayerLand()
-    {
-        if (dying)
-            Die();
     }
 
 }

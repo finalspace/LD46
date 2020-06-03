@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -17,12 +18,20 @@ namespace BoingKit
 {
   public class BoingBehavior : MonoBehaviour
   {
+    public BoingManager.UpdateMode UpdateMode = BoingManager.UpdateMode.Update;
+    public BoingManager.UpdateTiming UpdateTiming = BoingManager.UpdateTiming.Late;
+
     public bool TwoDDistanceCheck      = false;
     public bool TwoDPositionInfluence  = false;
     public bool TwoDRotationInfluence  = false;
     public bool EnablePositionEffect   = true;
     public bool EnableRotationEffect   = true;
     public bool GlobalReactionUpVector = false;
+
+    public BoingManager.TranslationLockSpace TranslationLockSpace = BoingManager.TranslationLockSpace.Global;
+    public bool LockTranslationX = false;
+    public bool LockTranslationY = false;
+    public bool LockTranslationZ = false;
 
     public BoingWork.Params Params;
     public SharedBoingParams SharedParams;
@@ -60,7 +69,6 @@ namespace BoingKit
 
     internal Vector3 CachedPosition;
     internal Quaternion CachedRotation;
-    internal int LastPullResultsFrame = -1;
 
     internal bool InitRebooted = false;
 
@@ -111,6 +119,9 @@ namespace BoingKit
       Params.Bits.SetBit(BoingWork.ReactorFlags.EnablePositionEffect  , EnablePositionEffect  );
       Params.Bits.SetBit(BoingWork.ReactorFlags.EnableRotationEffect  , EnableRotationEffect  );
       Params.Bits.SetBit(BoingWork.ReactorFlags.GlobalReactionUpVector, GlobalReactionUpVector);
+
+      Params.Bits.SetBit(BoingWork.ReactorFlags.FixedUpdate, (UpdateMode == BoingManager.UpdateMode.FixedUpdate));
+      Params.Bits.SetBit(BoingWork.ReactorFlags.LateUpdateTiming, (UpdateTiming == BoingManager.UpdateTiming.Late));
     }
 
     public virtual void PrepareExecute()
@@ -160,7 +171,7 @@ namespace BoingKit
       PullResults(ref Params);
     }
 
-    public void PullResults(ref BoingWork.Output o)
+    public void GatherOutput(ref BoingWork.Output o)
     {
         #if UNITY_2018_1_OR_NEWER
         if (BoingManager.UseAsynchronousJobs)
@@ -181,28 +192,22 @@ namespace BoingKit
           Params.Instance.PositionSpring = o.PositionSpring;
           Params.Instance.RotationSpring = o.RotationSpring;
         }
-
-        PullResults(ref Params);
     }
 
     private void PullResults(ref BoingWork.Params p)
     {
       CachedPosition = transform.position;
-      transform.position = p.Instance.PositionSpring.Value;
+      transform.position = BoingWork.ComputeTranslationalResults(transform, transform.position, p.Instance.PositionSpring.Value, this);
 
       CachedRotation = transform.rotation;
       transform.rotation = p.Instance.RotationSpring.ValueQuat;
-
-      LastPullResultsFrame = Time.frameCount;
     }
 
     public void Restore()
     {
-      if (LastPullResultsFrame < Time.frameCount)
-        return;
-
       transform.position = CachedPosition;
       transform.rotation = CachedRotation;
     }
   }
 }
+

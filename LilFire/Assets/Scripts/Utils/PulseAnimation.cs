@@ -6,18 +6,20 @@ using UnityEngine;
 public class PulseAnimation : MonoBehaviour
 {
     public Transform pulseRoot;
+    public bool loop = false;
+
+    public bool autoStart = false;
+    [Header("Basic")]
     public float pulseScale = 1.5f;
     public float phaseTime = 0.5f;
-    public bool SyncWithRhythem = false;
+
+    [Header("Style")]
+    public Ease easeType = Ease.OutCubic;
+    public LoopType loopType = LoopType.Restart;
 
     private string id;
     private float scale;
     private bool playing = false;
-
-    private void PlayEffect()
-    {
-        Play();
-    }
 
     private void Start()
     {
@@ -25,6 +27,9 @@ public class PulseAnimation : MonoBehaviour
 
         if (pulseRoot == null)
             pulseRoot = transform;
+
+        if (autoStart)
+            Play(loop);
     }
 
     private void Update()
@@ -35,12 +40,13 @@ public class PulseAnimation : MonoBehaviour
         pulseRoot.transform.localScale = Vector3.one * scale;
     }
 
-    public void Play()
+    public void Play(bool loop = false)
     {
         DOTween.Kill(id);
         scale = pulseScale;
         playing = true;
-        DOTween.To(() => scale, x => scale = x, 1, phaseTime).SetEase(Ease.OutCubic).SetId(id).OnComplete(OnComplete);
+        int loopTimes = loop ? -1 : 1;
+        DOTween.To(() => scale, x => scale = x, 1, phaseTime).SetLoops(loopTimes, loopType).SetEase(easeType).SetId(id).OnComplete(OnComplete);
     }
 
     private void OnComplete()

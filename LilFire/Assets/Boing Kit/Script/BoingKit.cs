@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -13,7 +14,7 @@ namespace BoingKit
   {
     public static readonly int MajorVersion = 1;
     public static readonly int MinorVersion = 2;
-    public static readonly int Revision     = 6;
+    public static readonly int Revision     = 17;
     public static string Version { get { return MajorVersion + "." + MinorVersion + "." + Revision; } }
   }
 }

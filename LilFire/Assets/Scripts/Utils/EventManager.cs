@@ -19,6 +19,9 @@ public class EventManager
     public delegate void ReleaseAiming();
     public static event ReleaseAiming OnReleaseAiming;
 
+    public delegate void SectionFinish(Section section);
+    public static event SectionFinish OnSectionFinish;
+
     public static void Event_PlayerLand()
     {
         OnPlayerLand();
@@ -42,6 +45,11 @@ public class EventManager
     public static void Event_PlayerStopAiming()
     {
         OnReleaseAiming();
+    }
+
+    public static void Event_SectionFinish(Section section)
+    {
+        OnSectionFinish(section);
     }
 
 

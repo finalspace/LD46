@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -14,6 +15,13 @@ namespace BoingKit
   public class BoingReactorFieldCPUSampler : MonoBehaviour
   {
     public BoingReactorField ReactorField;
+
+    [Tooltip(
+        "When to apply transforms for rendering.\n\n" 
+      + "Update - Apply transforms for rendering during Update. Only use this mode if your render logic pulls transforms during Update(), such as Unity's skinned sprite renderer (in certain versions).\n\n" 
+      + "Late Update - Apply transforms for rendering during LateUpdate(). This is the recommended option."
+    )]
+    public BoingManager.UpdateTiming UpdateTiming = BoingManager.UpdateTiming.Late;
 
     [Range(0.0f, 10.0f)]
     [Tooltip(

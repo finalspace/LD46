@@ -15,7 +15,8 @@ public class MainGameManager : SingletonBehaviour<MainGameManager> {
 
 	private void Start()
 	{
-        GoToTitleScene();
+        if (gameState == GameState.Title)
+            GoToTitleScene();
     }
 
 	private void Update()

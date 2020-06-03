@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -31,6 +32,8 @@ namespace BoingKit
       GlobalReactionUpVector, 
       EnablePropagation, 
       AnchorPropagationAtBorder, 
+      FixedUpdate, 
+      LateUpdateTiming, 
     }
 
     [Serializable]
@@ -430,8 +433,10 @@ namespace BoingKit
             // otherwise, we'd cache delta propagated down from parent bones
             foreach (var bone in aBone)
             {
-              bone.CachedPosition = bone.Transform.position;
-              bone.CachedRotation = bone.Transform.rotation;
+              bone.CachedPositionWs = bone.Transform.position;
+              bone.CachedPositionLs = bone.Transform.localPosition;
+              bone.CachedRotationWs = bone.Transform.rotation;
+              bone.CachedRotationLs = bone.Transform.localRotation;
             }
 
             // blend bone position
@@ -442,15 +447,15 @@ namespace BoingKit
               // skip fixed root
               if (iBone == 0 && !chain.LooseRoot)
               {
-                bone.BlendedPosition = bone.CachedPosition;
+                bone.BlendedPositionWs = bone.CachedPositionWs;
                 continue;
               }
 
-              bone.BlendedPosition =
+              bone.BlendedPositionWs =
                 Vector3.Lerp
                 (
                   bone.Instance.PositionSpring.Value,
-                  bone.CachedPosition,
+                  bone.CachedPositionWs,
                   bone.AnimationBlend
                 );
             }
@@ -465,7 +470,7 @@ namespace BoingKit
                 // skip fixed root
                 if (iBone == 0 && !chain.LooseRoot)
                 {
-                  bone.BlendedRotation = bone.CachedRotation;
+                  bone.BlendedRotationWs = bone.CachedRotationWs;
                   continue;
                 }
 
@@ -474,15 +479,15 @@ namespace BoingKit
                   if (bone.ParentIndex >= 0)
                   {
                     var parentBone = aBone[bone.ParentIndex];
-                    bone.BlendedRotation = parentBone.BlendedRotation * (parentBone.RotationInverse * bone.CachedRotation);
+                    bone.BlendedRotationWs = parentBone.BlendedRotationWs * (parentBone.RotationInverseWs * bone.CachedRotationWs);
                   }
 
                   continue;
                 }
 
-                Vector3 bonePos = bone.CachedPosition;
-                Vector3 boneBlendedPos = bone.BlendedPosition;
-                Quaternion boneRot = bone.CachedRotation;
+                Vector3 bonePos = bone.CachedPositionWs;
+                Vector3 boneBlendedPos = ComputeTranslationalResults(bone.Transform, bonePos, bone.BlendedPositionWs, bones);
+                Quaternion boneRot = bone.CachedRotationWs;
                 Quaternion boneRotInv = Quaternion.Inverse(boneRot);
 
                 Vector4 childRotDeltaPsVecAccumulator = Vector3.zero;
@@ -491,11 +496,11 @@ namespace BoingKit
                 {
                   var childBone = aBone[iChild];
 
-                  Vector3 childPos = childBone.CachedPosition;
+                  Vector3 childPos = childBone.CachedPositionWs;
                   Vector3 childPosDelta = childPos - bonePos;
                   Vector3 childPosDeltaDir = VectorUtil.NormalizeSafe(childPosDelta, Vector3.zero);
 
-                  Vector3 childBlendedPos = childBone.BlendedPosition;
+                  Vector3 childBlendedPos = ComputeTranslationalResults(childBone.Transform, childPos, childBone.BlendedPositionWs, bones);
                   Vector3 childBlendedPosDelta = childBlendedPos - boneBlendedPos;
                   Vector3 childBlendedPosDeltaDir = VectorUtil.NormalizeSafe(childBlendedPosDelta, Vector3.zero);
 
@@ -512,12 +517,12 @@ namespace BoingKit
                 {
                   Vector4 avgChildRotDeltaPsVec = childRotDeltaPsVecAccumulator / totalWeight;
                   bone.RotationBackPropDeltaPs = QuaternionUtil.FromVector4(avgChildRotDeltaPsVec);
-                  bone.BlendedRotation = (boneRot * bone.RotationBackPropDeltaPs) * boneRot;
+                  bone.BlendedRotationWs = (boneRot * bone.RotationBackPropDeltaPs) * boneRot;
                 }
                 else if (bone.ParentIndex >= 0)
                 {
                   var parentBone = aBone[bone.ParentIndex];
-                  bone.BlendedRotation = parentBone.BlendedRotation * (parentBone.RotationInverse * bone.CachedRotation);
+                  bone.BlendedRotationWs = parentBone.BlendedRotationWs * (parentBone.RotationInverseWs * bone.CachedRotationWs);
                 }
               }
             }
@@ -530,18 +535,16 @@ namespace BoingKit
               // skip fixed root
               if (iBone == 0 && !chain.LooseRoot)
               {
-                bone.Instance.PositionSpring.Reset(bone.CachedPosition);
-                bone.Instance.RotationSpring.Reset(bone.CachedRotation);
+                bone.Instance.PositionSpring.Reset(bone.CachedPositionWs);
+                bone.Instance.RotationSpring.Reset(bone.CachedRotationWs);
                 continue;
               }
 
-              bone.Transform.position = bone.BlendedPosition;
-              bone.Transform.rotation = bone.BlendedRotation;
-              bone.Transform.localScale = bone.BlendedScale;
+              bone.Transform.position = ComputeTranslationalResults(bone.Transform, bone.Transform.position, bone.BlendedPositionWs, bones);
+              bone.Transform.rotation = bone.BlendedRotationWs;
+              bone.Transform.localScale = bone.BlendedScaleLs;
             }
           }
-
-          bones.LastPullResultsFrame = Time.frameCount;
         }
 
         private void SuppressWarnings()
@@ -613,16 +616,10 @@ namespace BoingKit
           if (aBone == null)
             continue;
 
-          Vector3 gravityDt = chain.Gravity * dt;
-
           // execute boing work
           for (int iBone = 0; iBone < aBone.Length; ++iBone) // skip root
           {
             var bone = aBone[iBone];
-
-            // no gravity on root
-            if (iBone > 0)
-              bone.Instance.PositionSpring.Velocity += gravityDt;
 
             if (chain.ParamsOverride == null)
             {
@@ -635,7 +632,7 @@ namespace BoingKit
           }
 
           var rootBone = aBone[0];
-          rootBone.GlobalScale = rootBone.BlendedScale = rootBone.CachedScale;
+          rootBone.ScaleWs = rootBone.BlendedScaleLs = rootBone.CachedScaleLs;
 
           rootBone.UpdateBounds();
           chain.Bounds = rootBone.Bounds;
@@ -648,20 +645,17 @@ namespace BoingKit
             var bone = aBone[iBone];
             var parentBone = aBone[bone.ParentIndex];
 
-            float tLengthStiffness = 1.0f - Mathf.Pow(1.0f - bone.LengthStiffness, 30.0f * dt); // a factor of 30.0f is what makes 0.5 length stiffness looks like 50% stiffness
-
             Vector3 toParentVec = parentBone.Instance.PositionSpring.Value - bone.Instance.PositionSpring.Value;
             Vector3 toParentDir = VectorUtil.NormalizeSafe(toParentVec, Vector3.zero);
-            float fullyStiffToParentLen = (parentBone.Transform.position - bone.Transform.position).magnitude;
             float toParentLen = toParentVec.magnitude;
-            float fullyStiffLenDelta = toParentLen - fullyStiffToParentLen;
-            float toParentAdjustLen = tLengthStiffness * fullyStiffLenDelta;
+            float fullyStiffLenDelta = toParentLen - bone.FullyStiffToParentLength;
+            float toParentAdjustLen = bone.LengthStiffnessT * fullyStiffLenDelta;
 
             // length stiffness
             {
               bone.Instance.PositionSpring.Value += toParentAdjustLen * toParentDir;
               Vector3 velocityInParentAdjustDir = Vector3.Project(bone.Instance.PositionSpring.Velocity, toParentDir);
-              bone.Instance.PositionSpring.Velocity -= tLengthStiffness * velocityInParentAdjustDir;
+              bone.Instance.PositionSpring.Velocity -= bone.LengthStiffnessT  * velocityInParentAdjustDir;
             }
 
             // bend angle cap
@@ -676,30 +670,30 @@ namespace BoingKit
             // volume preservation
             if (bone.SquashAndStretch > 0.0f)
             {
-              float toParentLenRatio = toParentLen * MathUtil.InvSafe(fullyStiffToParentLen);
+              float toParentLenRatio = toParentLen * MathUtil.InvSafe(bone.FullyStiffToParentLength);
               float volumePreservationScale = Mathf.Sqrt(1.0f / toParentLenRatio);
               volumePreservationScale = Mathf.Clamp(volumePreservationScale, 1.0f / Mathf.Max(1.0f, chain.MaxStretch), Mathf.Max(1.0f, chain.MaxSquash));
-              Vector3 volumePreservationScaleVec = VectorUtil.ComponentWiseDivSafe(volumePreservationScale * Vector3.one, parentBone.GlobalScale);
+              Vector3 volumePreservationScaleVec = VectorUtil.ComponentWiseDivSafe(volumePreservationScale * Vector3.one, parentBone.ScaleWs);
 
-              bone.BlendedScale = 
+              bone.BlendedScaleLs = 
                 Vector3.Lerp
                 (
                   Vector3.Lerp
                   (
-                    bone.CachedScale,
+                    bone.CachedScaleLs,
                     volumePreservationScaleVec, 
                     bone.SquashAndStretch
                   ),
-                  bone.CachedScale, 
+                  bone.CachedScaleLs, 
                   bone.AnimationBlend
                 );
             }
             else
             {
-              bone.BlendedScale = bone.CachedScale;
+              bone.BlendedScaleLs = bone.CachedScaleLs;
             }
 
-            bone.GlobalScale = VectorUtil.ComponentWiseMult(parentBone.GlobalScale, bone.BlendedScale);
+            bone.ScaleWs = VectorUtil.ComponentWiseMult(parentBone.ScaleWs, bone.BlendedScaleLs);
 
             bone.UpdateBounds();
             chain.Bounds.Encapsulate(bone.Bounds);
@@ -734,8 +728,11 @@ namespace BoingKit
           }
 
           // Unity colliders
-          if (chain.EnableUnityCollision)
+          var sharedSphereCollider = BoingManager.SharedSphereCollider;
+          if (chain.EnableUnityCollision && sharedSphereCollider != null)
           {
+            sharedSphereCollider.enabled = true;
+
             foreach (var collider in bones.UnityColliders)
             {
               if (collider == null)
@@ -749,7 +746,6 @@ namespace BoingKit
                 if (!bone.Bounds.Intersects(collider.bounds))
                   continue;
 
-                var sharedSphereCollider = bones.SharedSphereCollider;
                 sharedSphereCollider.center = bone.Instance.PositionSpring.Value;
                 sharedSphereCollider.radius = bone.CollisionRadius;
 
@@ -758,7 +754,7 @@ namespace BoingKit
                 bool collided = 
                   Physics.ComputePenetration
                   (
-                    bones.SharedSphereCollider, Vector3.zero, Quaternion.identity,
+                    sharedSphereCollider, Vector3.zero, Quaternion.identity,
                     collider, collider.transform.position, collider.transform.rotation, 
                     out pushDir, out pushDist
                   );
@@ -769,6 +765,8 @@ namespace BoingKit
                 bone.Instance.PositionSpring.Velocity -= Vector3.Project(bone.Instance.PositionSpring.Velocity, pushDir);
               }
             }
+
+            sharedSphereCollider.enabled = false;
           }
 
           // self collision
@@ -864,27 +862,22 @@ namespace BoingKit
         RotationSpring = rotationSpring;
       }
 
-      public void PullResults(BoingBones.Bone bone)
-      {
-        // TODO
-      }
-
-      public void PullResults(Dictionary<int, BoingBehavior> behaviorMap)
+      public void GatherOutput(Dictionary<int, BoingBehavior> behaviorMap)
       {
         BoingBehavior behavior;
         if (!behaviorMap.TryGetValue(InstanceID, out behavior))
           return;
 
-        behavior.PullResults(ref this);
+        behavior.GatherOutput(ref this);
       }
 
-      public void PullResults(Dictionary<int, BoingReactor> reactorMap)
+      public void GatherOutput(Dictionary<int, BoingReactor> reactorMap)
       {
         BoingReactor reactor;
         if (!reactorMap.TryGetValue(InstanceID, out reactor))
           return;
 
-        reactor.PullResults(ref this);
+        reactor.GatherOutput(ref this);
       }
 
       private void SuppressWarnings()
@@ -895,6 +888,41 @@ namespace BoingKit
         m_padding0 = m_padding1;
         m_padding1 = m_padding2;
         m_padding2 = m_padding0;
+      }
+    }
+
+    internal static Vector3 ComputeTranslationalResults(Transform t, Vector3 src, Vector3 dst, BoingBehavior b)
+    {
+      if (!b.LockTranslationX && !b.LockTranslationY && !b.LockTranslationZ)
+      {
+        return dst;
+      }
+      else
+      {
+        Vector3 delta = dst - src;
+
+        switch (b.TranslationLockSpace)
+        {
+          case BoingManager.TranslationLockSpace.Global:
+            if (b.LockTranslationX)
+              delta.x = 0.0f;
+            if (b.LockTranslationY)
+              delta.y = 0.0f;
+            if (b.LockTranslationZ)
+              delta.z = 0.0f;
+            break;
+
+          case BoingManager.TranslationLockSpace.Local:
+            if (b.LockTranslationX)
+              delta -= Vector3.Project(delta, t.right);
+            if (b.LockTranslationY)
+              delta -= Vector3.Project(delta, t.up);
+            if (b.LockTranslationZ)
+              delta -= Vector3.Project(delta, t.forward);
+            break;
+        }
+
+        return src + delta;
       }
     }
   }

@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -28,6 +29,11 @@ namespace BoingKit
     private SerializedProperty DebugDrawBoneNames;
     private SerializedProperty DebugDrawLengthFromRoot;
     private SerializedProperty DebugDrawChainBounds;
+
+    public BoingBonesEditor()
+    {
+      m_isBones = true;
+    }
 
     public override void OnEnable()
     {

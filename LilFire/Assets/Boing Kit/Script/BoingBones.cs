@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -26,23 +27,27 @@ namespace BoingKit
     {
       internal BoingWork.Params.InstanceData Instance;
       internal Transform Transform;
-      internal Vector3 GlobalScale;
-      internal Vector3 CachedScale;
-      internal Vector3 BlendedPosition;
-      internal Vector3 BlendedScale;
-      internal Vector3 CachedPosition;
+      internal Vector3 ScaleWs;
+      internal Vector3 CachedScaleLs;
+      internal Vector3 BlendedPositionWs;
+      internal Vector3 BlendedScaleLs;
+      internal Vector3 CachedPositionWs;
+      internal Vector3 CachedPositionLs;
       internal Bounds Bounds;
-      internal Quaternion RotationInverse;
-      internal Quaternion SpringRotation;
-      internal Quaternion SpringRotationInverse;
-      internal Quaternion CachedRotation;
-      internal Quaternion BlendedRotation;
+      internal Quaternion RotationInverseWs;
+      internal Quaternion SpringRotationWs;
+      internal Quaternion SpringRotationInverseWs;
+      internal Quaternion CachedRotationWs;
+      internal Quaternion CachedRotationLs;
+      internal Quaternion BlendedRotationWs;
       internal Quaternion RotationBackPropDeltaPs;
       internal int ParentIndex;
       internal int [] ChildIndices;
       internal float LengthFromRoot;
       internal float AnimationBlend;
       internal float LengthStiffness;
+      internal float LengthStiffnessT;
+      internal float FullyStiffToParentLength;
       internal float PoseStiffness;
       internal float BendAngleCap;
       internal float CollisionRadius;
@@ -61,13 +66,15 @@ namespace BoingKit
       )
       {
         Transform = transform;
-        RotationInverse = Quaternion.identity;
+        RotationInverseWs = Quaternion.identity;
         ParentIndex = iParent;
         LengthFromRoot = lengthFromRoot;
         Instance.Reset();
-        CachedPosition = transform.position;
-        CachedRotation = transform.rotation;
-        CachedScale = transform.localScale;
+        CachedPositionWs = transform.position;
+        CachedPositionLs = transform.localPosition;
+        CachedRotationWs = transform.rotation;
+        CachedRotationLs = transform.localRotation;
+        CachedScaleLs = transform.localScale;
         AnimationBlend = 0.0f;
         LengthStiffness = 0.0f;
         PoseStiffness = 0.0f;
@@ -82,9 +89,9 @@ namespace BoingKit
     {
       public enum CurveType
       {
-        FlatOne, 
-        FlatHalf, 
-        FlatZero, 
+        ConstantOne, 
+        ConstantHalf, 
+        ConstantZero, 
         RootOneTailHalf, 
         RootOneTailZero, 
         RootHalfTailOne, 
@@ -119,9 +126,9 @@ namespace BoingKit
             "Animation blend determines each bone's final transform between the original raw transform and its corresponding boing bone. " 
            + "1.0 means 100% contribution from raw (or animated) transform. 0.0 means 100% contribution from boing bone.\n\n" 
            + "Each curve type provides a type of mapping for each bone's percentage down the chain (0.0 at root & 1.0 at maximum chain length) to the bone's animation blend:\n\n"
-           + " - Flat One: 1.0 all the way.\n" 
-           + " - Flat Half: 0.5 all the way.\n" 
-           + " - Flat Zero: 0.0 all the way.\n" 
+           + " - Constant One: 1.0 all the way.\n" 
+           + " - Constant Half: 0.5 all the way.\n" 
+           + " - Constant Zero: 0.0 all the way.\n" 
            + " - Root One Tail Half: 1.0 at 0% chain length and 0.5 at 100% chain length.\n" 
            + " - Root One Tail Zero: 1.0 at 0% chain length and 0.0 at 100% chain length.\n" 
            + " - Root Half Tail One: 0.5 at 0% chain length and 1.0 at 100% chain length.\n" 
@@ -140,16 +147,16 @@ namespace BoingKit
              "Length stiffness determines how much each target bone (target transform each boing bone is sprung towards) tries to maintain original distance from its parent. " 
            + "1.0 means 100% distance maintenance. 0.0 means 0% distance maintenance.\n\n" 
            + "Each curve type provides a type of mapping for each bone's percentage down the chain (0.0 at root & 1.0 at maximum chain length) to the bone's length stiffness:\n\n" 
-           + " - Flat One: 1.0 all the way.\n" 
-           + " - Flat Half: 0.5 all the way.\n" 
-           + " - Flat Zero: 0.0 all the way.\n" 
+           + " - Constant One: 1.0 all the way.\n" 
+           + " - Constant Half: 0.5 all the way.\n" 
+           + " - Constant Zero: 0.0 all the way.\n" 
            + " - Root One Tail Half: 1.0 at 0% chain length and 0.5 at 100% chain length.\n" 
            + " - Root One Tail Zero: 1.0 at 0% chain length and 0.0 at 100% chain length.\n" 
            + " - Root Half Tail One: 0.5 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Root Zero Tail One: 0.0 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Custom: Custom curve."
       )]
-      public CurveType LengthStiffnessCurveType = CurveType.FlatOne;
+      public CurveType LengthStiffnessCurveType = CurveType.ConstantOne;
       [ConditionalField("LengthStiffnessCurveType", CurveType.Custom, 
         Label = "  Custom Curve"
       )]
@@ -161,16 +168,16 @@ namespace BoingKit
             "Pose stiffness determines how much each target bone (target transform each boing bone is sprung towards) tries to maintain original transform. " 
            + "1.0 means 100% original transform maintenance. 0.0 means 0% original transform maintenance.\n\n" 
            + "Each curve type provides a type of mapping for each bone's percentage down the chain (0.0 at root & 1.0 at maximum chain length) to the bone's pose stiffness:\n\n" 
-           + " - Flat One: 1.0 all the way.\n" 
-           + " - Flat Half: 0.5 all the way.\n" 
-           + " - Flat Zero: 0.0 all the way.\n" 
+           + " - Constant One: 1.0 all the way.\n" 
+           + " - Constant Half: 0.5 all the way.\n" 
+           + " - Constant Zero: 0.0 all the way.\n" 
            + " - Root One Tail Half: 1.0 at 0% chain length and 0.5 at 100% chain length.\n" 
            + " - Root One Tail Zero: 1.0 at 0% chain length and 0.0 at 100% chain length.\n" 
            + " - Root Half Tail One: 0.5 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Root Zero Tail One: 0.0 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Custom: Custom curve."
       )]
-      public CurveType PoseStiffnessCurveType = CurveType.FlatOne;
+      public CurveType PoseStiffnessCurveType = CurveType.ConstantOne;
       [ConditionalField("PoseStiffnessCurveType", CurveType.Custom, 
         Label = "  Custom Curve"
       )]
@@ -190,16 +197,16 @@ namespace BoingKit
            + "Bend angle cap limits how much each bone can bend relative to the root (in degrees). " 
            + "1.0 means 100% maximum bend angle cap. 0.0 means 0% maximum bend angle cap.\n\n" 
            + "Each curve type provides a type of mapping for each bone's percentage down the chain (0.0 at root & 1.0 at maximum chain length) to the bone's pose stiffness:\n\n" 
-           + " - Flat One: 1.0 all the way.\n" 
-           + " - Flat Half: 0.5 all the way.\n" 
-           + " - Flat Zero: 0.0 all the way.\n" 
+           + " - Constant One: 1.0 all the way.\n" 
+           + " - Constant Half: 0.5 all the way.\n" 
+           + " - Constant Zero: 0.0 all the way.\n" 
            + " - Root One Tail Half: 1.0 at 0% chain length and 0.5 at 100% chain length.\n" 
            + " - Root One Tail Zero: 1.0 at 0% chain length and 0.0 at 100% chain length.\n" 
            + " - Root Half Tail One: 0.5 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Root Zero Tail One: 0.0 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Custom: Custom curve."
       )]
-      public CurveType BendAngleCapCurveType = CurveType.FlatOne;
+      public CurveType BendAngleCapCurveType = CurveType.ConstantOne;
       [ConditionalField("BendAngleCapCurveType", CurveType.Custom, 
         Label = "    Custom Curve"
       )]
@@ -215,16 +222,16 @@ namespace BoingKit
         Tooltip = 
              "Percentage (0.0 = 0%; 1.0 = 100%) of maximum bone collision radius.\n\n" 
            + "Each curve type provides a type of mapping for each bone's percentage down the chain (0.0 at root & 1.0 at maximum chain length) to the bone's collision radius:\n\n" 
-           + " - Flat One: 1.0 all the way.\n" 
-           + " - Flat Half: 0.5 all the way.\n" 
-           + " - Flat Zero: 0.0 all the way.\n" 
+           + " - Constant One: 1.0 all the way.\n" 
+           + " - Constant Half: 0.5 all the way.\n" 
+           + " - Constant Zero: 0.0 all the way.\n" 
            + " - Root One Tail Half: 1.0 at 0% chain length and 0.5 at 100% chain length.\n" 
            + " - Root One Tail Zero: 1.0 at 0% chain length and 0.0 at 100% chain length.\n" 
            + " - Root Half Tail One: 0.5 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Root Zero Tail One: 0.0 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Custom: Custom curve."
       )]
-      public CurveType CollisionRadiusCurveType = CurveType.FlatOne;
+      public CurveType CollisionRadiusCurveType = CurveType.ConstantOne;
       [ConditionalField("CollisionRadiusCurveType", CurveType.Custom, 
         Label = "    Custom Curve"
       )]
@@ -257,16 +264,16 @@ namespace BoingKit
              "Percentage (0.0 = 0%; 1.0 = 100%) of each bone's squash & stretch effect. " 
            + "Squash & stretch is the effect of volume preservation by scaling bones based on how compressed or stretched the distances between bones become.\n\n" 
            + "Each curve type provides a type of mapping for each bone's percentage down the chain (0.0 at root & 1.0 at maximum chain length) to the bone's squash & stretch effect amount:\n\n" 
-           + " - Flat One: 1.0 all the way.\n" 
-           + " - Flat Half: 0.5 all the way.\n" 
-           + " - Flat Zero: 0.0 all the way.\n" 
+           + " - Constant One: 1.0 all the way.\n" 
+           + " - Constant Half: 0.5 all the way.\n" 
+           + " - Constant Zero: 0.0 all the way.\n" 
            + " - Root One Tail Half: 1.0 at 0% chain length and 0.5 at 100% chain length.\n" 
            + " - Root One Tail Zero: 1.0 at 0% chain length and 0.0 at 100% chain length.\n" 
            + " - Root Half Tail One: 0.5 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Root Zero Tail One: 0.0 at 0% chain length and 1.0 at 100% chain length.\n" 
            + " - Custom: Custom curve."
       )]
-      public CurveType SquashAndStretchCurveType = CurveType.FlatZero;
+      public CurveType SquashAndStretchCurveType = CurveType.ConstantZero;
       [ConditionalField("SquashAndStretchCurveType", CurveType.Custom, 
         Label = "  Custom Curve"
       )]
@@ -294,13 +301,13 @@ namespace BoingKit
       {
         switch (type)
         {
-        case CurveType.FlatOne:
+        case CurveType.ConstantOne:
           return 1.0f;
 
-        case CurveType.FlatHalf:
+        case CurveType.ConstantHalf:
           return 0.5f;
 
-        case CurveType.FlatZero:
+        case CurveType.ConstantZero:
           return 0.0f;
 
         case CurveType.RootOneTailHalf:
@@ -327,8 +334,6 @@ namespace BoingKit
     [Range(0.1f, 20.0f)] public float MaxCollisionResolutionSpeed = 3.0f;
     public BoingBoneCollider[] BoingColliders = new BoingBoneCollider[0];
     public Collider[] UnityColliders = new Collider[0];
-    private GameObject m_colliderHolder;
-    internal SphereCollider SharedSphereCollider { get { return m_colliderHolder ? m_colliderHolder.GetComponent<SphereCollider>() : null; } }
 
     public bool DebugDrawRawBones = false;
     public bool DebugDrawTargetBones = false;
@@ -375,18 +380,6 @@ namespace BoingKit
 
       RescanBoneChains();
       Reboot();
-
-      string dummyColliderHolderName = "Boing Kit collider holder (don't delete)";
-      var dummyChildTransform = transform.Find(dummyColliderHolderName);
-      m_colliderHolder = dummyChildTransform != null ? dummyChildTransform.gameObject : null;
-      if (m_colliderHolder == null)
-      {
-        m_colliderHolder = new GameObject(dummyColliderHolderName);
-        m_colliderHolder.transform.SetParent(transform);
-        m_colliderHolder.transform.localPosition = Vector3.zero;
-
-        m_colliderHolder.AddComponent<SphereCollider>();
-      }
     }
 
     public void RescanBoneChains()
@@ -474,6 +467,8 @@ namespace BoingKit
 
           var boneTransform = entry.Transform;
           var aChildIndex = new int[boneTransform.childCount];
+          for (int iChildIndex = 0; iChildIndex < aChildIndex.Length; ++iChildIndex)
+            aChildIndex[iChildIndex] = -1;
           int numChildrenQueued = 0;
           for (int iChild = 0, numChildren = boneTransform.childCount; iChild < numChildren; ++iChild)
           {
@@ -486,7 +481,6 @@ namespace BoingKit
 
             boneQueue.Enqueue(new RescanEntry(childTransform, iBone, lengthFromRoot));
 
-            aChildIndex[iChild] = iBone + numChildrenQueued + 1;
             ++numChildrenQueued;  
           }
 
@@ -497,6 +491,24 @@ namespace BoingKit
             bone.ChildIndices = aChildIndex;
 
           aBone.Add(bone);
+        }
+
+        // fill in child indices
+        for (int iBone = 0; iBone < aBone.Count; ++iBone)
+        {
+          var bone = aBone[iBone];
+          if (bone.ParentIndex < 0)
+            continue;
+
+          var parentBone = aBone[bone.ParentIndex];
+          int iChildIndex = 0;
+          while (parentBone.ChildIndices[iChildIndex] >= 0)
+            ++iChildIndex;
+
+          if (iChildIndex >= parentBone.ChildIndices.Length)
+            continue;
+
+          parentBone.ChildIndices[iChildIndex] = iBone;
         }
 
         if (aBone.Count == 0)
@@ -557,9 +569,11 @@ namespace BoingKit
       {
         bone.Instance.PositionSpring.Reset(bone.Transform.position);
         bone.Instance.RotationSpring.Reset(bone.Transform.rotation);
-        bone.CachedPosition = bone.Transform.position;
-        bone.CachedRotation = bone.Transform.rotation;
-        bone.CachedScale = bone.Transform.localScale;
+        bone.CachedPositionWs = bone.Transform.position;
+        bone.CachedPositionLs = bone.Transform.localPosition;
+        bone.CachedRotationWs = bone.Transform.rotation;
+        bone.CachedRotationLs = bone.Transform.localRotation;
+        bone.CachedScaleLs = bone.Transform.localScale;
       }
     }
 
@@ -583,6 +597,10 @@ namespace BoingKit
 
         if (aBone == null || chain.Root == null || aBone.Length == 0)
           continue;
+
+        Vector3 gravityDt = chain.Gravity * dt;
+        if (UpdateMode == BoingManager.UpdateMode.FixedUpdate)
+          gravityDt *= BoingManager.NumFixedUpdateIterations;
 
         // update length from root
         float maxLengthFromRoot = 0.0f;
@@ -608,135 +626,109 @@ namespace BoingKit
           float tBone = bone.LengthFromRoot * maxLengthFromRootInv;
           bone.AnimationBlend = Chain.EvaluateCurve(chain.AnimationBlendCurveType, tBone, chain.AnimationBlendCustomCurve);
           bone.LengthStiffness = Chain.EvaluateCurve(chain.LengthStiffnessCurveType, tBone, chain.LengthStiffnessCustomCurve);
+          bone.LengthStiffnessT = 1.0f - Mathf.Pow(1.0f - bone.LengthStiffness, 30.0f * dt); // a factor of 30.0f is what makes 0.5 length stiffness looks like 50% stiffness
+          bone.FullyStiffToParentLength =
+            bone.ParentIndex >= 0
+            ? Vector3.Distance(aBone[bone.ParentIndex].Transform.position, bone.Transform.position)
+            : 0.0f;
           bone.PoseStiffness = Chain.EvaluateCurve(chain.PoseStiffnessCurveType, tBone, chain.PoseStiffnessCustomCurve);
           bone.BendAngleCap = chain.MaxBendAngleCap * MathUtil.Deg2Rad * Chain.EvaluateCurve(chain.BendAngleCapCurveType, tBone, chain.BendAngleCapCustomCurve);
           bone.CollisionRadius = chain.MaxCollisionRadius * Chain.EvaluateCurve(chain.CollisionRadiusCurveType, tBone, chain.CollisionRadiusCustomCurve);
           bone.SquashAndStretch = Chain.EvaluateCurve(chain.SquashAndStretchCurveType, tBone, chain.SquashAndStretchCustomCurve);
         }
 
-        // compute target transform
         var rootBone = aBone[0];
         Vector3 rootAnimPos = rootBone.Transform.position;
-        foreach (var bone in aBone)
+        for (int iBone = 0; iBone < aBone.Length; ++iBone)
         {
-          bone.RotationInverse = Quaternion.Inverse(bone.Transform.rotation);
-          bone.SpringRotation = bone.Instance.RotationSpring.ValueQuat;
-          bone.SpringRotationInverse = Quaternion.Inverse(bone.SpringRotation);
+          var bone = aBone[iBone];
 
-          Vector3 targetPos = bone.Transform.position;
-          Quaternion targetRot = bone.Transform.rotation;
-
-          // compute translation & rotation in parent space
-          if (bone.ParentIndex >= 0)
+          // evaluate curves
           {
-            // TODO: use parent spring transform to compute blended position & rotation
+            float tBone = bone.LengthFromRoot * maxLengthFromRootInv;
+            bone.AnimationBlend = Chain.EvaluateCurve(chain.AnimationBlendCurveType, tBone, chain.AnimationBlendCustomCurve);
+            bone.LengthStiffness = Chain.EvaluateCurve(chain.LengthStiffnessCurveType, tBone, chain.LengthStiffnessCustomCurve);
+            bone.PoseStiffness = Chain.EvaluateCurve(chain.PoseStiffnessCurveType, tBone, chain.PoseStiffnessCustomCurve);
+            bone.BendAngleCap = chain.MaxBendAngleCap * MathUtil.Deg2Rad * Chain.EvaluateCurve(chain.BendAngleCapCurveType, tBone, chain.BendAngleCapCustomCurve);
+            bone.CollisionRadius = chain.MaxCollisionRadius * Chain.EvaluateCurve(chain.CollisionRadiusCurveType, tBone, chain.CollisionRadiusCustomCurve);
+            bone.SquashAndStretch = Chain.EvaluateCurve(chain.SquashAndStretchCurveType, tBone, chain.SquashAndStretchCustomCurve);
+          } // end: evaluate curves
 
-            var parentBone = aBone[bone.ParentIndex];
-
-            Vector3 parentAnimPos = parentBone.Transform.position;
-            Vector3 parentSpringPos = parentBone.Instance.PositionSpring.Value;
-
-            Vector3 springPosPs = parentBone.SpringRotationInverse * (bone.Instance.PositionSpring.Value - parentSpringPos);
-            Quaternion springRotPs = parentBone.SpringRotationInverse * bone.Instance.RotationSpring.ValueQuat;
-
-            Vector3 animPos = bone.Transform.position;
-            Quaternion animRot = bone.Transform.rotation;
-            Vector3 animPosPs = parentBone.RotationInverse * (animPos - parentAnimPos);
-            Quaternion animRotPs = parentBone.RotationInverse * animRot;
-
-            // apply pose stiffness
-            float tPoseStiffness = bone.PoseStiffness;
-            Vector3 blendedPosPs = Vector3.Lerp(springPosPs, animPosPs, tPoseStiffness);
-            Quaternion blendedRotPs = Quaternion.Slerp(springRotPs, animRotPs, tPoseStiffness);
-
-            targetPos = parentSpringPos + (parentBone.SpringRotation * blendedPosPs);
-            targetRot = parentBone.SpringRotation * blendedRotPs;
-
-            // bend angle cap
-            if (bone.BendAngleCap < MathUtil.Pi - MathUtil.Epsilon)
-            {
-              Vector3 targetPosDelta = targetPos - rootAnimPos;
-              targetPosDelta = VectorUtil.ClampBend(targetPosDelta, animPos - rootAnimPos, bone.BendAngleCap);
-              targetPos = rootAnimPos + targetPosDelta;
-            }
+          // gravity
+          {
+            // no gravity on root
+            if (iBone > 0)
+              bone.Instance.PositionSpring.Velocity += gravityDt;
           }
+          // end: gravity
 
-          // do we need target-level collision?
-          /*
-          // Boing Kit colliders
-          if (chain.EnableBoingKitCollision)
+          // compute target transform
           {
-            foreach (var collider in BoingColliders)
+            bone.RotationInverseWs = Quaternion.Inverse(bone.Transform.rotation);
+            bone.SpringRotationWs = bone.Instance.RotationSpring.ValueQuat;
+            bone.SpringRotationInverseWs = Quaternion.Inverse(bone.SpringRotationWs);
+
+            Vector3 targetPos = bone.Transform.position;
+            Quaternion targetRot = bone.Transform.rotation;
+
+            // compute translation & rotation in parent space
+            if (bone.ParentIndex >= 0)
             {
-              if (collider == null)
-                continue;
+              // TODO: use parent spring transform to compute blended position & rotation
 
-              Vector3 push;
-              bool collided = collider.Collide(targetPos, MinScale * bone.CollisionRadius, out push);
-              if (!collided)
-                continue;
+              var parentBone = aBone[bone.ParentIndex];
 
-              targetPos += push;
+              Vector3 parentAnimPos = parentBone.Transform.position;
+              Vector3 parentSpringPos = parentBone.Instance.PositionSpring.Value;
+
+              Vector3 springPosPs = parentBone.SpringRotationInverseWs * (bone.Instance.PositionSpring.Value - parentSpringPos);
+              Quaternion springRotPs = parentBone.SpringRotationInverseWs * bone.Instance.RotationSpring.ValueQuat;
+
+              Vector3 animPos = bone.Transform.position;
+              Quaternion animRot = bone.Transform.rotation;
+              Vector3 animPosPs = parentBone.RotationInverseWs * (animPos - parentAnimPos);
+              Quaternion animRotPs = parentBone.RotationInverseWs * animRot;
+
+              // apply pose stiffness
+              float tPoseStiffness = bone.PoseStiffness;
+              Vector3 blendedPosPs = Vector3.Lerp(springPosPs, animPosPs, tPoseStiffness);
+              Quaternion blendedRotPs = Quaternion.Slerp(springRotPs, animRotPs, tPoseStiffness);
+
+              targetPos = parentSpringPos + (parentBone.SpringRotationWs * blendedPosPs);
+              targetRot = parentBone.SpringRotationWs * blendedRotPs;
+
+              // bend angle cap
+              if (bone.BendAngleCap < MathUtil.Pi - MathUtil.Epsilon)
+              {
+                Vector3 targetPosDelta = targetPos - rootAnimPos;
+                targetPosDelta = VectorUtil.ClampBend(targetPosDelta, animPos - rootAnimPos, bone.BendAngleCap);
+                targetPos = rootAnimPos + targetPosDelta;
+              }
             }
-          }
 
-          // Unity colliders
-          if (chain.EnableUnityCollision)
-          {
-            foreach (var rigidbody in UnityRigidBodies)
+            if (chain.ParamsOverride == null)
             {
-              if (rigidbody == null)
-                continue;
-
-              var collider = rigidbody.GetComponent<Collider>();
-              if (collider == null)
-                continue;
-
-              if (!bone.Bounds.Intersects(collider.bounds))
-                continue;
-
-              SharedSphereCollider.center = targetPos;
-              SharedSphereCollider.radius = bone.CollisionRadius;
-
-              Vector3 pushDir;
-              float pushDist;
-              bool collided = 
-              Physics.ComputePenetration
+              bone.Instance.PrepareExecute
               (
-                SharedSphereCollider, Vector3.zero, Quaternion.identity, 
-                collider, collider.transform.position, collider.transform.rotation, 
-                out pushDir, out pushDist
+                ref Params, 
+                targetPos, 
+                targetRot, 
+                MinScale, 
+                true
               );
-              if (!collided)
-                continue;
-
-              targetPos += pushDir * pushDist;
             }
-          }
-          */
-
-          if (chain.ParamsOverride == null)
-          {
-            bone.Instance.PrepareExecute
-            (
-              ref Params, 
-              targetPos, 
-              targetRot, 
-              MinScale, 
-              true
-            );
-          }
-          else
-          {
-            bone.Instance.PrepareExecute
-            (
-              ref chain.ParamsOverride.Params, 
-              targetPos, 
-              targetRot, 
-              MinScale, 
-              true
-            );
-          }
+            else
+            {
+              bone.Instance.PrepareExecute
+              (
+                ref chain.ParamsOverride.Params, 
+                targetPos, 
+                targetRot, 
+                MinScale, 
+                true
+              );
+            }
+          } // end: compute target transform
         }
       }
     }
@@ -797,9 +789,6 @@ namespace BoingKit
 
     public new void Restore()
     {
-      if (LastPullResultsFrame < Time.frameCount)
-        return;
-
       for (int iChain = 0; iChain < BoneData.Length; ++iChain)
       {
         var chain = BoneChains[iChain];
@@ -816,16 +805,10 @@ namespace BoingKit
           if (iBone == 0 && !chain.LooseRoot)
             continue;
 
-          bone.Transform.position = bone.CachedPosition;
-          bone.Transform.rotation = bone.CachedRotation;
-          bone.Transform.localScale = bone.CachedScale;
+          bone.Transform.localPosition = bone.CachedPositionLs;
+          bone.Transform.localRotation = bone.CachedRotationLs;
+          bone.Transform.localScale = bone.CachedScaleLs;
         }
-      }
-
-      var sharedCircleCollider = SharedSphereCollider;
-      if (sharedCircleCollider != null)
-      {
-        sharedCircleCollider.radius = 0.0f;
       }
     }
 
@@ -846,6 +829,9 @@ namespace BoingKit
 
         foreach (var collider in BoingColliders)
         {
+          if (collider == null)
+            continue;
+
           if (collider.gameObject == selectedGo)
           {
             selected = true;
@@ -874,14 +860,14 @@ namespace BoingKit
               ? aBone[bone.ParentIndex] 
               : null;
           
-          Vector3 boneAnimPos = Application.isPlaying ? bone.CachedPosition : bone.Transform.position;
+          Vector3 boneAnimPos = Application.isPlaying ? bone.CachedPositionWs : bone.Transform.position;
           Vector3 boneTargetPos = bone.Instance.PositionTarget;
           Vector3 boneSpringPos = bone.Instance.PositionSpring.Value;
-          Vector3 boneBlendedPos = bone.BlendedPosition;
-          Quaternion boneAnimRot = Application.isPlaying ? bone.CachedRotation : bone.Transform.rotation;
+          Vector3 boneBlendedPos = bone.BlendedPositionWs;
+          Quaternion boneAnimRot = Application.isPlaying ? bone.CachedRotationWs : bone.Transform.rotation;
           Quaternion boneTargetRot = QuaternionUtil.FromVector4(bone.Instance.RotationTarget);
           Quaternion boneSpringRot = bone.Instance.RotationSpring.ValueQuat;
-          Quaternion boneBlendedRot = bone.BlendedRotation;
+          Quaternion boneBlendedRot = bone.BlendedRotationWs;
 
           float boneRadius = 
             (chain.EnableBoingKitCollision || chain.EnableUnityCollision || chain.EnableInterChainCollision)
@@ -899,7 +885,7 @@ namespace BoingKit
             {
               Vector3 parentAnimPos = 
                 Application.isPlaying 
-                  ? parentBone.CachedPosition 
+                  ? parentBone.CachedPositionWs 
                   : parentBone.Transform.position;
               
               Gizmos.DrawLine(boneAnimPos, parentAnimPos);
@@ -966,7 +952,7 @@ namespace BoingKit
 
             if (parentBone != null)
             {
-              Vector3 blendedParentBone = Vector3.Lerp(parentBone.Instance.PositionSpring.Value, parentBone.CachedPosition, parentBone.AnimationBlend);
+              Vector3 blendedParentBone = Vector3.Lerp(parentBone.Instance.PositionSpring.Value, parentBone.CachedPositionWs, parentBone.AnimationBlend);
 
               Gizmos.DrawLine(boneBlendedPos, blendedParentBone);
             }

@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -17,15 +18,28 @@ namespace BoingKit
   {
     #region Behavior
     
-    internal static void UpdateBehaviorsLateUpdate(Dictionary<int, BoingBehavior> behaviorMap)
+    internal static void ExecuteBehaviors(Dictionary<int, BoingBehavior> behaviorMap, BoingManager.UpdateTiming updateTiming)
     {
       float dt = Time.deltaTime;
       foreach (var itBehavior in behaviorMap)
       {
         var behavior = itBehavior.Value;
+        if (behavior.UpdateTiming != updateTiming)
+          continue;
+
         behavior.PrepareExecute();
-        behavior.Execute(dt);
-        behavior.PullResults();
+
+        switch (behavior.UpdateMode)
+        {
+          case BoingManager.UpdateMode.Update:
+            behavior.Execute(dt);
+            break;
+
+          case BoingManager.UpdateMode.FixedUpdate:
+            for (int iteration = 0; iteration < BoingManager.NumFixedUpdateIterations; ++iteration)
+              behavior.Execute(BoingManager.FixedDeltaTime);
+            break;
+        }
       }
     }
 
@@ -34,12 +48,13 @@ namespace BoingKit
 
     #region Reactor
 
-    internal static void UpdateReactorsLateUpdate
+    internal static void ExecuteReactors
     (
       BoingEffector.Params[] aEffectorParams, 
       Dictionary<int, BoingReactor> reactorMap, 
       Dictionary<int, BoingReactorField> fieldMap, 
-      Dictionary<int, BoingReactorFieldCPUSampler> cpuSamplerMap
+      Dictionary<int, BoingReactorFieldCPUSampler> cpuSamplerMap, 
+      BoingManager.UpdateTiming updateTiming
     )
     {
       float dt = Time.deltaTime;
@@ -49,6 +64,8 @@ namespace BoingKit
       foreach (var itReactor in reactorMap)
       {
         var reactor = itReactor.Value;
+        if (reactor.UpdateTiming != updateTiming)
+          continue;
 
         reactor.PrepareExecute();
 
@@ -56,8 +73,17 @@ namespace BoingKit
           reactor.Params.AccumulateTarget(ref aEffectorParams[i]);
         reactor.Params.EndAccumulateTargets();
 
-        reactor.Execute(dt);
-        reactor.PullResults();
+        switch (reactor.UpdateMode)
+        {
+          case BoingManager.UpdateMode.Update:
+            reactor.Execute(dt);
+            break;
+
+          case BoingManager.UpdateMode.FixedUpdate:
+            for (int iteration = 0; iteration < BoingManager.NumFixedUpdateIterations; ++iteration)
+              reactor.Execute(BoingManager.FixedDeltaTime);
+            break;
+        }
       }
       Profiler.EndSample();
 
@@ -78,7 +104,7 @@ namespace BoingKit
       foreach (var itSampler in cpuSamplerMap)
       {
         var sampler = itSampler.Value;
-        sampler.SampleFromField();
+        //sampler.SampleFromField();
       }
       Profiler.EndSample();
     }
@@ -89,10 +115,11 @@ namespace BoingKit
     #region Bones
 
     // use fixed time step for bones because they involve collision resolution
-    internal static void UpdateBonesLateUpdateExecute
+    internal static void ExecuteBones
     (
       BoingEffector.Params[] aEffectorParams, 
-      Dictionary<int, BoingBones> bonesMap
+      Dictionary<int, BoingBones> bonesMap, 
+      BoingManager.UpdateTiming updateTiming
     )
     {
       Profiler.BeginSample("Update Bones (Execute)");
@@ -100,23 +127,36 @@ namespace BoingKit
       foreach (var itBones in bonesMap)
       {
         var bones = itBones.Value;
+        if (bones.UpdateTiming != updateTiming)
+          continue;
+
         bones.PrepareExecute();
 
         for (int i = 0; i < aEffectorParams.Length; ++i)
           bones.AccumulateTarget(ref aEffectorParams[i]);
         bones.EndAccumulateTargets();
 
-        for (int iteration = 0; iteration < BoingManager.NumFixedUpdateIterations; ++iteration)
-          bones.Params.Execute(bones, BoingManager.FixedDeltaTime);
+        switch (bones.UpdateMode)
+        {
+          case BoingManager.UpdateMode.Update:
+            bones.Params.Execute(bones, BoingManager.DeltaTime);
+            break;
+
+          case BoingManager.UpdateMode.FixedUpdate:
+            for (int iteration = 0; iteration < BoingManager.NumFixedUpdateIterations; ++iteration)
+              bones.Params.Execute(bones, BoingManager.FixedDeltaTime);
+            break;
+        }
       }
 
       Profiler.EndSample();
     }
 
-    internal static void UpdateBonesLateUpdatePullResults
+    internal static void PullBonesResults
     (
       BoingEffector.Params[] aEffectorParams,
-      Dictionary<int, BoingBones> bonesMap
+      Dictionary<int, BoingBones> bonesMap, 
+      BoingManager.UpdateTiming updateTiming
     )
     {
       Profiler.BeginSample("Update Bones (Pull Results)");
@@ -124,6 +164,8 @@ namespace BoingKit
       foreach (var itBones in bonesMap)
       {
         var bones = itBones.Value;
+        if (bones.UpdateTiming != updateTiming)
+          continue;
 
         bones.Params.PullResults(bones);
       }

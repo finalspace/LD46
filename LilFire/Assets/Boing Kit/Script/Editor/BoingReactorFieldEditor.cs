@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -35,6 +36,11 @@ namespace BoingKit
     private SerializedProperty RotationPropagation;
     private SerializedProperty PropagationDepth;
     private SerializedProperty AnchorPropagationAtBorder;
+
+    public BoingReactorFieldEditor()
+    {
+      m_isReactorField = true;
+    }
 
     public override void OnEnable()
     {

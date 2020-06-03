@@ -18,9 +18,6 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
-        if (MainGameManager.Instance.CurrentState() != GameState.Main)
-            return;
-
         if (player.position.y > spawnHeight)
         {
             Spawn();

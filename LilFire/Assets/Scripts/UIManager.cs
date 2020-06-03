@@ -6,34 +6,39 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : SingletonBehaviour<UIManager>
 {
-    public Text score;
-    //public Text finalscore;
+    public Text scoreText;
+    public Text lives;
     public Image healthbar;
-    public List<GameObject> lives;
     public GameObject GameOver;
     public TMPro.TextMeshProUGUI FinalScore;
-    
 
+    private PulseAnimation scorePulse;
     private float lifebarWidth, lifebarHeight;
     private float playerEnergy;
     private float energyPercentage;
+    private int score = 0;
 
     void Start()
     {
+        scorePulse = scoreText.GetComponent<PulseAnimation>();
         lifebarWidth = healthbar.rectTransform.sizeDelta.x;
         lifebarHeight = healthbar.rectTransform.sizeDelta.y;
     }
 
     void Update()
     {
-        if (MainGameManager.Instance.gameState != GameState.Main)
-            return;
+        if (MainGameManager.Instance.gameState != GameState.Main) return;
 
         playerEnergy = PlayerStats.Instance.energy;
         energyPercentage = playerEnergy / 100.0f;
         healthbar.rectTransform.sizeDelta = new Vector2(lifebarWidth * energyPercentage, lifebarHeight);
 
-        score.text = "" + PlayerStats.Instance.score;
+        if (score != PlayerStats.Instance.score)
+        {
+            score = PlayerStats.Instance.score;
+            scoreText.text = "" + score;
+            scorePulse.Play();
+        }
     }
 
     public void PushGameEnd()
@@ -44,10 +49,6 @@ public class UIManager : SingletonBehaviour<UIManager>
 
     public void UpdateLife(int value)
     {
-        int i = 0;
-        for (; i < value; i++)
-            lives[i].SetActive(true);
-        for (; i < lives.Count; i++)
-            lives[i].SetActive(false);
+        lives.text = (value >= 10) ? "" : "0" + value;
     }
 }

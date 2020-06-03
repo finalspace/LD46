@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -15,13 +16,21 @@ namespace BoingKit
   [CanEditMultipleObjects]
   public class BoingBehaviorEditor : BoingEditorBase
   {
+    private SerializedProperty UpdateMode;
+    private SerializedProperty UpdateTiming;
+
     private SerializedProperty TwoDDistanceCheck;
     private SerializedProperty TwoDPositionInfluence;
     private SerializedProperty TwoDRotationInfluence;
     private SerializedProperty EnablePositionEffect;
     private SerializedProperty EnableRotationEffect;
     private SerializedProperty GlobalReactionUpVector;
-    
+
+    private SerializedProperty TranslationLockSpace;
+    private SerializedProperty LockTranslatoinX;
+    private SerializedProperty LockTranslatoinY;
+    private SerializedProperty LockTranslatoinZ;
+
     private SerializedProperty TwoDPlane;
 
     private SerializedProperty SharedParams;
@@ -44,10 +53,15 @@ namespace BoingKit
     private SerializedProperty RotationReactionUp;
 
     protected bool m_isReactor = false;
+    protected bool m_isReactorField = false;
+    protected bool m_isBones = false;
 
     public virtual void OnEnable()
     {
       var p = serializedObject.FindProperty("Params");
+
+      UpdateMode = serializedObject.FindProperty("UpdateMode");
+      UpdateTiming = serializedObject.FindProperty("UpdateTiming");
 
       TwoDDistanceCheck = serializedObject.FindProperty("TwoDDistanceCheck");
       TwoDPositionInfluence = serializedObject.FindProperty("TwoDPositionInfluence");
@@ -55,6 +69,11 @@ namespace BoingKit
       EnablePositionEffect = serializedObject.FindProperty("EnablePositionEffect");
       EnableRotationEffect = serializedObject.FindProperty("EnableRotationEffect");
       GlobalReactionUpVector = serializedObject.FindProperty("GlobalReactionUpVector");
+
+      TranslationLockSpace = serializedObject.FindProperty("TranslationLockSpace");
+      LockTranslatoinX = serializedObject.FindProperty("LockTranslationX");
+      LockTranslatoinY = serializedObject.FindProperty("LockTranslationY");
+      LockTranslatoinZ = serializedObject.FindProperty("LockTranslationZ");
 
       SharedParams = serializedObject.FindProperty("SharedParams");
 
@@ -84,6 +103,39 @@ namespace BoingKit
       
 
       bool useSharedParams = (SharedParams.objectReferenceValue != null);
+
+      if (!m_isReactorField)
+      {
+        Header("Updates");
+
+        if (m_isBones)
+        {
+          Property(UpdateMode, 
+          "Update Mode", 
+              "Match this mode with how you update your object's transform.\n\n" 
+            + "Update - Use this mode if you update your object's transform in Update(). This uses variable Time.detalTime. Use FixedUpdate if physics simulation becomes unstable.\n\n" 
+            + "Fixed Update - Use this mode if you update your object's transform in FixedUpdate(). This uses fixed Time.fixedDeltaTime. " 
+            + "Also, use this mode if the game object is affected by Unity physics (i.e. has a rigid body component), which uses fixed updates." 
+          );
+        }
+        else
+        {
+          Property(UpdateMode, 
+            "Update Mode", 
+                "Match this mode with how you update your object's transform.\n\n" 
+              + "Update - Use this mode if you update your object's transform in Update(). This uses variable Time.detalTime.\n" 
+              + "Fixed Update - Use this mode if you update your object's transform in FixedUpdate(). This uses fixed Time.fixedDeltaTime. " 
+              + "Also, use this mode if the game object is affected by Unity physics (i.e. has a rigid body component), which uses fixed updates."
+          );
+        }
+
+        Property(UpdateTiming, 
+        "Update Timing", 
+            "When to apply transforms for rendering.\n\n" 
+          + "Update - Apply transforms for rendering during Update. Only use this mode if your render logic pulls transforms during Update(), such as Unity's skinned sprite renderer (in certain versions).\n\n" 
+          + "Late Update - Apply transforms for rendering during LateUpdate(). This is the recommended option."
+        );
+      }
 
       Header("Shared Parameters");
       Property(SharedParams, 
@@ -272,6 +324,29 @@ namespace BoingKit
         }
       }
 
+      {
+        Header("Translational Locks");
+        
+        Property(TranslationLockSpace, 
+          "Space", 
+          "Lock translation in global space or object's local space"
+        );
+
+        Property(LockTranslatoinX, 
+          "Lock X Axis", 
+          "When locked, translational effects along the X axis is eliminated."
+        );
+        
+        Property(LockTranslatoinY, 
+          "Lock Y Axis", 
+          "When locked, translational effects along the Y axis is eliminated."
+        );
+
+        Property(LockTranslatoinZ, 
+          "Lock Z Axis", 
+          "When locked, translational effects along the Z axis is eliminated."
+        );
+      }
 
       if (m_isReactor)
       {

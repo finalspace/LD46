@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -1172,7 +1173,6 @@ namespace BoingKit
     #if UNITY_EDITOR
     public void OnDrawGizmos()
     {
-
       if (Effectors == null)
         return;
       
@@ -1186,11 +1186,13 @@ namespace BoingKit
 
         bool selected = false;
         foreach (var selectedGo in UnityEditor.Selection.gameObjects)
+        {
           if (effector.gameObject == selectedGo)
           {
             selected = true;
             break;
           }
+        }
 
         if (!selected)
           continue;

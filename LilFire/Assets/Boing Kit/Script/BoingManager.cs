@@ -1,3 +1,4 @@
+﻿/******************************************************************************/
 /*
   Project   - Boing Kit
   Publisher - Long Bunny Labs
@@ -25,6 +26,24 @@ namespace BoingKit
   public static class BoingManager
   {
     #region Public
+
+    public enum UpdateMode
+    {
+      Update, 
+      FixedUpdate, 
+    }
+
+    public enum UpdateTiming
+    {
+      Early, 
+      Late, 
+    }
+
+    public enum TranslationLockSpace
+    {
+      Global, 
+      Local, 
+    }
 
     // enumerables: use these to iterate through objects already registered
     public static IEnumerable<BoingBehavior> Behaviors { get { return s_behaviorMap.Values; } }
@@ -71,23 +90,12 @@ namespace BoingKit
 
     #region Timer
 
-    private static float s_fixedUpdateTimer = 0.0f;
-    private static float s_fixedUpdateInterpolationT = 0.0f;
+    private static float s_deltaTime = 0.0f;
     private static float s_fixedDeltaTime = 0.0f;
     private static int s_numFixedUpdateIterations = 0;
-    private static readonly int kMaxFixedTimeSteps = 3;
-    public static float FixedUpdateInterpolationT { get { return s_fixedUpdateInterpolationT; } }
+    public static float DeltaTime { get { return s_deltaTime; } }
     public static float FixedDeltaTime { get { return s_fixedDeltaTime; } }
     public static int NumFixedUpdateIterations { get { return s_numFixedUpdateIterations; } }
-
-    internal static void LateUpdateFixedUpdateTimer()
-    {
-      s_fixedDeltaTime = Time.fixedDeltaTime;
-      s_fixedUpdateTimer += Time.deltaTime;
-      s_numFixedUpdateIterations = Mathf.Min(kMaxFixedTimeSteps, Mathf.FloorToInt(s_fixedUpdateTimer / Mathf.Max(0.001f, s_fixedDeltaTime)));
-      s_fixedUpdateTimer = Mathf.Repeat(s_fixedUpdateTimer, s_fixedDeltaTime);
-      s_fixedUpdateInterpolationT = Mathf.Clamp01(s_fixedUpdateTimer * MathUtil.InvSafe(s_fixedDeltaTime));
-    }
 
     #endregion
 
@@ -120,15 +128,31 @@ namespace BoingKit
     internal static readonly bool UseAsynchronousJobs = true;
     #endif
 
-
-    internal static GameObject s_lateUpdatePumpGo;
-    private static void ValidateLateUpdatePump()
+    internal static GameObject s_managerGo;
+    private static void ValidateManager()
     {
-      if (s_lateUpdatePumpGo != null)
+      if (s_managerGo != null)
         return;
 
-      s_lateUpdatePumpGo = new GameObject("Boing Kit update pump (don't delete)");
-      s_lateUpdatePumpGo.AddComponent<BoingManagerUpdatePump>();
+      s_managerGo = new GameObject("Boing Kit manager (don't delete)");
+      s_managerGo.AddComponent<BoingManagerPreUpdatePump>();
+      s_managerGo.AddComponent<BoingManagerPostUpdatePump>();
+      UnityEngine.Object.DontDestroyOnLoad(s_managerGo);
+
+      // shared collider
+      var collider = s_managerGo.AddComponent<SphereCollider>();
+      collider.enabled = false;
+    }
+
+    internal static SphereCollider SharedSphereCollider
+    {
+      get
+      {
+        if (s_managerGo == null)
+          return null;
+
+        return s_managerGo.GetComponent<SphereCollider>();
+      }
     }
 
     internal static void Register(BoingBehavior behavior)
@@ -259,18 +283,7 @@ namespace BoingKit
 
     private static void PreRegisterBehavior()
     {
-      ValidateLateUpdatePump();
-
-      if (s_behaviorMap.Count > 0)
-        return;
-
-      Camera.onPreCull += UpdateBehaviorsPreCull;
-      Camera.onPostRender += UpdateBehaviorsPostRender;
-
-      #if UNITY_2019_1_OR_NEWER
-      RenderPipelineManager.beginFrameRendering += UpdateBehaviorsPreCull;
-      RenderPipelineManager.endFrameRendering += UpdateBehaviorsPostRender;
-      #endif
+      ValidateManager();
     }
 
     private static void PostUnregisterBehavior()
@@ -281,42 +294,24 @@ namespace BoingKit
       #if UNITY_2018_1_OR_NEWER
       BoingWorkAsynchronous.PostUnregisterBehaviorCleanUp();
       #endif
-
-      Camera.onPreCull -= UpdateBehaviorsPreCull;
-      Camera.onPostRender -= UpdateBehaviorsPostRender;
-
-      #if UNITY_2019_1_OR_NEWER
-      RenderPipelineManager.beginFrameRendering -= UpdateBehaviorsPreCull;
-      RenderPipelineManager.endFrameRendering -= UpdateBehaviorsPostRender;
-      #endif
     }
 
     private static void PreRegisterEffectorReactor()
     {
-      ValidateLateUpdatePump();
-
-      if (s_effectorMap.Count > 0 || s_reactorMap.Count > 0 || s_fieldMap.Count > 0 || s_cpuSamplerMap.Count > 0 || s_gpuSamplerMap.Count > 0)
-        return;
+      ValidateManager();
 
       if (s_effectorParamsBuffer == null)
       {
         s_effectorParamsList = new List<BoingEffector.Params>(kEffectorParamsIncrement);
         s_effectorParamsBuffer = new ComputeBuffer(s_effectorParamsList.Capacity, BoingEffector.Params.Stride);
       }
-      if (s_effectorMap.Count > s_effectorParamsList.Capacity)
+
+      if (s_effectorMap.Count >= s_effectorParamsList.Capacity)
       {
         s_effectorParamsList.Capacity += kEffectorParamsIncrement;
         s_effectorParamsBuffer.Dispose();
         s_effectorParamsBuffer = new ComputeBuffer(s_effectorParamsList.Capacity, BoingEffector.Params.Stride);
       }
-
-      Camera.onPreCull += UpdateReactorsPreCull;
-      Camera.onPostRender += UpdateReactorsPostRender;
-
-      #if UNITY_2019_1_OR_NEWER
-      RenderPipelineManager.beginFrameRendering += UpdateReactorsPreCull;
-      RenderPipelineManager.endFrameRendering += UpdateReactorsPostRender;
-      #endif
     }
 
     private static void PostUnregisterEffectorReactor()
@@ -331,44 +326,16 @@ namespace BoingKit
       #if UNITY_2018_1_OR_NEWER
       BoingWorkAsynchronous.PostUnregisterEffectorReactorCleanUp();
       #endif
-
-      Camera.onPreCull -= UpdateReactorsPreCull;
-      Camera.onPostRender -= UpdateReactorsPostRender;
-
-      #if UNITY_2019_1_OR_NEWER
-      RenderPipelineManager.beginFrameRendering -= UpdateReactorsPreCull;
-      RenderPipelineManager.endFrameRendering -= UpdateReactorsPostRender;
-      #endif
     }
 
     private static void PreRegisterBones()
     {
-      ValidateLateUpdatePump();
-
-      if (s_bonesMap.Count > 0)
-        return;
-
-      Camera.onPreCull += UpdateBonesPreCull;
-      Camera.onPostRender += UpdateBonesPostRender;
-
-      #if UNITY_2019_1_OR_NEWER
-      RenderPipelineManager.beginFrameRendering += UpdateBonesPreCull;
-      RenderPipelineManager.endFrameRendering += UpdateBonesPostRender;
-      #endif
+      ValidateManager();
     }
 
     private static void PostUnregisterBones()
     {
-      if (s_bonesMap.Count > 0)
-        return;
-
-      Camera.onPreCull -= UpdateBonesPreCull;
-      Camera.onPostRender -= UpdateBonesPostRender;
-
-      #if UNITY_2019_1_OR_NEWER
-      RenderPipelineManager.beginFrameRendering -= UpdateBonesPreCull;
-      RenderPipelineManager.endFrameRendering -= UpdateBonesPostRender;
-      #endif
+      
     }
 
     #endregion // Registry
@@ -376,20 +343,27 @@ namespace BoingKit
 
     #region Update
 
-    internal static void LateUpdate()
+    internal static void FixedUpdate()
     {
-      LateUpdateFixedUpdateTimer();
+      ++s_numFixedUpdateIterations;
+      s_fixedDeltaTime = Time.fixedDeltaTime;
+    }
+
+    internal static void Execute(UpdateTiming updateTiming)
+    {
+      if (updateTiming == UpdateTiming.Early)
+        s_deltaTime = Time.deltaTime;
 
       RefreshEffectorParams();
 
       // execute bones first, so they operate on unmodified transform hierarchy
-      LateUpdateBonesExecute();
+      ExecuteBones(updateTiming);
 
-      LateUpdateBehaviors();
-      LateUpdateReactors();
+      ExecuteBehaviors(updateTiming);
+      ExecuteReactors(updateTiming);
 
-      // pull bones results last, so bone transforms don't inherit parent transform delta
-      LateUpdateBonesPullResults();
+      if (updateTiming == UpdateTiming.Late)
+        s_numFixedUpdateIterations = 0;
     }
 
     #endregion
@@ -397,12 +371,12 @@ namespace BoingKit
 
     #region Behavior
 
-    internal static void LateUpdateBehaviors()
+    internal static void ExecuteBehaviors(UpdateTiming updateTiming)
     {
-      Profiler.BeginSample("BoingManager.UpdateBehaviorsLateUpdate");
-
       if (s_behaviorMap.Count == 0)
         return;
+
+      Profiler.BeginSample("BoingManager.ExecuteBehaviors");
 
       foreach (var itBehavior in s_behaviorMap)
       {
@@ -417,66 +391,42 @@ namespace BoingKit
       #if UNITY_2018_1_OR_NEWER
       if (UseAsynchronousJobs)
       {
-        BoingWorkAsynchronous.UpdateBehaviorsLateUpdate(s_behaviorMap);
+        BoingWorkAsynchronous.ExecuteBehaviors(s_behaviorMap, updateTiming);
       }
       else
       #endif
       {
-        BoingWorkSynchronous.UpdateBehaviorsLateUpdate(s_behaviorMap);
+        BoingWorkSynchronous.ExecuteBehaviors(s_behaviorMap, updateTiming);
       }
 
       Profiler.EndSample();
     }
 
-    private static int s_behaviorUpdateCameraCount = 0;
-
-    internal static void UpdateBehaviorsPreCull(Camera camera)
+    internal static void PullBehaviorResults(UpdateTiming updateTiming)
     {
-      Profiler.BeginSample("BoingManager.UpdateBehaviorsPreRender");
+      Profiler.BeginSample("BoingManager.PullBehaviorResults");
 
-      ++s_behaviorUpdateCameraCount;
+      foreach (var itBehavior in s_behaviorMap)
+      {
+        var behavior = itBehavior.Value;
+        if (behavior.UpdateTiming != updateTiming)
+          continue;
+
+        itBehavior.Value.PullResults();
+      }
 
       Profiler.EndSample();
     }
 
-    internal static void UpdateBehaviorsPostRender(Camera camera)
+    internal static void RestoreBehaviors()
     {
       Profiler.BeginSample("BoingManager.UpdateBehaviorsPostRender");
-
-      if (s_behaviorMap.Count == 0)
-        return;
-
-      #if UNITY_2019_1_OR_NEWER
-      if (RenderPipelineManager.currentPipeline != null)
-      {
-        s_behaviorUpdateCameraCount = 0;
-      }
-      else
-      #endif
-      {
-        if (s_behaviorUpdateCameraCount < Camera.allCamerasCount)
-          return;
-
-        s_behaviorUpdateCameraCount = 0;
-      }
 
       foreach (var itBehavior in s_behaviorMap)
         itBehavior.Value.Restore();
 
       Profiler.EndSample();
     }
-
-    #if UNITY_2019_1_OR_NEWER
-    internal static void UpdateBehaviorsPreCull(ScriptableRenderContext context, Camera[] camera)
-    {
-      UpdateBehaviorsPreCull(null);
-    }  
-
-    internal static void UpdateBehaviorsPostRender(ScriptableRenderContext context, Camera[] camera)
-    {
-      UpdateBehaviorsPostRender(null);
-    }
-    #endif
 
     #endregion // Behavior
 
@@ -485,6 +435,9 @@ namespace BoingKit
 
     internal static void RefreshEffectorParams()
     {
+      if (s_effectorParamsList == null)
+        return;
+
       s_effectorParamsIndexMap.Clear();
       s_effectorParamsList.Clear();
       foreach (var itEffector in s_effectorMap)
@@ -505,12 +458,12 @@ namespace BoingKit
 
     #region Reactor
 
-    internal static void LateUpdateReactors()
+    internal static void ExecuteReactors(UpdateTiming updateTiming)
     {
-      Profiler.BeginSample("BoingManager.UpdateReactorsLateUpdate");
-
       if (s_effectorMap.Count == 0 && s_reactorMap.Count == 0 && s_fieldMap.Count == 0 && s_cpuSamplerMap.Count == 0)
         return;
+
+      Profiler.BeginSample("BoingManager.ExecuteReactors");
 
       foreach (var itReactor in s_reactorMap)
       {
@@ -525,48 +478,45 @@ namespace BoingKit
       #if UNITY_2018_1_OR_NEWER
       if (UseAsynchronousJobs)
       {
-        BoingWorkAsynchronous.UpdateReactorsLateUpdate(s_effectorMap, s_reactorMap, s_fieldMap, s_cpuSamplerMap);
+        BoingWorkAsynchronous.ExecuteReactors(s_effectorMap, s_reactorMap, s_fieldMap, s_cpuSamplerMap, updateTiming);
       }
       else
       #endif
       {
-        BoingWorkSynchronous.UpdateReactorsLateUpdate(s_aEffectorParams, s_reactorMap, s_fieldMap, s_cpuSamplerMap);
+        BoingWorkSynchronous.ExecuteReactors(s_aEffectorParams, s_reactorMap, s_fieldMap, s_cpuSamplerMap, updateTiming);
       }
 
       Profiler.EndSample();
     }
 
-    private static int s_reactorUpdateCameraCount = 0;
-
-    internal static void UpdateReactorsPreCull(Camera camera)
+    internal static void PullReactorResults(UpdateTiming updateTiming)
     {
-      Profiler.BeginSample("BoingManager.UpdateReactorsPreRender");
+      Profiler.BeginSample("BoingManager.PullReactorResults");
 
-      ++s_reactorUpdateCameraCount;
+      foreach (var itReactor in s_reactorMap)
+      {
+        var reactor = itReactor.Value;
+        if (reactor.UpdateTiming != updateTiming)
+          continue;
+
+        itReactor.Value.PullResults();
+      }
+
+      foreach (var itSampler in s_cpuSamplerMap)
+      {
+        var sampler = itSampler.Value;
+        if (sampler.UpdateTiming != updateTiming)
+          continue;
+
+        itSampler.Value.SampleFromField();
+      }
 
       Profiler.EndSample();
     }
 
-    internal static void UpdateReactorsPostRender(Camera camera)
+    internal static void RestoreReactors()
     {
-      Profiler.BeginSample("BoingManager.UpdateReactorsPostRender");
-
-      if (s_effectorMap.Count == 0 && s_reactorMap.Count == 0 && s_fieldMap.Count == 0 && s_cpuSamplerMap.Count == 0)
-        return;
-
-      #if UNITY_2019_1_OR_NEWER
-      if (RenderPipelineManager.currentPipeline != null)
-      {
-        s_reactorUpdateCameraCount = 0;
-      }
-      else
-      #endif
-      {
-        if (s_reactorUpdateCameraCount < Camera.allCamerasCount)
-          return;
-
-        s_reactorUpdateCameraCount = 0;
-      }
+      Profiler.BeginSample("BoingManager.PullReactorResults");
 
       foreach (var itReactor in s_reactorMap)
         itReactor.Value.Restore();
@@ -574,25 +524,10 @@ namespace BoingKit
       foreach (var itSampler in s_cpuSamplerMap)
         itSampler.Value.Restore();
 
-      // do this post-render so we have one frame to finish compute dispatches
-      DispatchReactorFieldCompute();
-
       Profiler.EndSample();
     }
 
-    #if UNITY_2019_1_OR_NEWER
-    internal static void UpdateReactorsPreCull(ScriptableRenderContext context, Camera[] camera)
-    {
-      UpdateReactorsPreCull(null);
-    }
-
-    internal static void UpdateReactorsPostRender(ScriptableRenderContext context, Camera[] camera)
-    {
-      UpdateReactorsPostRender(null);
-    }
-    #endif
-
-    private static void DispatchReactorFieldCompute()
+    internal static void DispatchReactorFieldCompute()
     {
       if (s_effectorParamsBuffer == null)
         return;
@@ -624,12 +559,12 @@ namespace BoingKit
 
     #region Bones
 
-    internal static void LateUpdateBonesExecute()
+    internal static void ExecuteBones(UpdateTiming updateTiming)
     {
-      Profiler.BeginSample("BoingManager.UpdateBonesLateUpdateExecute");
-
       if (s_bonesMap.Count == 0)
         return;
+
+      Profiler.BeginSample("BoingManager.ExecuteBones");
 
       foreach (var itBones in s_bonesMap)
       {
@@ -644,87 +579,47 @@ namespace BoingKit
       #if UNITY_2018_1_OR_NEWER
       if (UseAsynchronousJobs)
       {
-        BoingWorkAsynchronous.UpdateBonesLateUpdateExecute(s_aEffectorParams, s_bonesMap);
+        BoingWorkAsynchronous.ExecuteBones(s_aEffectorParams, s_bonesMap, updateTiming);
       }
       else
       #endif
       {
-        BoingWorkSynchronous.UpdateBonesLateUpdateExecute(s_aEffectorParams, s_bonesMap);
+        BoingWorkSynchronous.ExecuteBones(s_aEffectorParams, s_bonesMap, updateTiming);
       }
 
       Profiler.EndSample();
     }
 
-    internal static void LateUpdateBonesPullResults()
+    internal static void PullBonesResults(UpdateTiming updateTiming)
     {
-      Profiler.BeginSample("BoingManager.UpdateBonesLateUpdateExecute");
-
       if (s_bonesMap.Count == 0)
         return;
+
+      Profiler.BeginSample("BoingManager.PullBonesResults");
 
       #if UNITY_2018_1_OR_NEWER
       if (UseAsynchronousJobs)
       {
-        BoingWorkAsynchronous.UpdateBonesLateUpdatePullResults(s_aEffectorParams, s_bonesMap);
+        BoingWorkAsynchronous.PullBonesResults(s_aEffectorParams, s_bonesMap, updateTiming);
       }
       else
       #endif
       {
-        BoingWorkSynchronous.UpdateBonesLateUpdatePullResults(s_aEffectorParams, s_bonesMap);
+        BoingWorkSynchronous.PullBonesResults(s_aEffectorParams, s_bonesMap, updateTiming);
       }
 
       Profiler.EndSample();
     }
 
-    private static int s_bonesUpdateCameraCount = 0;
-
-    internal static void UpdateBonesPreCull(Camera camera)
+    internal static void RestoreBones()
     {
-      Profiler.BeginSample("BoingManager.UpdateBonesPreRender");
-
-      ++s_bonesUpdateCameraCount;
-
-      Profiler.EndSample();
-    }
-
-    internal static void UpdateBonesPostRender(Camera camera)
-    {
-      Profiler.BeginSample("BoingManager.UpdateBonesPostRender");
-
-      if (s_bonesMap.Count == 0)
-        return;
-
-      #if UNITY_2019_1_OR_NEWER
-      if (RenderPipelineManager.currentPipeline != null)
-      {
-        s_bonesUpdateCameraCount = 0;
-      }
-      else
-      #endif
-      {
-        if (s_bonesUpdateCameraCount < Camera.allCamerasCount)
-          return;
-
-        s_bonesUpdateCameraCount = 0;
-      }
+      Profiler.BeginSample("BoingManager.RestoreBones");
 
       foreach (var itBones in s_bonesMap)
         itBones.Value.Restore();
 
       Profiler.EndSample();
     }
-
-    #if UNITY_2019_1_OR_NEWER
-    internal static void UpdateBonesPreCull(ScriptableRenderContext context, Camera[] camera)
-    {
-      UpdateBonesPreCull(null);
-    }
-
-    internal static void UpdateBonesPostRender(ScriptableRenderContext context, Camera[] camera)
-    {
-      UpdateBonesPostRender(null);
-    }
-    #endif
 
     #endregion // Bones
   }

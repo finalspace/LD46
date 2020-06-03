@@ -33,9 +33,10 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnGround = false;
     private bool isJumping = true;
     //private bool isFalling = false;
-    const int maxJumpNum = 2;
+    const int maxJumpNum = 1;
     private int jumpNum;
-    private bool powerMode = false;
+    private bool dashing = false;
+    private bool dashReady = false;
 
     private Transform parentTransform;
     private Vector2 parentLastPosition;
@@ -69,8 +70,10 @@ public class PlayerMovement : MonoBehaviour
 		anim = GetComponent<Animator>();
         playerCollision = GetComponent<PlayerCollision> ();
 		gravity = -(2 * jumpHeight) / Mathf.Pow (timeToJumpApex, 2);
+        gravity *= 1;
 		jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
-        jumpNum = 0;
+        jumpNum = maxJumpNum;
+        dashReady = false;
 
         aimingRoot.transform.SetParent(null);
 	}
@@ -99,10 +102,14 @@ public class PlayerMovement : MonoBehaviour
                 Instantiate(footEffect, pos, Quaternion.identity);
                 root.rotation = Quaternion.Euler(0, 0, 0);
             }
-            velocity.y = 0;
+            velocity.y = Mathf.Abs(velocity.y * 0.3f);
+            //velocity.y = 0;
+            
+            velocity.x = 0;
             targetVelocityX = 0;
-            jumpNum = 0;
-            powerMode = false;
+            jumpNum = maxJumpNum;
+            dashing = false;
+            dashReady = false;
         }
         else
         {
@@ -150,8 +157,12 @@ public class PlayerMovement : MonoBehaviour
                 mouseFirstPos = mousePosition;
 
                 SetAiming(true);
-                if (jumpNum == maxJumpNum - 1)
+
+                /*
+                //slow motion aiming?
+                if (superDash)
                     TimeManager.Instance.SlowMotion();
+                */
             }
 
             if (Input.GetMouseButton(0))
@@ -165,9 +176,9 @@ public class PlayerMovement : MonoBehaviour
                 if (!aiming) return;
 
                 SetAiming(false);
-                TimeManager.Instance.Reset();
+                //TimeManager.Instance.Reset();
 
-                if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.5f)
+                if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.1f)
                     Launch();
                 else LaunchFailed();
             }
@@ -192,13 +203,13 @@ public class PlayerMovement : MonoBehaviour
         float accelerationTime = (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime, Mathf.Infinity, Time.fixedDeltaTime);
 
-        if (!powerMode)
+        if (!dashing)
         velocity.y += gravity * Time.fixedDeltaTime;
 
-        if (powerMode)
+        if (dashing)
             velocity *= 0.88f;
         if (velocity.magnitude < 5.0f)
-            powerMode = false;
+            dashing = false;
 
         if (parentTransform != null)
         {
@@ -286,7 +297,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool AbleToJump()
     {
-        return (jumpNum < maxJumpNum);
+        return (jumpNum > 0);
     }
 
 
@@ -328,8 +339,8 @@ public class PlayerMovement : MonoBehaviour
         if (energy < 3) return;
 
         isJumping = true;
-        jumpNum++;
-        powerMode = (jumpNum == maxJumpNum);
+        jumpNum--;
+        dashing = dashReady;
         Detach();
 
         velocity = ComputeInitialVelocity();
@@ -337,7 +348,7 @@ public class PlayerMovement : MonoBehaviour
         float adjustedPower = Mathf.Min(power, energy);
         velocity = velocity * (adjustedPower / power);  //adjusted velocity
 
-        if (powerMode)
+        if (dashing)
             velocity *= 2.5f;
 
         targetVelocityX = velocity.x / 2;

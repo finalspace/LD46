@@ -27,7 +27,7 @@ public class UIManager : SingletonBehaviour<UIManager>
 
     void Update()
     {
-        if (MainGameManager.Instance.gameState != GameState.Main) return;
+        if (MainGameManager.Instance != null && MainGameManager.Instance.gameState != GameState.Main) return;
 
         playerEnergy = PlayerStats.Instance.energy;
         energyPercentage = playerEnergy / 100.0f;

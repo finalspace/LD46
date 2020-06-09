@@ -53,7 +53,7 @@ public class Player : SingletonBehaviour<Player>
 
     public void CollectItem()
     {
-        MusicManager.Instance.PlayEat();
+        MusicManager.Instance?.PlayEat();
         animator.PlayEat();
     }
 

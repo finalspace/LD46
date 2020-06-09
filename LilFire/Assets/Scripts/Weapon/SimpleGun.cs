@@ -25,7 +25,7 @@ public class SimpleGun : MonoBehaviour
 
     private void Update()
     {
-        if (DateTimeUtil.SecondsElapse(lastTime) > cooldown)
+        if (DateTimeUtil.MillisecondsElapse(lastTime) > cooldown)
         {
             Spawn();
             ResetCoolDown();
@@ -45,7 +45,7 @@ public class SimpleGun : MonoBehaviour
 
     private void ResetCoolDown()
     {
-        cooldown = Random.Range(coolDownMin, coolDownMax);
+        cooldown = Random.Range(coolDownMin, coolDownMax) * 1000;
     }
 
 }

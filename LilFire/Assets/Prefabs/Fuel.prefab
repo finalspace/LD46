@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 6463927397538789717}
   - component: {fileID: 6463927397538789719}
   - component: {fileID: 7897462274035928816}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Fuel
   m_TagString: Untagged
   m_Icon: {fileID: 0}

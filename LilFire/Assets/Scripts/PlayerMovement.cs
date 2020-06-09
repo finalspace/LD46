@@ -4,10 +4,8 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 [RequireComponent (typeof (PlayerCollision))]
-//public class PlayerMovement : SingletonBehaviour<Player>
 public class PlayerMovement : MonoBehaviour
 {
-
 	[Header ("Moving and Jumping")]
 	public float jumpHeight = 4;
 	public float timeToJumpApex = .4f;
@@ -45,8 +43,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Aiming Effects")]
     public GameObject aimingRoot;
     public List<GameObject> aimingDots;
+    public int aimingDotsCount = 6;
     public bool aiming = false;
-    private int NumIterations = 13;
     //private float aimingLoopRange = 10;
     private float aimingTime = 0;
     private Vector3 camFirstPos;
@@ -247,7 +245,7 @@ public class PlayerMovement : MonoBehaviour
         vel.y += gravity * offTime;
         dotPos += vel * offTime;
      
-        for (int i = 0; i < NumIterations; ++i)
+        for (int i = 0; i < aimingDotsCount; ++i)
         {
             aimingDots[i].transform.position = dotPos;
             vel.x = Mathf.SmoothDamp(vel.x, targetVx, ref velXSmoothingTemp, accelerationTimeAirborne, Mathf.Infinity, dt);

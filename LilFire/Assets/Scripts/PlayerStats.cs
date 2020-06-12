@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//holds data only
 public class PlayerStats : SingletonBehaviour<PlayerStats>
 {
     public float maxHeight = 0;
@@ -14,8 +15,10 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public Player player;
     public BoardManager lvl;
     public float startingAltitude = 0;
+    public bool isDying = false;
 
-    public bool dying = false;
+    [Header("status")]
+    public bool IsInvulnerable = false;
 
     private void OnEnable()
     {
@@ -50,7 +53,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         if (energy > 0 && losingEnergy)
         {
             energy -= Time.deltaTime * decreasingSpeed;
-            if (energy <= 0) player.TryDie();
+            if (energy <= 0) player.SoftKill();
         }
 
     }
@@ -61,7 +64,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         if (energy <= 0)
         {
             energy = 0;
-            player.TryDie();
+            player.SoftKill();
         }
         energy = Mathf.Clamp(energy, 0, 120);
     }

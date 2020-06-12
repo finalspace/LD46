@@ -6,11 +6,15 @@ using Spine;
 
 public class CharacterSpineAnimator : MonoBehaviour
 {
+    [Header("Spine Animation")]
 	public SkeletonAnimation skeletonAnimation;
-	public AnimationReferenceAsset idle, jump, eat, squish, hurt, transition;
+	public AnimationReferenceAsset birth, idle, jump, eat, squish, hurt, transition, die;
 	public string currentState;
 	public float speed;
 	public float movement;
+
+    [Header("Unity Animation")]
+    public Animator unityAnimator;
 
     private void OnEnable()
     {
@@ -45,6 +49,21 @@ public class CharacterSpineAnimator : MonoBehaviour
         {
 			PlayIdle();
         }
+        else if (te.Animation.Name == "birth")
+        {
+            PlayIdle();
+        }
+    }
+
+    /*****************************************
+     * 
+     * Spine Animation
+     * 
+     *****************************************/
+
+    public void PlayBirth()
+    {
+        SetAnimatoin(birth, false, 1f);
     }
 
     public void PlayEat()
@@ -75,6 +94,27 @@ public class CharacterSpineAnimator : MonoBehaviour
     public void PlayLanding()
     {
         SetAnimatoin(transition, false, 1f);
+    }
+
+    public void PlayDie()
+    {
+        SetAnimatoin(die, false, 1f);
+    }
+
+    /*****************************************
+     * 
+     * Unity Animation
+     * 
+     *****************************************/
+
+    public void PlayFlash()
+    {
+        unityAnimator.Play("Hit");
+    }
+
+    public void StopFlash()
+    {
+        unityAnimator.Play("Normal");
     }
 
     public void SetAnimatoin(AnimationReferenceAsset animation, bool loop, float timeScale)

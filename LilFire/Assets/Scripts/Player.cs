@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class Player : SingletonBehaviour<Player>
 {
-    public LayerMask interactable;
     public CharacterSpineAnimator animator;
 
+    private PlayerMovement playerMovement;
     private PlayerStats playerStats;
     private PlayerCollision playercollision;
+
+    private bool isSimulating = true;
 
     private void OnEnable()
     {
@@ -22,14 +24,19 @@ public class Player : SingletonBehaviour<Player>
 
     private void Start()
     {
-        interactable = CollisionManager.Instance.Interactable;
-        animator = GetComponent<CharacterSpineAnimator>();
         playerStats = PlayerStats.Instance;
+        animator = GetComponent<CharacterSpineAnimator>();
+        playerMovement = GetComponent<PlayerMovement>();
         playercollision = GetComponent<PlayerCollision>();
     }
 
     public void Update()
     {
+        // die if player height goes below the starting level; can update the fatal height as we got
+        if (transform.position.y < playerStats.fatalHeightFalling)
+        {
+            Kill();
+        }
         /*
         //need non-trigger collider
         RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, transform.up, distance, interactable);
@@ -51,19 +58,62 @@ public class Player : SingletonBehaviour<Player>
         */
     }
 
+
+
+    /*****************************************
+     * 
+     * Actions
+     * 
+     *****************************************/
+
+    /// <summary>
+    /// character doesn't react to game systems
+    /// </summary>
+    public void StopSimulation()
+    {
+        isSimulating = false;
+        playerMovement.StopSimulation();
+    }
+
+    public void StartSimulation()
+    {
+        isSimulating = true;
+        playerMovement.StartSimulation();
+    }
+
     public void CollectItem()
     {
         MusicManager.Instance?.PlayEat();
         animator.PlayEat();
     }
 
-    public void Hurt()
+    /// <summary>
+    /// Damage()->Kill()->Die()
+    /// </summary>
+    /// <param name="damage"></param>
+    public void Damage(int damage = 0)
     {
-        MusicManager.Instance.PlayDamage();
-        animator.PlayEat();
+        if (!isSimulating || playerStats.IsInvulnerable) return;
+
+        MusicManager.Instance?.PlayDamage();
+        animator.PlayHurt();
+
+        //todo: damage system to trigger Kill/Die
+        Die();
     }
 
-    public void TryDie()
+    public void Kill()
+    {
+        if (!isSimulating || playerStats.IsInvulnerable) return;
+
+        Die();
+    }
+
+    /// <summary>
+    /// set to dying status. allow some last chances to survive
+    /// i.e. character running out of energy in the air, but will survive if he lands on a fuel or campfire
+    /// </summary>
+    public void SoftKill()
     {
         if (playercollision.collisions.below)
         {
@@ -71,32 +121,44 @@ public class Player : SingletonBehaviour<Player>
             return;
         }
 
-        playerStats.dying = true;
+        playerStats.isDying = true;
     }
 
-    public void Die()
+    private void Die()
     {
         playerStats.lives--;
-        UIManager.Instance?.UpdateLife(PlayerStats.Instance.lives);
-        if (PlayerStats.Instance.lives <= 0)
+        UIManager.Instance?.UpdateLife(playerStats.lives);
+        if (playerStats.lives <= 0)
         {
             MainGameManager.Instance.GameLost();
             Destroy(gameObject);
         }
         else
         {
-            Respawn();
+            Invoke("Respawn", 2);
         }
-        playerStats.dying = false;
+
+        playerStats.isDying = false;
+        animator.PlayDie();
+
+        StopSimulation();
     }
 
     public void Respawn()
     {
         MusicManager.Instance?.PlayThunder();
         playerStats.energy = 100;
-        PlayerMovement motionCtrl = GetComponent<PlayerMovement>();
-        motionCtrl.Reset();
+        playerMovement.Reset();
+        transform.position = GetRespawnPosition();
+        animator.PlayBirth();
+        SetInvulnerable();
+        Invoke("DismissInvulnerable", 3);
 
+        StartSimulation();
+    }
+
+    private Vector3 GetRespawnPosition()
+    {
         Vector3 respawnPos = Vector3.zero;
         if (BoardManager.Instance != null)
         {
@@ -104,10 +166,17 @@ public class Player : SingletonBehaviour<Player>
             GameObject checkPoint = brd.GetCurrentWaypoint();
             respawnPos = checkPoint.transform.position;
         }
+        else
+        {
+            respawnPos = CameraManager.Instance.transform.position + 2f * Vector3.up;
+            respawnPos.z = 0;
+        }
 
         // put player a little higher than achieved waypoint or will fall through
-        transform.position = respawnPos + 1.3f * Vector3.up;
-        animator.PlayIdle();
+        respawnPos += 1.3f * Vector3.up;
+
+        
+        return respawnPos;
     }
 
     public void CenterOnWaypoint()
@@ -121,6 +190,26 @@ public class Player : SingletonBehaviour<Player>
         //move.GoToHighestWaypoint();
     }
 
+    /*****************************************
+     * 
+     * Status
+     * 
+     *****************************************/
+
+    public void SetInvulnerable()
+    {
+        animator.PlayFlash();
+        playerStats.IsInvulnerable = true;
+        Invoke("DismissInvulnerable", 3);
+    }
+
+    public void DismissInvulnerable()
+    {
+        animator.StopFlash();
+        playerStats.IsInvulnerable = false;
+    }
+
+
 
     /*****************************************
      * 
@@ -129,7 +218,7 @@ public class Player : SingletonBehaviour<Player>
      *****************************************/
     private void OnPlayerLand()
     {
-        if (playerStats.dying)
-            Die();
+        if (playerStats.isDying)
+            Kill();
     }
 }

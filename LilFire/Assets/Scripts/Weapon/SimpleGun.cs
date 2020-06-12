@@ -40,7 +40,7 @@ public class SimpleGun : MonoBehaviour
         Vector3 direction = new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad), 0);
         Bullet bullet = Instantiate(bulletPrefab).GetComponent<Bullet>();
         bullet.transform.position = root.position;
-        bullet.Init(direction * speed);
+        bullet.Init(direction * speed, Player.Instance?.transform);
     }
 
     private void ResetCoolDown()

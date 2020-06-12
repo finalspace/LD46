@@ -327,7 +327,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5376853498699244664}
   m_Layer: 0
-  m_Name: patrolpoint1
+  m_Name: gunLeftEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -345,7 +345,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4409497470539846630}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2556344965742703541
 GameObject:
@@ -587,6 +587,7 @@ Transform:
   - {fileID: 2129902838}
   - {fileID: 497896599}
   - {fileID: 9159627799755584924}
+  - {fileID: 7669914715669859729}
   - {fileID: 5376853498699244664}
   - {fileID: 4303264926739512849}
   m_Father: {fileID: 4228047215511948766}
@@ -602,7 +603,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4303264926739512849}
   m_Layer: 0
-  m_Name: patrolpoint2
+  m_Name: gunRightEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -620,7 +621,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4409497470539846630}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3635215758014861799
 GameObject:
@@ -844,7 +845,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7365267433978496098
 Transform:
   m_ObjectHideFlags: 0
@@ -931,7 +932,6 @@ MonoBehaviour:
   beam: {fileID: 6614339614646398944}
   countDownText: {fileID: 2384928954308367698}
   movement: {fileID: 620582307195124997}
-  countdown: {fileID: 0}
 --- !u!114 &620582307195124997
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -947,7 +947,7 @@ MonoBehaviour:
   root: {fileID: 9159627799755584924}
   p1: {fileID: 5376853498699244664}
   p2: {fileID: 4303264926739512849}
-  time: 2
+  time: 3
 --- !u!1 &6614339614646398944
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,7 +967,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1840061061664409759
 Transform:
   m_ObjectHideFlags: 0
@@ -1088,5 +1088,79 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55347f48bb4ea4d968216464e45b7311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visualRoot: {fileID: 0}
   velocity: {x: 0, y: 0, z: 0}
   destroyAfterHit: 0
+  homing: 0
+  target: {fileID: 0}
+  power: 0
+--- !u!1 &8802419801504374350
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7669914715669859729}
+  - component: {fileID: 4380856773811879423}
+  - component: {fileID: 1415755581126882380}
+  m_Layer: 0
+  m_Name: gun homing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7669914715669859729
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8802419801504374350}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 4.26, y: -0.92, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4409497470539846630}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4380856773811879423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8802419801504374350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 572d8c47594334a0f85082b4350e8642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  root: {fileID: 7669914715669859729}
+  bulletPrefab: {fileID: 8911759861059520756, guid: a248d8bb149e8489eb502c1ee4da83b3,
+    type: 3}
+  angleFrom: -45
+  angleTo: 5
+  speedFrom: 5
+  speedTo: 6
+  coolDownMin: 6
+  coolDownMax: 12
+  lastTime: 0
+--- !u!114 &1415755581126882380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8802419801504374350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f36c20d78b8da480b82e1fe04425349d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  root: {fileID: 7669914715669859729}
+  p1: {fileID: 5376853498699244664}
+  p2: {fileID: 4303264926739512849}
+  time: 4

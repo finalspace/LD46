@@ -931,7 +931,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6595471381436736881}
-  - {fileID: 6417434960338316853}
+  - {fileID: 1033327167276764673}
   - {fileID: 7071189041097252916}
   - {fileID: 8290664666180685812}
   - {fileID: 1179102842}
@@ -1167,6 +1167,7 @@ MonoBehaviour:
   lvl: {fileID: 0}
   startingAltitude: 0
   dying: 0
+  IsInvulnerable: 0
 --- !u!114 &7200217227627858473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1180,15 +1181,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 6417434960338316850}
+  birth: {fileID: 11400000, guid: 2456ba332d8064212b05b91741b0586c, type: 2}
   idle: {fileID: 11400000, guid: b54337a9885714d4683e0b2cc5022571, type: 2}
   jump: {fileID: 11400000, guid: 5ff66e57b47fd42908ae6c79985b5496, type: 2}
   eat: {fileID: 11400000, guid: 18f6b9f3ca2f74904ad7d62a4729aedb, type: 2}
   squish: {fileID: 11400000, guid: da098736e66fe47e1a230bfdbae65587, type: 2}
   hurt: {fileID: 11400000, guid: aa23da51a7cd846e58db03e88f343bb2, type: 2}
   transition: {fileID: 11400000, guid: 77ed1e8c3124e4a95bdca41138fee2a1, type: 2}
+  die: {fileID: 11400000, guid: b59e06f479498434d958ecb79e46a235, type: 2}
   currentState: 
   speed: 0
   movement: 0
+  unityAnimator: {fileID: 5464455202111231138}
 --- !u!114 &4388519252538787516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1442,6 +1446,57 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &8835386309543407758
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1033327167276764673}
+  - component: {fileID: 5464455202111231138}
+  m_Layer: 0
+  m_Name: AnimationRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1033327167276764673
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8835386309543407758}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.569, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 6417434960338316853}
+  m_Father: {fileID: 4472603484395781405}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &5464455202111231138
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8835386309543407758}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: dae688148ba7e4f3e985d89315cbd83e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &917979719
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2092,12 +2147,17 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 4472603484395781405}
+    m_TransformParent: {fileID: 1033327167276764673}
     m_Modifications:
     - target: {fileID: 1602274139491963464, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
       propertyPath: m_Name
       value: Spine GameObject (Fireboy)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602274139491963464, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
@@ -2107,7 +2167,7 @@ PrefabInstance:
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.569
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
@@ -2117,17 +2177,17 @@ PrefabInstance:
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
@@ -2137,7 +2197,7 @@ PrefabInstance:
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}
@@ -2153,6 +2213,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.125
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.125
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963466, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}

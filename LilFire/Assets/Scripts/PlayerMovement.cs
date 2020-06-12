@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
 	public float moveSpeed = 6;
     public Transform root;
 
+    private PlayerCollision playerCollision;
     private Vector2 deltaMovement;
     private float accelerationTimeAirborne = .9f;
 	private float accelerationTimeGrounded = .2f;
@@ -21,9 +22,8 @@ public class PlayerMovement : MonoBehaviour
 	private float velocityXSmoothing;
     private float targetVelocityX;
 
-    private PlayerCollision playerCollision;
-	private Animator anim;
-
+    [Header("Status")]
+    private bool isSimulating = true;
     private bool isDead = false;
 	private bool facingRight = true;
     private bool doubleJump = false;
@@ -65,7 +65,6 @@ public class PlayerMovement : MonoBehaviour
     private float trailEffectTime;
 
     void Start() {
-		anim = GetComponent<Animator>();
         playerCollision = GetComponent<PlayerCollision> ();
 		gravity = -(2 * jumpHeight) / Mathf.Pow (timeToJumpApex, 2);
         gravity *= 1;
@@ -78,6 +77,8 @@ public class PlayerMovement : MonoBehaviour
 
 	void Update() 
     {
+        if (!isSimulating) return;
+
         HandleInput();
         if (aiming)
             DrawTrajectory();
@@ -85,6 +86,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!isSimulating) return;
+
         UpdateMovement();
 
         // on the ground or in the air
@@ -97,7 +100,8 @@ public class PlayerMovement : MonoBehaviour
                 Attach(playerCollision.collisions.belowTransform);
 
                 Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
-                Instantiate(footEffect, pos, Quaternion.identity);
+                if (footEffect != null)
+                    Instantiate(footEffect, pos, Quaternion.identity);
                 root.rotation = Quaternion.Euler(0, 0, 0);
             }
             velocity.y = Mathf.Abs(velocity.y * 0.3f);
@@ -123,17 +127,10 @@ public class PlayerMovement : MonoBehaviour
         //when blocked by ceiling
         if (playerCollision.collisions.above)
         {
-            velocity.y = 0;
+            velocity.y = -velocity.y * 0.3f;
             velocity.x *= 0.8f;
             targetVelocityX *= 0.8f;
         }
-
-        // die if player height goes below the starting level; can update the fatal height as we got
-        if (Player.Instance.transform.position.y < PlayerStats.Instance.fatalHeightFalling)
-        {
-            Player.Instance.Die();
-        }
-
     }
 
     /// <summary>
@@ -304,6 +301,17 @@ public class PlayerMovement : MonoBehaviour
     * Actions
     * 
     *****************************************/
+
+    public void StartSimulation()
+    {
+        isSimulating = true;
+    }
+
+    public void StopSimulation()
+    {
+        isSimulating = false;
+        Reset();
+    }
 
     public void Reset()
     {

@@ -12,7 +12,7 @@ public class BeamGun : MonoBehaviour
 
     [Header("Behavior")]
     public LinearMovement movement;
-    public Countdown countdown;
+    private Countdown countdown;
 
     private DateTime countDownStartTime;
     private bool showingCountDown = false;

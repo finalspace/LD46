@@ -65,9 +65,9 @@ public class RopeControl : MonoBehaviour
 
     }
 
-    public void StartSwing()
+    public void StartSwing(int dir = 1)
     {
-        swingTrigger.EnableTrigger(-1);
+        swingTrigger.EnableTrigger(dir);
     }
 
     public void StopSwing()

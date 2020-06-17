@@ -17,6 +17,7 @@ public class RopeCarrier : MonoBehaviour
     private float speed = 4f;  //in FixedUpdate
     private float dealthMovement = 0.22f;  //in FixedUpdate
     private bool sliding = false;  //before character reaches the end of the rope
+    private Vector3[] lastPos;
 
     //temporary variables
     private float dist;
@@ -57,6 +58,7 @@ public class RopeCarrier : MonoBehaviour
 
             transform.rotation = target.rotation;
         }
+        RecordLastPositions();
     }
 
     /// <summary>
@@ -72,6 +74,8 @@ public class RopeCarrier : MonoBehaviour
         end = ropeControl.total;
         target = rope.segments[current + 1].transform;
         transform.SetParent(rope.segments[current].transform, true);
+        lastPos = new Vector3[3];
+        RecordLastPositions();
 
         rope.rope.Drag(current, vel/3);
         sliding = true;
@@ -84,6 +88,14 @@ public class RopeCarrier : MonoBehaviour
         Destroy(this);
     }
 
+    private void RecordLastPositions()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            lastPos[i] = rope.segments[end - 1 - i].transform.position;
+        }
+    }
+
     private bool UpdateTarget()
     {
         current++;
@@ -94,7 +106,14 @@ public class RopeCarrier : MonoBehaviour
             transform.position = rope.segments[end - 1].transform.position;
 
             sliding = false;
-            rope.StartSwing();
+            //int dir = (target.transform.position.x > rope.transform.position.x) ? 1 : -1;
+            float diff = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                diff += rope.segments[end - 1 - i].transform.position.x - lastPos[i].x;
+            }
+            int dir = diff > 0 ? 1 : -1;
+            rope.StartSwing(dir);
             return false;
         }
         else

@@ -14,6 +14,7 @@ public class SwingTrigger : MonoBehaviour
     private bool on = false;
     private int direction = 1;
     private bool inZone = false;
+    private int count = 0;
 
     private void FixedUpdate()
     {
@@ -30,9 +31,11 @@ public class SwingTrigger : MonoBehaviour
             {
                 inZone = true;
                 direction = -direction;
+                count++;
             }
 
-            rope.Drag(ropeSegmentIdx, force * direction);
+            float coeff = Mathf.Clamp01((float)count / 3);
+            rope.Drag(ropeSegmentIdx, force * direction * coeff);
         }
         else inZone = false;
     }
@@ -46,6 +49,7 @@ public class SwingTrigger : MonoBehaviour
     public void DisableTrigger()
     {
         on = false;
+        count = 0;
     }
 
 }

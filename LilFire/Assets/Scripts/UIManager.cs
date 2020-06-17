@@ -11,6 +11,7 @@ public class UIManager : SingletonBehaviour<UIManager>
     public Image healthbar;
     public GameObject GameOver;
     public TMPro.TextMeshProUGUI FinalScore;
+    
 
     private PulseAnimation scorePulse;
     private float lifebarWidth, lifebarHeight;

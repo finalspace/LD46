@@ -69,8 +69,9 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
         energy = Mathf.Clamp(energy, 0, 120);
     }
 
-    public void ConsumeEnergy(float value)
+    public void ConsumeEnergy(Vector3 vel)
     {
+        float value = vel.magnitude / 3;
         value = 0;
         UpdateEnergy(-value);
     }

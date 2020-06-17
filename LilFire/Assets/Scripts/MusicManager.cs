@@ -101,7 +101,7 @@ public class MusicManager : SingletonBehaviour<MusicManager>
         audioSource_BG.clip = audioClip_Game;
     }
 
-    public void PlayJump(float power)
+    public void PlayJump(Vector3 vel)
     {
         if (thundering) return; // not used currently but thunder is false by default
         audioSource_SE.clip = audioClip_Jump;

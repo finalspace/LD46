@@ -5,12 +5,26 @@ using UnityEngine;
 public class Player : SingletonBehaviour<Player>
 {
     public CharacterSpineAnimator animator;
+    public PlayerMovement playerMovement;
 
-    private PlayerMovement playerMovement;
     private PlayerStats playerStats;
     private PlayerCollision playercollision;
 
     private bool isSimulating = true;
+    private bool isTakingControl = true;
+
+    [Header("Aiming Effects")]
+    public GameObject aimingRoot;
+    public List<GameObject> aimingDots;
+    public int aimingDotsCount = 6;
+    public bool fullTrajctory = false;
+
+    private bool aiming = false;
+    private float aimingTime;
+    private Vector3 camFirstPos;
+    private Vector3 mouseFirstPos;
+    private Vector3 mousePosition;
+    private Vector3 startPosOffset = new Vector3(0, 0.5f, 0);
 
     private void OnEnable()
     {
@@ -28,17 +42,33 @@ public class Player : SingletonBehaviour<Player>
         animator = GetComponent<CharacterSpineAnimator>();
         playerMovement = GetComponent<PlayerMovement>();
         playercollision = GetComponent<PlayerCollision>();
+
+        aimingRoot.transform.SetParent(null);
+        if (fullTrajctory)
+            ShowFullTrajectory();
     }
 
     public void Update()
     {
+        if (isTakingControl)
+            HandleInput();
+
+        if (aiming)
+            DrawTrajectory();
+
         // die if player height goes below the starting level; can update the fatal height as we got
         if (transform.position.y < playerStats.fatalHeightFalling)
         {
             Kill();
         }
+
+        //HandleInteraction();
+    }
+
+    //need non-trigger collider
+    private void HandleInteraction()
+    {
         /*
-        //need non-trigger collider
         RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, transform.up, distance, interactable);
         if (hitInfo.collider != null)
         {
@@ -58,6 +88,63 @@ public class Player : SingletonBehaviour<Player>
         */
     }
 
+    private void ShowFullTrajectory()
+    {
+        for (int i = 0; i < aimingDots.Count - 1; ++i)
+        {
+            aimingDots[i].GetComponent<SpriteRenderer>().color = Color.white;
+        }
+    }
+
+    private void DrawTrajectory()
+    {
+        Vector2 startPos = transform.position + startPosOffset;
+        Vector2 vel = ComputeInitialVelocity();
+        Vector2[] dotPosition = playerMovement.GetTrajectory(startPos, vel, aimingTime);
+        for (int i = 0; i < aimingDotsCount; ++i)
+        {
+            aimingDots[i].transform.position = dotPosition[i];
+        }
+    }
+
+    /// <summary>
+    /// calculate launch velociy based on drag input
+    /// </summary>
+    /// <returns></returns>
+    private Vector2 ComputeInitialVelocity()
+    {
+        Vector2 power;
+        Vector2 diff = mouseFirstPos + startPosOffset - mousePosition;
+        float x = Mathf.InverseLerp(0, 6, Mathf.Abs(diff.x));
+        //x = Mathf.Sqrt(x);
+        x = Mathf.Sin(x * Mathf.PI / 2);
+        power.x = Mathf.Lerp(0, 15f, x) * Mathf.Sign(diff.x);
+
+        float y = Mathf.InverseLerp(0, 1.5f, Mathf.Abs(diff.y));
+        y = Mathf.Sqrt(y);
+        power.y = Mathf.Lerp(0, 20f, y) * Mathf.Sign(diff.y);
+
+        return power;
+    }
+
+    public void SetAiming(bool val)
+    {
+        if (aiming == val)
+            return;
+        aiming = val;
+
+        aimingRoot.SetActive(val);
+        if (!aiming)
+        {
+            aimingTime = 0;
+        }
+
+        if (aiming)
+            animator.PlaySquish();
+        else
+            animator.PlayIdle();
+    }
+
 
 
     /*****************************************
@@ -65,20 +152,43 @@ public class Player : SingletonBehaviour<Player>
      * Actions
      * 
      *****************************************/
-
     /// <summary>
-    /// character doesn't react to game systems
+    /// Handles the input. 
+    /// calculate deltaMovement used for UpdateMovement
     /// </summary>
-    public void StopSimulation()
+    private void HandleInput()
     {
-        isSimulating = false;
-        playerMovement.StopSimulation();
-    }
+        if (Input.GetMouseButtonDown(0) && playerMovement.AbleToJump())
+        {
+            mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mouseFirstPos = mousePosition;
 
-    public void StartSimulation()
-    {
-        isSimulating = true;
-        playerMovement.StartSimulation();
+            SetAiming(true);
+
+            /*
+            //slow motion aiming?
+            if (superDash)
+                TimeManager.Instance.SlowMotion();
+            */
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            if (!aiming) return;
+            mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (!aiming) return;
+
+            SetAiming(false);
+            //TimeManager.Instance.Reset();
+
+            if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.1f)
+                playerMovement.Launch(ComputeInitialVelocity());
+            else playerMovement.LaunchFailed();
+        }
     }
 
     public void CollectItem()
@@ -115,7 +225,7 @@ public class Player : SingletonBehaviour<Player>
     /// </summary>
     public void SoftKill()
     {
-        if (playercollision.collisions.below)
+        if (!playerMovement.isJumping)
         {
             Die();
             return;
@@ -138,6 +248,7 @@ public class Player : SingletonBehaviour<Player>
             Invoke("Respawn", 2);
         }
 
+        SetAiming(false);
         playerStats.isDying = false;
         animator.PlayDie();
 
@@ -195,6 +306,33 @@ public class Player : SingletonBehaviour<Player>
      * Status
      * 
      *****************************************/
+    /// <summary>
+    /// character doesn't react to game systems (movement, input control)
+    /// used for cutscene, or play die animation
+    /// </summary>
+    public void StopSimulation()
+    {
+        isSimulating = false;
+        isTakingControl = false;
+        playerMovement.StopSimulation();
+    }
+
+    public void StartSimulation()
+    {
+        isSimulating = true;
+        isTakingControl = true;
+        playerMovement.StartSimulation();
+    }
+
+    public void StartControl()
+    {
+        isTakingControl = true;
+    }
+
+    public void StopControl()
+    {
+        isTakingControl = false;
+    }
 
     public void SetInvulnerable()
     {
@@ -208,8 +346,6 @@ public class Player : SingletonBehaviour<Player>
         animator.StopFlash();
         playerStats.IsInvulnerable = false;
     }
-
-
 
     /*****************************************
      * 

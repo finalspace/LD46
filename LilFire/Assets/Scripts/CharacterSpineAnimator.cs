@@ -76,7 +76,7 @@ public class CharacterSpineAnimator : MonoBehaviour
         SetAnimatoin(hurt, false, 1f);
     }
 
-    public void PlayJump(float power)
+    public void PlayJump(Vector3 vel)
     {
         SetAnimatoin(jump, true, 1f);
     }

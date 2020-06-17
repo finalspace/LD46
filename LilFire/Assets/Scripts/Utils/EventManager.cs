@@ -7,7 +7,7 @@ public class EventManager
     public delegate void PlayerLand();
     public static event PlayerLand OnPlayerLand;
 
-    public delegate void PlayerJump(float power);
+    public delegate void PlayerJump(Vector3 vel);
     public static event PlayerJump OnPlayerJump;
 
     public delegate void PlayerJumpFailed();
@@ -27,9 +27,9 @@ public class EventManager
         OnPlayerLand();
     }
 
-    public static void Event_PlayerJump(float power)
+    public static void Event_PlayerJump(Vector3 vel)
     {
-        OnPlayerJump(power);
+        OnPlayerJump(vel);
     }
 
     public static void Event_PlayerJumpFail()

@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
 	public float jumpHeight = 4;
 	public float timeToJumpApex = .4f;
 	public float moveSpeed = 6;
-    public Transform root;
+    public Transform root;    //view root
 
     private PlayerCollision playerCollision;
     private Vector2 deltaMovement;
@@ -19,8 +19,10 @@ public class PlayerMovement : MonoBehaviour
 	private float gravity;
 	private float jumpVelocity;
 	private Vector2 velocity;
-	private float velocityXSmoothing;
-    private float targetVelocityX;
+    private float targetVelocityX;  //don't set x velocity directly
+
+    private float velocityXSmoothing;
+    private float velXSmoothingTemp;
 
     [Header("Status")]
     private bool isSimulating = true;
@@ -29,29 +31,13 @@ public class PlayerMovement : MonoBehaviour
     private bool doubleJump = false;
     private bool isRunning = false;
     private bool isOnGround = false;
-    private bool isJumping = true;
-    //private bool isFalling = false;
+    public bool isJumping = true;
+    //private bool isOnRope = false;
     const int maxJumpNum = 1;
     private int jumpNum;
     private bool dashing = false;
     private bool dashReady = false;
-
-    private Transform parentTransform;
-    private Vector2 parentLastPosition;
     private Vector2 parentVelocity;
-
-    [Header("Aiming Effects")]
-    public GameObject aimingRoot;
-    public List<GameObject> aimingDots;
-    public int aimingDotsCount = 6;
-    public bool aiming = false;
-    //private float aimingLoopRange = 10;
-    private float aimingTime = 0;
-    private Vector3 camFirstPos;
-    private Vector3 mouseFirstPos;
-    private Vector3 mousePosition;
-    private Vector3 startPosOffset = new Vector3(0, 0.5f, 0);
-    private float velXSmoothingTemp;
 
     //[Header("Skills")]
     //public RangedWeapon rangeWeapon;
@@ -72,16 +58,6 @@ public class PlayerMovement : MonoBehaviour
         jumpNum = maxJumpNum;
         dashReady = false;
 
-        aimingRoot.transform.SetParent(null);
-	}
-
-	void Update() 
-    {
-        if (!isSimulating) return;
-
-        HandleInput();
-        if (aiming)
-            DrawTrajectory();
     }
 
     private void FixedUpdate()
@@ -95,33 +71,17 @@ public class PlayerMovement : MonoBehaviour
         {
             if (isJumping == true)
             {
-                EventManager.Event_PlayerLand();
-                isJumping = false;
-                Attach(playerCollision.collisions.belowTransform);
-
-                Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
-                if (footEffect != null)
-                    Instantiate(footEffect, pos, Quaternion.identity);
-                root.rotation = Quaternion.Euler(0, 0, 0);
+                Land(playerCollision.collisions.belowTransform);
             }
-            velocity.y = Mathf.Abs(velocity.y * 0.3f);
-            //velocity.y = 0;
-            
-            velocity.x = 0;
-            targetVelocityX = 0;
-            jumpNum = maxJumpNum;
-            dashing = false;
-            dashReady = false;
         }
         else
         {
             isJumping = true;
-            parentTransform = null;
 
             float ang = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90;
             // ang = Mathf.LerpAngle(transform.eulerAngles.z, ang, Time.deltaTime * rotateSpeed);
             root.rotation = Quaternion.Euler(0, 0, ang);
-            Debug.DrawRay(transform.position, velocity * 2, Color.green);
+            Debug.DrawRay(transform.position, velocity, Color.green);
         }
 
         //when blocked by ceiling
@@ -133,6 +93,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /*
     /// <summary>
     /// Handles the input. 
     /// calculate deltaMovement used for UpdateMovement
@@ -145,45 +106,9 @@ public class PlayerMovement : MonoBehaviour
         {
             //keyboard control
             //deltaMovement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
-            if (Input.GetMouseButtonDown(0) && AbleToJump())
-            {
-                mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                mouseFirstPos = mousePosition;
-
-                SetAiming(true);
-
-                /*
-                //slow motion aiming?
-                if (superDash)
-                    TimeManager.Instance.SlowMotion();
-                */
-            }
-
-            if (Input.GetMouseButton(0))
-            {
-                if (!aiming) return;
-                mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            }
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                if (!aiming) return;
-
-                SetAiming(false);
-                //TimeManager.Instance.Reset();
-
-                if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.1f)
-                    Launch();
-                else LaunchFailed();
-            }
-
-            if (Input.GetKey(KeyCode.Space))
-            {
-                //Respawn();
-            }
         }
     }
+    */
 
 
     /// <summary>
@@ -206,11 +131,6 @@ public class PlayerMovement : MonoBehaviour
         if (velocity.magnitude < 5.0f)
             dashing = false;
 
-        if (parentTransform != null)
-        {
-            //velocity += parentVelocity;
-        }
-
         if (isDead)
         {
             playerCollision.MoveIgnoreCollision(velocity * Time.fixedDeltaTime);
@@ -227,10 +147,11 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void DrawTrajectory()
+    public Vector2[] GetTrajectory(Vector2 startPos, Vector2 vel, float aimingTime)
     {
-        Vector2 vel = ComputeInitialVelocity();
-        Vector2 dotPos = transform.position + startPosOffset;
+        int aimingDotsCount = 7;
+        Vector2[] positions = new Vector2[aimingDotsCount];
+        Vector2 dotPos = startPos;
 
         aimingTime += Time.fixedDeltaTime;
         float offTime = Mathf.Repeat(aimingTime, 1.0f);
@@ -241,86 +162,29 @@ public class PlayerMovement : MonoBehaviour
         vel.x = Mathf.SmoothDamp(vel.x, targetVx, ref velXSmoothingTemp, accelerationTimeAirborne, Mathf.Infinity, offTime);
         vel.y += gravity * offTime;
         dotPos += vel * offTime;
-     
+
         for (int i = 0; i < aimingDotsCount; ++i)
         {
-            aimingDots[i].transform.position = dotPos;
+            positions[i] = dotPos;
             vel.x = Mathf.SmoothDamp(vel.x, targetVx, ref velXSmoothingTemp, accelerationTimeAirborne, Mathf.Infinity, dt);
             vel.y += gravity * dt;
             dotPos += vel * dt;
         }
+
+        return positions;
     }
 
-
-    private Vector2 ComputeInitialVelocity()
-    {
-        Vector2 power;
-        Vector2 diff = mouseFirstPos + startPosOffset - mousePosition;
-        float x = Mathf.InverseLerp(0, 6, Mathf.Abs(diff.x));
-        //x = Mathf.Sqrt(x);
-        x = Mathf.Sin(x * Mathf.PI / 2);
-        power.x = Mathf.Lerp(0, 15f, x) * Mathf.Sign(diff.x);
-
-        float y = Mathf.InverseLerp(0, 1.5f, Mathf.Abs(diff.y));
-        y = Mathf.Sqrt(y);
-        power.y = Mathf.Lerp(0, 20f, y) * Mathf.Sign(diff.y);
-
-        return power;
-    }
-      
-    public void SetAiming(bool val)
-    {
-        if (aiming == val)
-            return;
-        aiming = val;
-
-        aimingRoot.SetActive(val);
-        if (!aiming)
-        {
-            for (int i = 0; i < aimingDots.Count; i++)
-            {
-                aimingDots[i].transform.position = transform.position;
-            }
-            aimingTime = 0;
-        }
-
-        if (aiming)
-            Player.Instance.animator.PlaySquish();
-        else
-            Player.Instance.animator.PlayIdle();
-    }
-
-    private bool AbleToJump()
+    public bool AbleToJump()
     {
         return (jumpNum > 0);
     }
 
 
-   /*****************************************
-    * 
-    * Actions
-    * 
-    *****************************************/
-
-    public void StartSimulation()
-    {
-        isSimulating = true;
-    }
-
-    public void StopSimulation()
-    {
-        isSimulating = false;
-        Reset();
-    }
-
-    public void Reset()
-    {
-        root.rotation = Quaternion.Euler(0, 0, 0);
-        velocity = Vector2.zero;
-        SetAiming(false);
-        Detach();
-    }
-      
+    /*****************************************
+     * 
+     * Actions
+     * 
+     *****************************************/
     public void Dead()
     {
         if (isDead)
@@ -338,8 +202,33 @@ public class PlayerMovement : MonoBehaviour
         velocity.y = jumpVelocity;
     }
 
+    public void Land(Transform gound)
+    {
+        EventManager.Event_PlayerLand();
+        isJumping = false;
+        Attach(gound);
 
-    private void Launch()
+        Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
+        if (footEffect != null)
+            Instantiate(footEffect, pos, Quaternion.identity);
+        root.rotation = Quaternion.Euler(0, 0, 0);
+
+        OnGround();
+    }
+
+    public void OnGround()
+    {
+        velocity.y = Mathf.Abs(velocity.y * 0.3f);
+        //velocity.y = 0;
+
+        velocity.x = 0;
+        targetVelocityX = 0;
+        jumpNum = maxJumpNum;
+        dashing = false;
+        dashReady = false;
+    }
+
+    public void Launch(Vector2 vel)
     {
         float energy = PlayerStats.Instance.energy;
         if (energy < 3) return;
@@ -349,7 +238,7 @@ public class PlayerMovement : MonoBehaviour
         dashing = dashReady;
         Detach();
 
-        velocity = ComputeInitialVelocity();
+        velocity = vel;
         float power = velocity.magnitude / 3;
         float adjustedPower = Mathf.Min(power, energy);
         velocity = velocity * (adjustedPower / power);  //adjusted velocity
@@ -359,10 +248,10 @@ public class PlayerMovement : MonoBehaviour
 
         targetVelocityX = velocity.x / 2;
 
-        EventManager.Event_PlayerJump(adjustedPower);
+        EventManager.Event_PlayerJump(velocity);
     }
 
-    private void LaunchFailed()
+    public void LaunchFailed()
     {
         EventManager.Event_PlayerJumpFail();
     }
@@ -395,14 +284,11 @@ public class PlayerMovement : MonoBehaviour
 
     public void Attach(Transform trans)
     {
-        parentTransform = trans;
-        parentLastPosition = parentTransform.position;
-        transform.SetParent(trans);
+        transform.SetParent(trans, true);
     }
 
     public void Detach()
     {
-        parentTransform = null;
         transform.SetParent(null);
     }
 
@@ -422,9 +308,42 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /*****************************************
+     * 
+     * Status
+     * 
+     *****************************************/
+    public void StartSimulation()
+    {
+        isSimulating = true;
+
+        //rotation might have been modified when out of control
+        //update root rotation instead to reflect the change
+        root.localRotation = transform.rotation;
+        transform.rotation = Quaternion.identity;
+    }
+
+    public void StopSimulation()
+    {
+        isSimulating = false;
+        Reset();
+    }
+
+    public void Reset()
+    {
+        root.rotation = Quaternion.Euler(0, 0, 0);
+        velocity = Vector2.zero;
+        Detach();
+    }
+
     public bool IsDead()
     {
         return isDead;
+    }
+
+    public Vector3 GetVelocity()
+    {
+        return velocity;
     }
 
 

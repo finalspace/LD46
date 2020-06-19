@@ -9,6 +9,9 @@ public class PlayerCollision : MonoBehaviour {
 
     private LayerMask oneSideCollision;
     private LayerMask hardCollision;
+    private int layerOneSide;
+    private int layerHard;
+    private int layerCombined;
 
     float horizontalRaySpacing;
 	float verticalRaySpacing;
@@ -23,6 +26,8 @@ public class PlayerCollision : MonoBehaviour {
 		CalculateRaySpacing ();
         oneSideCollision = CollisionManager.Instance.OneSideGound;
         hardCollision = CollisionManager.Instance.HardBlock;
+        layerOneSide = oneSideCollision.value;
+        layerHard = hardCollision.value;
     }
 
 	public void Move(Vector3 velocity) {
@@ -50,11 +55,13 @@ public class PlayerCollision : MonoBehaviour {
 		float rayLength = Mathf.Abs (velocity.x) + skinWidth;
         bool left = (directionX == -1);
 
-        LayerMask collisionMask = hardCollision;
+        //LayerMask collisionMask = hardCollision;
+        int testLayer = layerHard;
+
         for (int i = 0; i < horizontalRayCount; i ++) {
 			Vector2 rayOrigin = left ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
 			rayOrigin += Vector2.up * (horizontalRaySpacing * i);
-			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
+			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, testLayer);
 
 			Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength,Color.red);
 
@@ -77,11 +84,13 @@ public class PlayerCollision : MonoBehaviour {
 		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
         bool below = (directionY == -1);
 
-        LayerMask collisionMask = directionY > 0 ? hardCollision : oneSideCollision;
+        //LayerMask collisionMask = directionY > 0 ? hardCollision : oneSideCollision
+        int testLayer = directionY > 0 ? layerHard : (layerOneSide | layerHard);
+
 		for (int i = 0; i < verticalRayCount; i ++) {
 			Vector2 rayOrigin = below ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
 			rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
-			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
+			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, testLayer);
 
 			Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength,Color.red);
 

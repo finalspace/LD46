@@ -4,11 +4,24 @@ using UnityEngine;
 
 public class AutoRotation : MonoBehaviour
 {
-    public float spinSpeed = 1.0f;
+    public float spinSpeedMin;
+    public float spinSpeedMax;
+    public float minAbsSpeed;
+
+    private float speed;
+
+    private void Start()
+    {
+        int k = 100;
+        while (Mathf.Abs(speed) < minAbsSpeed && k-- > 0)
+        {
+            speed = Random.Range(spinSpeedMin, spinSpeedMax);
+        }
+    }
 
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(0, 0, spinSpeed * Time.deltaTime);
+        transform.Rotate(0, 0, speed * Time.deltaTime);
     }
 }

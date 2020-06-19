@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
 	public float moveSpeed = 6;
     public Transform root;    //view root
 
-    private PlayerCollision playerCollision;
+    public PlayerCollision playerCollision;
     private Vector2 deltaMovement;
     private float accelerationTimeAirborne = .9f;
 	private float accelerationTimeGrounded = .2f;
@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
 	private bool facingRight = true;
     private bool doubleJump = false;
     private bool isRunning = false;
-    private bool isOnGround = false;
+    public bool isOnGround = false;
     public bool isJumping = true;
     //private bool isOnRope = false;
     const int maxJumpNum = 1;
@@ -57,30 +57,70 @@ public class PlayerMovement : MonoBehaviour
 		jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         jumpNum = maxJumpNum;
         dashReady = false;
-
     }
 
     private void FixedUpdate()
     {
         if (!isSimulating) return;
 
-        UpdateMovement();
+        SimulateMovement();
+        HandlePhysics();
+    }
 
-        // on the ground or in the air
+    /// <summary>
+    /// Update velocity and simulate movement
+    /// Based on Time (velocity accumulation, position change)
+    /// Physics data ready after this step
+    /// </summary>
+    private void SimulateMovement()
+    {
+        //Flip(deltaMovement);
+
+        //------------------------ Update Velocity ---------------------------------------
+        //------------------------                 ---------------------------------------
+        //float targetVelocityX = deltaMovement.x * moveSpeed;  //keyboard direct control
+        float accelerationTime = isOnGround ? accelerationTimeGrounded : accelerationTimeAirborne;
+        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime, Mathf.Infinity, Time.fixedDeltaTime);
+        //only apply gravity when not on the ground, and not dashing
+        velocity.y += (dashing ? 0 : gravity) * Time.fixedDeltaTime;
+
+        if (dashing)
+        {
+            velocity *= 0.88f;
+            if (velocity.magnitude < 5.0f)
+                dashing = false;
+        }
+
+        //------------------------ Update Position ---------------------------------------
+        //------------------------                 ---------------------------------------
+        playerCollision.Move(velocity * Time.fixedDeltaTime);  //move and update physics status based on new position
+    }
+
+    /// <summary>
+    /// Handle physics after movement
+    /// update velocity and position
+    /// Based on physics
+    ///
+    /// in this case, position physics is already handled in SimulateMovement();
+    /// </summary>
+    private void HandlePhysics()
+    {
+        //------------------------ Update Velocity ---------------------------------------
+        //------------------------                 -------------------------------------
         if (playerCollision.collisions.below)
         {
             if (isJumping == true)
             {
                 Land(playerCollision.collisions.belowTransform);
             }
+            //OnGround();
         }
         else
         {
             isJumping = true;
-
             float ang = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90;
-            // ang = Mathf.LerpAngle(transform.eulerAngles.z, ang, Time.deltaTime * rotateSpeed);
-            root.rotation = Quaternion.Euler(0, 0, ang);
+            //ang = Mathf.LerpAngle(transform.eulerAngles.z, ang, Time.deltaTime * rotateSpeed);
+            //root.rotation = Quaternion.Euler(0, 0, ang);
             Debug.DrawRay(transform.position, velocity, Color.green);
         }
 
@@ -91,56 +131,21 @@ public class PlayerMovement : MonoBehaviour
             velocity.x *= 0.8f;
             targetVelocityX *= 0.8f;
         }
-    }
 
-    /*
-    /// <summary>
-    /// Handles the input. 
-    /// calculate deltaMovement used for UpdateMovement
-    /// </summary>
-    private void HandleInput()
-    {
-        deltaMovement = Vector2.zero;
-
-        if (!isDead)
+        //side wall
+        if (playerCollision.collisions.left || playerCollision.collisions.right)
         {
-            //keyboard control
-            //deltaMovement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        }
-    }
-    */
-
-
-    /// <summary>
-    /// Updates the movement using deltaMovement calculated every frame
-    /// </summary>
-    private void UpdateMovement()
-    {
-        Flip(deltaMovement);
-
-        // handles moving and physics for jumping
-        //float targetVelocityX = deltaMovement.x * moveSpeed;
-        float accelerationTime = (playerCollision.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne;
-        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime, Mathf.Infinity, Time.fixedDeltaTime);
-
-        if (!dashing)
-        velocity.y += gravity * Time.fixedDeltaTime;
-
-        if (dashing)
-            velocity *= 0.88f;
-        if (velocity.magnitude < 5.0f)
-            dashing = false;
-
-        if (isDead)
-        {
-            playerCollision.MoveIgnoreCollision(velocity * Time.fixedDeltaTime);
-            return;
+            float speed = Mathf.Max(1f, Mathf.Abs(velocity.x));
+            velocity.x = Mathf.Sign(-velocity.x) * speed * 0.3f;
         }
 
-        playerCollision.Move(velocity * Time.fixedDeltaTime);
-
+        //------------------------ Update Status ---------------------------------------
+        //------------------------                 -------------------------------------
         isOnGround = playerCollision.collisions.below;
+        isJumping = !isOnGround;
 
+        //------------------------ Update View -------------------------------------
+        //------------------------             -------------------------------------
         if (isRunning || !isOnGround)
         {
             //UpdateTrailEffect(); 
@@ -179,23 +184,28 @@ public class PlayerMovement : MonoBehaviour
         return (jumpNum > 0);
     }
 
+    /*
+    /// <summary>
+    /// Handles the input. 
+    /// calculate deltaMovement used for UpdateMovement
+    /// </summary>
+    private void HandleInput()
+    {
+        deltaMovement = Vector2.zero;
+
+        if (!isDead)
+        {
+            //keyboard control
+            //deltaMovement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        }
+    }
+    */
 
     /*****************************************
      * 
      * Actions
      * 
      *****************************************/
-    public void Dead()
-    {
-        if (isDead)
-            return;
-
-        PlayerUtils.PlayerDeadOccur();
-        velocity = new Vector2(-jumpVelocity / 8, jumpVelocity / 2);
-        playerCollision.collisions.below = false;
-        isDead = true;
-    }
-
     private void Jump()
     {
         isJumping = true;
@@ -206,7 +216,8 @@ public class PlayerMovement : MonoBehaviour
     {
         EventManager.Event_PlayerLand();
         isJumping = false;
-        Attach(gound);
+        //velocity.y = Mathf.Abs(velocity.y * 0.3f);
+        //Attach(gound);
 
         Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
         if (footEffect != null)
@@ -218,9 +229,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnGround()
     {
-        velocity.y = Mathf.Abs(velocity.y * 0.3f);
-        //velocity.y = 0;
-
+        velocity.y = 0;
         velocity.x = 0;
         targetVelocityX = 0;
         jumpNum = maxJumpNum;

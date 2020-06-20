@@ -61,7 +61,7 @@ public class PlayerStats : SingletonBehaviour<PlayerStats>
     public void UpdateEnergy(float value)
     {
         energy += value;
-        if (energy <= 0)
+        if (energy < 0)
         {
             energy = 0;
             player.SoftKill();

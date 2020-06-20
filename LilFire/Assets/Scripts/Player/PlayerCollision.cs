@@ -3,7 +3,7 @@ using System.Collections;
 
 [RequireComponent (typeof (BoxCollider2D))]
 public class PlayerCollision : MonoBehaviour {
-	const float skinWidth = .015f;
+	const float skinWidth = .15f;
 	public int horizontalRayCount = 4;
 	public int verticalRayCount = 4;
 
@@ -84,7 +84,6 @@ public class PlayerCollision : MonoBehaviour {
 		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
         bool below = (directionY == -1);
 
-        //LayerMask collisionMask = directionY > 0 ? hardCollision : oneSideCollision
         int testLayer = directionY > 0 ? layerHard : (layerOneSide | layerHard);
 
 		for (int i = 0; i < verticalRayCount; i ++) {
@@ -96,7 +95,9 @@ public class PlayerCollision : MonoBehaviour {
 
 			if (hit) {
 				velocity.y = (hit.distance - skinWidth) * directionY;
-				rayLength = hit.distance;
+                //if (hit.distance - skinWidth < 0)
+                //    velocity.y *= 2;
+                rayLength = hit.distance;
 
                 collisions.below = below;
 				collisions.above = !below;
@@ -104,10 +105,37 @@ public class PlayerCollision : MonoBehaviour {
                 if (below)
                     collisions.belowTransform = hit.transform;
                 else collisions.aboveTransform = hit.transform;
-
             }
 		}
-	}
+
+        //tilt surface (bottom)
+        float dist0 = -1, dist1 = -1;
+        float l = 0, r = 0;
+        for (int i = 0; i < verticalRayCount; i++)
+        {
+            Vector2 rayOrigin = raycastOrigins.bottomLeft;
+            rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 1, testLayer);
+
+            if (hit)
+            {
+                if (dist0 < 0)
+                {
+                    l = i;
+                    dist0 = hit.distance;
+                }
+                else
+                {
+                    r = i;
+                    dist1 = hit.distance;
+                }
+            }
+        }
+        if (l < r)
+        {
+            collisions.tiltAngle = Mathf.Atan2(dist1 - dist0, verticalRaySpacing * (r - l));
+        }
+    }
 
 	void UpdateRaycastOrigins() {
 		Bounds bounds = collider.bounds;
@@ -138,6 +166,7 @@ public class PlayerCollision : MonoBehaviour {
 	public struct CollisionInfo {
 		public bool above, below;
 		public bool left, right;
+        public float tiltAngle;
 
         public Transform aboveTransform, belowTransform, leftTransform, rightTransform;
 
@@ -145,7 +174,7 @@ public class PlayerCollision : MonoBehaviour {
 			above = below = false;
 			left = right = false;
             aboveTransform = belowTransform = leftTransform = rightTransform = null;
-
+            tiltAngle = 0;
         }
 	}
 

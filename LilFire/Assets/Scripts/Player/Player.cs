@@ -25,6 +25,7 @@ public class Player : SingletonBehaviour<Player>
     private Vector3 mouseFirstPos;
     private Vector3 mousePosition;
     private Vector3 startPosOffset = new Vector3(0, 0.5f, 0);
+    private bool buttonPressed = false;
 
     private void OnEnable()
     {
@@ -158,11 +159,15 @@ public class Player : SingletonBehaviour<Player>
     /// </summary>
     private void HandleInput()
     {
-        if (Input.GetMouseButtonDown(0) && playerMovement.AbleToJump())
+        if (Input.GetMouseButtonDown(0))
         {
+            buttonPressed = true;
             mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mouseFirstPos = mousePosition;
+        }
 
+        if (buttonPressed && playerMovement.AbleToJump())
+        {
             SetAiming(true);
 
             /*
@@ -180,6 +185,7 @@ public class Player : SingletonBehaviour<Player>
 
         if (Input.GetMouseButtonUp(0))
         {
+            buttonPressed = false;
             if (!aiming) return;
 
             SetAiming(false);
@@ -225,7 +231,9 @@ public class Player : SingletonBehaviour<Player>
     /// </summary>
     public void SoftKill()
     {
-        if (!playerMovement.isJumping)
+		if (!isSimulating || playerStats.IsInvulnerable) return;
+
+		if (playerMovement.isOnGround)
         {
             Die();
             return;

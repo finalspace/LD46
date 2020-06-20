@@ -19,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
 	private float gravity;
 	private float jumpVelocity;
 	private Vector2 velocity;
-    private float targetVelocityX;  //don't set x velocity directly
+    public float targetVelocityX;  //don't set x velocity directly
 
     private float velocityXSmoothing;
     private float velXSmoothingTemp;
@@ -113,7 +113,8 @@ public class PlayerMovement : MonoBehaviour
             {
                 Land(playerCollision.collisions.belowTransform);
             }
-            //OnGround();
+
+            OnGround();
         }
         else
         {
@@ -136,7 +137,20 @@ public class PlayerMovement : MonoBehaviour
         if (playerCollision.collisions.left || playerCollision.collisions.right)
         {
             float speed = Mathf.Max(1f, Mathf.Abs(velocity.x));
-            velocity.x = Mathf.Sign(-velocity.x) * speed * 0.3f;
+
+            BounceSurface bounceSurface =
+                (playerCollision.collisions.left ? playerCollision.collisions.leftTransform : playerCollision.collisions.rightTransform)
+                .GetComponent<BounceSurface>();
+
+            if (bounceSurface != null)
+            {
+                velocity.x = Mathf.Sign(-velocity.x) * speed * bounceSurface.bouncePower;
+                targetVelocityX = -targetVelocityX;
+            }
+            else
+            {
+                velocity.x *= 0.9f;
+            }
         }
 
         //------------------------ Update Status ---------------------------------------
@@ -212,29 +226,51 @@ public class PlayerMovement : MonoBehaviour
         velocity.y = jumpVelocity;
     }
 
-    public void Land(Transform gound)
+    public void Land(Transform ground)
     {
         EventManager.Event_PlayerLand();
         isJumping = false;
-        //velocity.y = Mathf.Abs(velocity.y * 0.3f);
-        //Attach(gound);
+        TryAttach(ground);
 
         Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
         if (footEffect != null)
             Instantiate(footEffect, pos, Quaternion.identity);
         root.rotation = Quaternion.Euler(0, 0, 0);
 
-        OnGround();
+        RefreshState();
     }
 
-    public void OnGround()
+    private void RefreshState()
     {
-        velocity.y = 0;
-        velocity.x = 0;
+        velocity = Vector2.zero;
+        root.rotation = Quaternion.Euler(0, 0, 0);
         targetVelocityX = 0;
         jumpNum = maxJumpNum;
         dashing = false;
         dashReady = false;
+    }
+
+    private void OnGround()
+    {
+        velocity.y = 0;
+        ProcessTiltSlide();
+    }
+
+    private void ProcessTiltSlide()
+    {
+        float surfaceAngle = playerCollision.collisions.tiltAngle;
+        float ang = Mathf.Tan(surfaceAngle) * Mathf.Rad2Deg;
+
+        //angle critical point to start sliding
+        float val = Mathf.InverseLerp(20f, 90f, Mathf.Abs(ang));
+        val = Mathf.Sin(val);  //modify curve
+
+        Vector2 dir = new Vector2(Mathf.Cos(ang * Mathf.Deg2Rad) * Mathf.Sign(ang), -Mathf.Sin(Mathf.Abs(ang * Mathf.Deg2Rad)));
+        velocity = dir.normalized * val * 20.0f;
+
+        //Debug
+        //float ang1 = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90;
+        //UIDebugManager.Instance.Arrow.rotation = Quaternion.Euler(0, 0, ang1);
     }
 
     public void Launch(Vector2 vel)
@@ -291,9 +327,11 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-    public void Attach(Transform trans)
+    public void TryAttach(Transform trans)
     {
-        transform.SetParent(trans, true);
+        AttachToMe attach = trans.gameObject.GetComponent<AttachToMe>();
+        if (attach != null)
+            transform.SetParent(trans, true);
     }
 
     public void Detach()

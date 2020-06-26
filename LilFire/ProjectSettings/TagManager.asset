@@ -12,6 +12,7 @@ TagManager:
   - DeadZone
   - Cloud
   - Moth
+  - PatrolCollider
   layers:
   - Default
   - TransparentFX

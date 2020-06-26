@@ -9,8 +9,12 @@ public class SectionManager : SingletonBehaviour<SectionManager>
     public List<GameObject> sections;
     public Section currentSection;
 
+    [Header("Boss")]
+    public List<GameObject> bossSections;
+
     private int idx = -1;
-    private Vector3 spawnPosition;
+    public Vector3 spawnPosition;
+    private bool spawning = true;
 
     private void OnEnable()
     {
@@ -22,7 +26,7 @@ public class SectionManager : SingletonBehaviour<SectionManager>
         EventManager.OnSectionFinish -= OnSectionFinish;
     }
 
-    void Start()
+    void Awake()
 	{
 		if (currentSection != null)
 			spawnPosition.y = currentSection.ceiling.position.y;
@@ -30,6 +34,8 @@ public class SectionManager : SingletonBehaviour<SectionManager>
 
     private void Update()
     {
+        if (!spawning) return;
+
         if (heightDetector.position.y > currentSection.ceiling.position.y)
         {
             SpawnNext();
@@ -40,10 +46,20 @@ public class SectionManager : SingletonBehaviour<SectionManager>
     {
         if (section != currentSection) return;
 
-        SpawnNext();
+        //SpawnNext();
+    }
+
+    public void OnBossSectionFinish(Section section)
+    {
+        StartSpawn();
     }
 
     public void SpawnNext()
+    {
+        SpawnRegular();
+    }
+
+    private void SpawnRegular()
     {
         int i = Random.Range(0, sections.Count);
         if (i == idx)
@@ -53,5 +69,32 @@ public class SectionManager : SingletonBehaviour<SectionManager>
         GameObject sectionObj = Instantiate(sections[idx], spawnPosition, Quaternion.identity, root);
         currentSection = sectionObj.GetComponent<Section>();
         spawnPosition.y = currentSection.ceiling.position.y;
+
+        EventManager.Event_SectionSpawned(currentSection);
+    }
+
+    public void SpawnBoss()
+    {
+        int i = Random.Range(0, bossSections.Count);
+        if (i == idx)
+            i = (i + 1) % bossSections.Count;
+        idx = i;
+
+        GameObject sectionObj = Instantiate(bossSections[idx], spawnPosition, Quaternion.identity, root);
+        currentSection = sectionObj.GetComponent<Section>();
+        spawnPosition.y = currentSection.ceiling.position.y;
+
+        EventManager.Event_SectionSpawned(currentSection);
+        PauseSpawn();
+    }
+
+    public void PauseSpawn()
+    {
+        spawning = false;
+    }
+
+    public void StartSpawn()
+    {
+        spawning = true;
     }
 }

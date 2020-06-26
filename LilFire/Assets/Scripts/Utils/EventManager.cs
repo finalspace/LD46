@@ -22,6 +22,12 @@ public class EventManager
     public delegate void SectionFinish(Section section);
     public static event SectionFinish OnSectionFinish;
 
+    public delegate void SectionSpawned(Section section);
+    public static event SectionSpawned OnSectionSpawned;
+
+    public delegate void BossSectionFinished(Section section);
+    public static event BossSectionFinished OnBossSectionFinished;
+
     public static void Event_PlayerLand()
     {
         OnPlayerLand();
@@ -52,6 +58,16 @@ public class EventManager
         OnSectionFinish(section);
     }
 
+    public static void Event_SectionSpawned(Section section)
+    {
+        if (OnSectionSpawned != null)
+            OnSectionSpawned(section);
+    }
+
+    public static void Event_BossSectionFinish(Section section)
+    {
+        OnBossSectionFinished(section);
+    }
 
 
 }

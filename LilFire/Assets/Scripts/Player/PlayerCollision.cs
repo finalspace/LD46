@@ -50,7 +50,21 @@ public class PlayerCollision : MonoBehaviour {
         transform.Translate(velocity);
     }
 
-	void HorizontalCollisions(ref Vector3 velocity) {
+    public void MoveIgnoreCollision(Vector3 velocity, Collider2D ignoreColliders)
+    {
+        if (ignoreColliders == null)
+        {
+            Move(velocity);
+        }
+        else
+        {
+            ignoreColliders.enabled = false;
+            Move(velocity);
+            ignoreColliders.enabled = true;
+        }
+    }
+
+    void HorizontalCollisions(ref Vector3 velocity) {
 		float directionX = Mathf.Sign (velocity.x);
 		float rayLength = Mathf.Abs (velocity.x) + skinWidth;
         bool left = (directionX == -1);
@@ -63,7 +77,8 @@ public class PlayerCollision : MonoBehaviour {
 			rayOrigin += Vector2.up * (horizontalRaySpacing * i);
 			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, testLayer);
 
-			Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength,Color.red);
+
+            Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength,Color.red);
 
 			if (hit) {
 				velocity.x = (hit.distance - skinWidth) * directionX;
@@ -83,7 +98,6 @@ public class PlayerCollision : MonoBehaviour {
 		float directionY = Mathf.Sign (velocity.y);
 		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
         bool below = (directionY == -1);
-
         int testLayer = directionY > 0 ? layerHard : (layerOneSide | layerHard);
 
 		for (int i = 0; i < verticalRayCount; i ++) {
@@ -103,38 +117,13 @@ public class PlayerCollision : MonoBehaviour {
 				collisions.above = !below;
 
                 if (below)
+                {
                     collisions.belowTransform = hit.transform;
+                    collisions.belowCollider = hit.collider;
+                }
                 else collisions.aboveTransform = hit.transform;
             }
 		}
-
-        //tilt surface (bottom)
-        float dist0 = -1, dist1 = -1;
-        float l = 0, r = 0;
-        for (int i = 0; i < verticalRayCount; i++)
-        {
-            Vector2 rayOrigin = raycastOrigins.bottomLeft;
-            rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
-            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 1, testLayer);
-
-            if (hit)
-            {
-                if (dist0 < 0)
-                {
-                    l = i;
-                    dist0 = hit.distance;
-                }
-                else
-                {
-                    r = i;
-                    dist1 = hit.distance;
-                }
-            }
-        }
-        if (l < r)
-        {
-            collisions.tiltAngle = Mathf.Atan2(dist1 - dist0, verticalRaySpacing * (r - l));
-        }
     }
 
 	void UpdateRaycastOrigins() {
@@ -158,6 +147,44 @@ public class PlayerCollision : MonoBehaviour {
 		verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
 	}
 
+    /// <summary>
+    /// calculate tilt angle of bottom surface
+    /// </summary>
+    public float CalculateTiltAngle()
+    {
+        float angle = 0;
+
+        int testLayer = (layerOneSide | layerHard);
+        float dist0 = -1, dist1 = -1;
+        float l = 0, r = 0;
+        for (int i = 0; i < verticalRayCount; i++)
+        {
+            Vector2 rayOrigin = raycastOrigins.bottomLeft;
+            rayOrigin += Vector2.right * (verticalRaySpacing * i);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 1, testLayer);
+
+            if (hit)
+            {
+                if (dist0 < 0)
+                {
+                    l = i;
+                    dist0 = hit.distance;
+                }
+                else
+                {
+                    r = i;
+                    dist1 = hit.distance;
+                }
+            }
+        }
+        if (l < r)
+        {
+            angle = Mathf.Atan2(dist1 - dist0, verticalRaySpacing * (r - l));
+        }
+        collisions.tiltAngle = angle;
+        return angle;
+    }
+
 	struct RaycastOrigins {
 		public Vector2 topLeft, topRight;
 		public Vector2 bottomLeft, bottomRight;
@@ -169,11 +196,13 @@ public class PlayerCollision : MonoBehaviour {
         public float tiltAngle;
 
         public Transform aboveTransform, belowTransform, leftTransform, rightTransform;
+        public Collider2D belowCollider;
 
 		public void Reset() {
 			above = below = false;
 			left = right = false;
             aboveTransform = belowTransform = leftTransform = rightTransform = null;
+            belowCollider = null;
             tiltAngle = 0;
         }
 	}

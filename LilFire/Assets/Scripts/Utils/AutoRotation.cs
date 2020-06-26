@@ -12,6 +12,7 @@ public class AutoRotation : MonoBehaviour
 
     private void Start()
     {
+        speed = Random.Range(spinSpeedMin, spinSpeedMax);
         int k = 100;
         while (Mathf.Abs(speed) < minAbsSpeed && k-- > 0)
         {

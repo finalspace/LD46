@@ -24,8 +24,11 @@ public class Player : SingletonBehaviour<Player>
     private Vector3 camFirstPos;
     private Vector3 mouseFirstPos;
     private Vector3 mousePosition;
-    private Vector3 startPosOffset = new Vector3(0, 0.5f, 0);
+    public Vector3 aimingPosOffset = new Vector3(0, 0.5f, 0);  //offset so you already aiming up at start
     private bool buttonPressed = false;
+
+    [Header("Debug")]
+    public bool debugNoDie = false;
 
     private void OnEnable()
     {
@@ -99,7 +102,7 @@ public class Player : SingletonBehaviour<Player>
 
     private void DrawTrajectory()
     {
-        Vector2 startPos = transform.position + startPosOffset;
+        Vector2 startPos = transform.position + aimingPosOffset;
         Vector2 vel = ComputeInitialVelocity();
         Vector2[] dotPosition = playerMovement.GetTrajectory(startPos, vel, aimingTime);
         for (int i = 0; i < aimingDotsCount; ++i)
@@ -115,17 +118,17 @@ public class Player : SingletonBehaviour<Player>
     private Vector2 ComputeInitialVelocity()
     {
         Vector2 power;
-        Vector2 diff = mouseFirstPos + startPosOffset - mousePosition;
+        Vector2 diff = (mouseFirstPos - mousePosition) + aimingPosOffset;
         float x = Mathf.InverseLerp(0, 6, Mathf.Abs(diff.x));
-        //x = Mathf.Sqrt(x);
-        x = Mathf.Sin(x * Mathf.PI / 2);
-        power.x = Mathf.Lerp(0, 15f, x) * Mathf.Sign(diff.x);
+        //x = Mathf.Sqrt(x);  //slow start
+        x = Mathf.Sin(x * Mathf.PI / 2);  //fast start
 
         float y = Mathf.InverseLerp(0, 1.5f, Mathf.Abs(diff.y));
         y = Mathf.Sqrt(y);
-        power.y = Mathf.Lerp(0, 20f, y) * Mathf.Sign(diff.y);
 
-        return power;
+        power = new Vector2(x * Mathf.Sign(diff.x), y * Mathf.Sign(diff.y));
+        Vector2 vel = playerMovement.GetMappedVelocity(power);
+        return vel;
     }
 
     public void SetAiming(bool val)
@@ -191,7 +194,7 @@ public class Player : SingletonBehaviour<Player>
             SetAiming(false);
             //TimeManager.Instance.Reset();
 
-            if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.1f)
+            if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.01f)
                 playerMovement.Launch(ComputeInitialVelocity());
             else playerMovement.LaunchFailed();
         }
@@ -244,6 +247,8 @@ public class Player : SingletonBehaviour<Player>
 
     private void Die()
     {
+        if (debugNoDie) return;
+
         playerStats.lives--;
         UIManager.Instance?.UpdateLife(playerStats.lives);
         if (playerStats.lives <= 0)

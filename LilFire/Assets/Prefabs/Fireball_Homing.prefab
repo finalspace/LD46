@@ -4916,9 +4916,11 @@ MonoBehaviour:
   visualRoot: {fileID: 837327022035448967}
   velocity: {x: 3, y: 0, z: 0}
   destroyAfterHit: 1
+  noDamage: 0
   homing: 1
   target: {fileID: 0}
   power: 0.05
+  trackingTime: 5
 --- !u!114 &8911759861059520759
 MonoBehaviour:
   m_ObjectHideFlags: 0

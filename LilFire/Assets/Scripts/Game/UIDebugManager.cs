@@ -8,11 +8,18 @@ public class UIDebugManager : SingletonBehaviour<UIDebugManager>
     public Text debugText1;
     public Text DebugText2;
     public Transform Arrow;
+    public GameObject wall;
+
+    private bool showWall = false;
 
     private void Update()
     {
-        //debugText1.text = Mathf.Cos(Player.Instance.playerMovement.playerCollision.collisions.leanAngle).ToString()
-        //    + ", " + Mathf.Sin(Player.Instance.playerMovement.playerCollision.collisions.leanAngle).ToString();
-        DebugText2.text = Player.Instance.playerMovement.GetVelocity().ToString();
+        //DebugText2.text = Player.Instance.playerMovement.GetVelocity().ToString();
+    }
+
+    public void ToggleWall()
+    {
+        showWall = !showWall;
+        wall.SetActive(showWall);
     }
 }

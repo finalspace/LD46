@@ -1100,10 +1100,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4003af03d0704c0ca22a7478f613367, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeight: 3
-  timeToJumpApex: 0.4
+  jumpHeight: 5
+  timeToJumpApex: 0.5
   moveSpeed: 6
   root: {fileID: 4472603484395781405}
+  playerCollision: {fileID: 0}
+  jumpVelocity: 0
+  targetVelocityX: 0
+  isOnGround: 0
+  isJumping: 1
   damageEffect: {fileID: 0}
   footEffect: {fileID: 1462327970484030, guid: a1186a29444d943da90ec6df463b5c36, type: 3}
   hurtPanel: {fileID: 0}
@@ -2166,6 +2171,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SortingOrder
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602274139491963469, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1602274139491963468, guid: c5f54d70a9ede41af98b6f5bc5ac825a,
         type: 3}

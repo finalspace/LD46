@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 572d8c47594334a0f85082b4350e8642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  root: {fileID: 353377051}
+  fireRoot: {fileID: 353377051}
   bulletPrefab: {fileID: 3762072646170118863, guid: 6db2d016dbf39498095d003b34005ae7,
     type: 3}
   angleFrom: -30
@@ -52,7 +52,9 @@ MonoBehaviour:
   speedTo: 6
   coolDownMin: 4
   coolDownMax: 10
-  lastTime: 0
+  startCooldown: -1
+  fireWarning: 0
+  warningTime: 0
 --- !u!1 &497896598
 GameObject:
   m_ObjectHideFlags: 0
@@ -96,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 572d8c47594334a0f85082b4350e8642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  root: {fileID: 497896599}
+  fireRoot: {fileID: 497896599}
   bulletPrefab: {fileID: 3762072646170118863, guid: 6db2d016dbf39498095d003b34005ae7,
     type: 3}
   angleFrom: -45
@@ -105,7 +107,9 @@ MonoBehaviour:
   speedTo: 6
   coolDownMin: 4
   coolDownMax: 10
-  lastTime: 0
+  startCooldown: -1
+  fireWarning: 0
+  warningTime: 0
 --- !u!1 &2129902837
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 572d8c47594334a0f85082b4350e8642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  root: {fileID: 2129902838}
+  fireRoot: {fileID: 2129902838}
   bulletPrefab: {fileID: 3762072646170118863, guid: 6db2d016dbf39498095d003b34005ae7,
     type: 3}
   angleFrom: -5
@@ -158,7 +162,9 @@ MonoBehaviour:
   speedTo: 6
   coolDownMin: 4
   coolDownMax: 10
-  lastTime: 0
+  startCooldown: -1
+  fireWarning: 0
+  warningTime: 0
 --- !u!1 &154918727540890703
 GameObject:
   m_ObjectHideFlags: 0
@@ -1091,9 +1097,11 @@ MonoBehaviour:
   visualRoot: {fileID: 0}
   velocity: {x: 0, y: 0, z: 0}
   destroyAfterHit: 0
+  noDamage: 0
   homing: 0
   target: {fileID: 0}
   power: 0
+  trackingTime: -1
 --- !u!1 &8802419801504374350
 GameObject:
   m_ObjectHideFlags: 0
@@ -1138,7 +1146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 572d8c47594334a0f85082b4350e8642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  root: {fileID: 7669914715669859729}
+  fireRoot: {fileID: 7669914715669859729}
   bulletPrefab: {fileID: 8911759861059520756, guid: a248d8bb149e8489eb502c1ee4da83b3,
     type: 3}
   angleFrom: -45
@@ -1147,7 +1155,9 @@ MonoBehaviour:
   speedTo: 6
   coolDownMin: 6
   coolDownMax: 12
-  lastTime: 0
+  startCooldown: -1
+  fireWarning: 0
+  warningTime: 0
 --- !u!114 &1415755581126882380
 MonoBehaviour:
   m_ObjectHideFlags: 0

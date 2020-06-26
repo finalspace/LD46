@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
 	[Header ("Moving and Jumping")]
 	public float jumpHeight = 4;
 	public float timeToJumpApex = .4f;
-	public float moveSpeed = 6;
+    public float jumpHorizontalPower = 15;
     public Transform root;    //view root
 
     public PlayerCollision playerCollision;
@@ -17,9 +17,9 @@ public class PlayerMovement : MonoBehaviour
     private float accelerationTimeAirborne = .9f;
 	private float accelerationTimeGrounded = .2f;
 	private float gravity;
-	private float jumpVelocity;
+	private float jumpVelY;
 	private Vector2 velocity;
-    public float targetVelocityX;  //don't set x velocity directly
+    private float targetVelocityX;  //don't set x velocity directly
 
     private float velocityXSmoothing;
     private float velXSmoothingTemp;
@@ -39,9 +39,6 @@ public class PlayerMovement : MonoBehaviour
     private bool dashReady = false;
     private Vector2 parentVelocity;
 
-    //[Header("Skills")]
-    //public RangedWeapon rangeWeapon;
-
     [Header("Visual Effects")]
 	public GameObject damageEffect;
 	public GameObject footEffect;
@@ -53,8 +50,7 @@ public class PlayerMovement : MonoBehaviour
     void Start() {
         playerCollision = GetComponent<PlayerCollision> ();
 		gravity = -(2 * jumpHeight) / Mathf.Pow (timeToJumpApex, 2);
-        gravity *= 1;
-		jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
+        jumpVelY = Mathf.Abs(gravity) * timeToJumpApex;
         jumpNum = maxJumpNum;
         dashReady = false;
     }
@@ -166,6 +162,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// map [0, 1] inclusive to [0, maxJumpVelocity]
+    /// </summary>
+    /// <returns></returns>
+    public Vector2 GetMappedVelocity(Vector2 input)
+    {
+        Vector2 vel = new Vector2();
+        vel.x = Mathf.Lerp(0, jumpHorizontalPower, Mathf.Abs(input.x)) * Mathf.Sign(input.x);
+        vel.y = Mathf.Lerp(0, jumpVelY, Mathf.Abs(input.y)) * Mathf.Sign(input.y);
+        return vel;
+    }
+
     public Vector2[] GetTrajectory(Vector2 startPos, Vector2 vel, float aimingTime)
     {
         int aimingDotsCount = 7;
@@ -223,7 +231,7 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         isJumping = true;
-        velocity.y = jumpVelocity;
+        velocity.y = jumpVelY;
     }
 
     public void Land(Transform ground)
@@ -258,12 +266,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void ProcessTiltSlide()
     {
-        float surfaceAngle = playerCollision.collisions.tiltAngle;
+        float surfaceAngle = playerCollision.CalculateTiltAngle();
         float ang = Mathf.Tan(surfaceAngle) * Mathf.Rad2Deg;
 
         //angle critical point to start sliding
         float val = Mathf.InverseLerp(20f, 90f, Mathf.Abs(ang));
-        val = Mathf.Sin(val);  //modify curve
+        val = Mathf.Sin(val * Mathf.PI / 2);  //modify curve
 
         Vector2 dir = new Vector2(Mathf.Cos(ang * Mathf.Deg2Rad) * Mathf.Sign(ang), -Mathf.Sin(Mathf.Abs(ang * Mathf.Deg2Rad)));
         velocity = dir.normalized * val * 20.0f;

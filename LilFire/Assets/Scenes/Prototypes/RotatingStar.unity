@@ -1962,6 +1962,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4472603484457188835, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
+        type: 3}
+      propertyPath: jumpHorizontalPower
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 7200217227627858473, guid: f8d70365c6c9d46c4b0a0c69b5dd56cb,
         type: 3}
       propertyPath: transition
@@ -3665,7 +3670,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1143607314}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.21, y: -1.33, z: 0}
+  m_LocalPosition: {x: -0.21, y: 0.93, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 990062128080124896}
@@ -4365,6 +4370,7 @@ MonoBehaviour:
   debugText1: {fileID: 533332925}
   DebugText2: {fileID: 166889931}
   Arrow: {fileID: 47180278}
+  wall: {fileID: 0}
 --- !u!1001 &1755350737
 PrefabInstance:
   m_ObjectHideFlags: 0

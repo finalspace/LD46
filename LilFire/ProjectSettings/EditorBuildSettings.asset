@@ -5,19 +5,25 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/main.unity
     guid: 14126f5094bbd4a51a4c7ca6022fde78
   - enabled: 0
     path: 
-    guid: 2d2498cdd6d8b418e9ca5c3883d0c47a
-  - enabled: 1
+    guid: 00000000000000000000000000000000
+  - enabled: 0
     path: Assets/Scenes/mainlevel.unity
     guid: d2759529ce2794292bb9a023ac452973
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Title.unity
     guid: a50da10b235af499ebb901208d007f45
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/mainlevel art.unity
     guid: 2f4f4d43a36074cc2aba111594d6d132
+  - enabled: 1
+    path: Assets/Scenes/Prototypes/TowerClimb.unity
+    guid: 9316ec72d445a40f7856ae345b0fb4a3
+  - enabled: 0
+    path: Assets/Scenes/Prototypes/RopeSwing.unity
+    guid: 2d456588f7b364288ac9fa0ba8e2d3cf
   m_configObjects: {}

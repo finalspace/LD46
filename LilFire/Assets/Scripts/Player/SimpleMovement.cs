@@ -2,31 +2,45 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.Events;
+
+[System.Serializable]
+public class LandEvent : UnityEvent<Collider2D>
+{
+}
 
 [RequireComponent (typeof (PlayerCollision))]
-public class FallingBugMovement : MonoBehaviour
+public class SimpleMovement : MonoBehaviour
 {
 	[Header ("Moving and Jumping")]
-    public PlayerCollision playerCollision;
+    public PlayerCollision characterCollision;
 	public float gravity;
-	public float bounceVelocity;
-	private Vector2 velocity;
-    private float targetVelocityX;  //don't set x velocity directly
-    private float accelerationTimeAirborne = .9f;
-    private float velocityXSmoothing;
-    private float velXSmoothingTemp;
+    public Vector2 startVelocity;
 
-    private Collider2D ignoreCollider;
+	public Vector2 velocity;
+    public float targetVelocityX;  //don't set x velocity directly
+    protected float accelerationTimeAirborne = .9f;
+    protected float accelerationTimeGrounded = .2f;
+    protected float velocityXSmoothing;
+    protected float velXSmoothingTemp;
+    protected Collider2D ignoreCollider;
+
+    public UnityEvent landEventSimple = new UnityEvent();
+    public LandEvent landEvent;
 
     [Header("Status")]
     public bool isSimulating = true;
-    private bool isJumping = false;
+    protected bool isOnGround = false;
+    protected bool isJumping = false;
 
     [Header("Visual Effects")]
 	public GameObject footEffect;
 
+    //[Header("-----------------------------")]
+
     void Start() {
-        playerCollision = GetComponent<PlayerCollision> ();
+        characterCollision = GetComponent<PlayerCollision> ();
+        velocity = startVelocity;
     }
 
     private void FixedUpdate()
@@ -46,13 +60,13 @@ public class FallingBugMovement : MonoBehaviour
     {
         //------------------------ Update Velocity ---------------------------------------
         //------------------------                 ---------------------------------------
-        float accelerationTime = accelerationTimeAirborne;
+        float accelerationTime = isOnGround ? accelerationTimeGrounded : accelerationTimeAirborne;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime, Mathf.Infinity, Time.fixedDeltaTime);
         velocity.y += gravity * Time.fixedDeltaTime;
 
         //------------------------ Update Position ---------------------------------------
         //------------------------                 ---------------------------------------
-        playerCollision.MoveIgnoreCollision(velocity * Time.fixedDeltaTime, ignoreCollider);
+        characterCollision.MoveIgnoreCollision(velocity * Time.fixedDeltaTime, ignoreCollider);
     }
 
     /// <summary>
@@ -62,43 +76,59 @@ public class FallingBugMovement : MonoBehaviour
     ///
     /// in this case, position physics is already handled in SimulateMovement();
     /// </summary>
-    private void HandlePhysics()
+    public virtual void HandlePhysics()
     {
         //------------------------ Update Velocity ---------------------------------------
         //------------------------                 -------------------------------------
-        if (playerCollision.collisions.below)
+        if (characterCollision.collisions.below)
         {
             if (isJumping == true)
             {
-                Land(playerCollision.collisions.belowCollider);
+                Land(characterCollision.collisions.belowCollider);
             }
+
+            OnGround();
         }
         else
         {
             isJumping = true;
         }
+
+        //when blocked by ceiling
+        if (characterCollision.collisions.above)
+        {
+            velocity.y = -velocity.y * 0.3f;
+            velocity.x *= 0.8f;
+            targetVelocityX *= 0.8f;
+        }
+
+        //------------------------ Update Status ---------------------------------------
+        //------------------------                 -------------------------------------
+        isOnGround = characterCollision.collisions.below;
+        isJumping = !isOnGround;
     }
 
-    public void Launch(Vector2 vel)
+    public virtual void Move(Vector2 vel, float targetVelX)
     {
-        isJumping = true;
         velocity = vel;
-        targetVelocityX = velocity.x / 2;
-
-        EventManager.Event_PlayerJump(velocity);
+        targetVelocityX = targetVelX;
     }
 
-
-    public void Land(Collider2D groundCollider)
+    public virtual void Land(Collider2D groundCollider)
     {
         isJumping = false;
-        ignoreCollider = groundCollider;
 
         Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
         if (footEffect != null)
             Instantiate(footEffect, pos, Quaternion.identity);
 
-        velocity = new Vector2(0, bounceVelocity);
+        landEvent.Invoke(groundCollider);
+        landEventSimple.Invoke();
+    }
+
+    public virtual void OnGround()
+    {
+        velocity.y = 0;
     }
 
 }

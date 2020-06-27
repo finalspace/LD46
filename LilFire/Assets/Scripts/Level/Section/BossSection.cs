@@ -8,6 +8,6 @@ public class BossSection : MonoBehaviour
 
     public void EnterSection()
     {
-        CameraTracker.Instance.ChangeCameraTarget(cameraPos, 3);
+        CameraTracker.Instance.ChangeCameraTarget(cameraPos, 4, 1.0f);
     }
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2127645071325537646}
   - component: {fileID: 2127645071325537645}
   - component: {fileID: 2127645071325537644}
+  - component: {fileID: 4563750790797230742}
   m_Layer: 12
   m_Name: FallingRock
   m_TagString: Untagged
@@ -50,11 +51,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visualRoot: {fileID: 7905171904014817552}
   velocity: {x: 0, y: 0, z: 0}
-  destroyAfterHit: 0
-  noDamage: 0
   homing: 0
   target: {fileID: 0}
   power: 0.05
+  trackingTime: -1
+  trigger: {fileID: 4563750790797230742}
   movement: {fileID: 2127645071325537644}
   rotationAnimation: {fileID: 6192192899370719111}
 --- !u!61 &2127645071325537646
@@ -115,6 +116,25 @@ MonoBehaviour:
   ignoreCollider: {fileID: 0}
   isSimulating: 0
   footEffect: {fileID: 0}
+--- !u!114 &4563750790797230742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127645071325537635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7cb1f6eb575646f5a1c35a6b8707c0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  destroyAfterHit: 0
+  active: 0
 --- !u!1 &2719603562572840357
 GameObject:
   m_ObjectHideFlags: 0

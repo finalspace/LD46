@@ -7,14 +7,16 @@ public class FallingRock : Bullet
     public FallingRockMovement movement;
     public AutoRotation rotationAnimation;
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
+        base.OnEnable();
         movement.isSimulating = true;
         rotationAnimation.enabled = true;
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         movement.isSimulating = false;
         rotationAnimation.enabled = false;
     }

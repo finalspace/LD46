@@ -3,23 +3,23 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-[RequireComponent (typeof (PlayerCollision))]
+[RequireComponent(typeof(PlayerCollision))]
 public class PlayerMovement : MonoBehaviour
 {
-	[Header ("Moving and Jumping")]
-	public float jumpHeight = 4;
-	public float timeToJumpApex = .4f;
+    [Header("Moving and Jumping")]
+    public float jumpHeight = 4;
+    public float timeToJumpApex = .4f;
     public float jumpHorizontalPower = 15;
     public Transform root;    //view root
 
     public PlayerCollision playerCollision;
     private Vector2 deltaMovement;
     private float accelerationTimeAirborne = .9f;
-	private float accelerationTimeGrounded = .2f;
-	private float gravity;
-	private float jumpVelY;
-	private Vector2 velocity;
-    private float targetVelocityX;  //don't set x velocity directly
+    private float accelerationTimeGrounded = .2f;
+    private float gravity;
+    private float jumpVelY;
+    public Vector2 velocity;
+    public float targetVelocityX;  //don't set x velocity directly
 
     private float velocityXSmoothing;
     private float velXSmoothingTemp;
@@ -35,9 +35,10 @@ public class PlayerMovement : MonoBehaviour
     //private bool isOnRope = false;
     const int maxJumpNum = 1;
     private int jumpNum;
-    private bool dashing = false;
-    private bool dashReady = false;
-    private Vector2 parentVelocity;
+    public bool isDashing = false;
+    public bool dashReady = false;
+    private bool isWalling = false;
+    private bool tiltSliding = false;
 
     [Header("Visual Effects")]
 	public GameObject damageEffect;
@@ -77,14 +78,23 @@ public class PlayerMovement : MonoBehaviour
         //float targetVelocityX = deltaMovement.x * moveSpeed;  //keyboard direct control
         float accelerationTime = isOnGround ? accelerationTimeGrounded : accelerationTimeAirborne;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTime, Mathf.Infinity, Time.fixedDeltaTime);
-        //only apply gravity when not on the ground, and not dashing
-        velocity.y += (dashing ? 0 : gravity) * Time.fixedDeltaTime;
 
-        if (dashing)
+        //velocity.y
+        if (isDashing)
         {
+            //no gravity
             velocity *= 0.88f;
             if (velocity.magnitude < 5.0f)
-                dashing = false;
+                isDashing = false;
+        }
+        else if (isWalling)
+        {
+            //remain slow speed
+        }
+        else
+        {
+            //apply gravity
+            velocity.y += gravity * Time.fixedDeltaTime;
         }
 
         //------------------------ Update Position ---------------------------------------
@@ -124,6 +134,7 @@ public class PlayerMovement : MonoBehaviour
         //when blocked by ceiling
         if (playerCollision.collisions.above)
         {
+            Debug.Log("Above");
             velocity.y = -velocity.y * 0.3f;
             velocity.x *= 0.8f;
             targetVelocityX *= 0.8f;
@@ -137,11 +148,22 @@ public class PlayerMovement : MonoBehaviour
             BounceSurface bounceSurface =
                 (playerCollision.collisions.left ? playerCollision.collisions.leftTransform : playerCollision.collisions.rightTransform)
                 .GetComponent<BounceSurface>();
+            AttachableSurface attachableSurface =
+                 (playerCollision.collisions.left ? playerCollision.collisions.leftTransform : playerCollision.collisions.rightTransform)
+                .GetComponent<AttachableSurface>();
 
             if (bounceSurface != null)
             {
                 velocity.x = Mathf.Sign(-velocity.x) * speed * bounceSurface.bouncePower;
-                targetVelocityX = -targetVelocityX;
+                velocityXSmoothing *= -bounceSurface.bouncePower;
+                targetVelocityX *= -bounceSurface.bouncePower;
+            }
+            else if (attachableSurface != null)
+            {
+                Land(attachableSurface.transform);
+                isWalling = true;
+                velocity.x = velocityXSmoothing = targetVelocityX = 0;
+                velocity.y = -1;
             }
             else
             {
@@ -180,10 +202,10 @@ public class PlayerMovement : MonoBehaviour
         Vector2[] positions = new Vector2[aimingDotsCount];
         Vector2 dotPos = startPos;
 
-        aimingTime += Time.fixedDeltaTime;
+        aimingTime += Time.fixedDeltaTime * (1 / Time.timeScale);
         float offTime = Mathf.Repeat(aimingTime, 1.0f);
         offTime = offTime / 10f;
-        float dt = Time.fixedDeltaTime * 5;
+        float dt = Time.fixedDeltaTime * 5 * (1 / Time.timeScale);
 
         float targetVx = vel.x / 2;
         vel.x = Mathf.SmoothDamp(vel.x, targetVx, ref velXSmoothingTemp, accelerationTimeAirborne, Mathf.Infinity, offTime);
@@ -203,7 +225,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool AbleToJump()
     {
-        return (jumpNum > 0);
+        return (jumpNum > 0 || dashReady);
     }
 
     /*
@@ -238,34 +260,50 @@ public class PlayerMovement : MonoBehaviour
     {
         EventManager.Event_PlayerLand();
         isJumping = false;
-        TryAttach(ground);
 
         Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
         if (footEffect != null)
             Instantiate(footEffect, pos, Quaternion.identity);
         root.rotation = Quaternion.Euler(0, 0, 0);
 
-        RefreshState();
+        ProcessGroundInfo(ground);
+        ResetState();
     }
 
-    private void RefreshState()
+    private void ProcessGroundInfo(Transform trans)
+    {
+        AttachToMe attach = trans.gameObject.GetComponent<AttachToMe>();
+        if (attach != null)
+            transform.SetParent(trans, true);
+
+        TiltSurface tiltSurface = trans.gameObject.GetComponent<TiltSurface>();
+        if (tiltSurface)
+            tiltSliding = true;
+    }
+
+    private void ResetState()
     {
         velocity = Vector2.zero;
         root.rotation = Quaternion.Euler(0, 0, 0);
         targetVelocityX = 0;
+        velocityXSmoothing = 0;
         jumpNum = maxJumpNum;
-        dashing = false;
+        isDashing = false;
         dashReady = false;
+        isWalling = false;
+        tiltSliding = false;
     }
 
     private void OnGround()
     {
         velocity.y = 0;
-        ProcessTiltSlide();
+        if (tiltSliding)
+            ProcessTiltSlide();
     }
 
     private void ProcessTiltSlide()
     {
+        Debug.Log("TiltSlide");
         float surfaceAngle = playerCollision.CalculateTiltAngle();
         float ang = Mathf.Tan(surfaceAngle) * Mathf.Rad2Deg;
 
@@ -287,8 +325,8 @@ public class PlayerMovement : MonoBehaviour
         if (energy < 3) return;
 
         isJumping = true;
+        isWalling = false;
         jumpNum--;
-        dashing = dashReady;
         Detach();
 
         velocity = vel;
@@ -296,7 +334,8 @@ public class PlayerMovement : MonoBehaviour
         float adjustedPower = Mathf.Min(power, energy);
         velocity = velocity * (adjustedPower / power);  //adjusted velocity
 
-        if (dashing)
+        isDashing = dashReady;
+        if (isDashing)
             velocity *= 2.5f;
 
         targetVelocityX = velocity.x / 2;
@@ -334,13 +373,6 @@ public class PlayerMovement : MonoBehaviour
 			transform.localScale = theScale;
 		}
 	}
-
-    public void TryAttach(Transform trans)
-    {
-        AttachToMe attach = trans.gameObject.GetComponent<AttachToMe>();
-        if (attach != null)
-            transform.SetParent(trans, true);
-    }
 
     public void Detach()
     {

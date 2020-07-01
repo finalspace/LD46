@@ -69,7 +69,8 @@ public class Gun_Pattern : MonoBehaviour
         float speed = Random.Range(speedFrom, speedTo);
         Vector3 direction = new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad), 0);
         bullet = Instantiate(bulletPrefab).GetComponent<Bullet>();
-        bullet.transform.position = fireRoot.position;
+		bullet.transform.SetParent(transform);
+		bullet.transform.position = fireRoot.position;
         bullet.Init(direction * speed, Player.Instance?.transform);
         bullet.enabled = false;
 
@@ -80,7 +81,12 @@ public class Gun_Pattern : MonoBehaviour
     {
         if (!loaded)
             LoadBullet();
-        bullet.enabled = true;
+
+		if (bullet)
+		{
+			bullet.transform.SetParent(null);
+			bullet.enabled = true;
+		}
 
         loaded = false;
     }

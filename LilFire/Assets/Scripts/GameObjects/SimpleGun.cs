@@ -7,13 +7,19 @@ public class SimpleGun : MonoBehaviour
     public Transform fireRoot;
     public GameObject bulletPrefab;
     public bool local = false;
-    public float angleFrom = 0;
-    public float angleTo = 0;
+
+    [Header("Speed")]
     public float speedFrom = 1.0f;
     public float speedTo = 2.0f;
+
+    [Header("Angle")]
+    public float angleFrom = 0;
+    public float angleTo = 0;
+    public bool randomFlip = false;
+
+    [Header("Cooldown")]
     public float coolDownMin = 1.0f;
     public float coolDownMax = 3.0f;
-
     [Tooltip("Initial Cooldown Overwrite(when value is positive).")]
     public float startCooldown = -1;
 
@@ -51,29 +57,33 @@ public class SimpleGun : MonoBehaviour
         }
     }
 
-    private void LoadBullet()
+    protected virtual void LoadBullet()
     {
-        float angle = Random.Range(angleFrom, angleTo) + transform.eulerAngles.y - transform.eulerAngles.z;
         float speed = Random.Range(speedFrom, speedTo);
+        float angle = Random.Range(angleFrom, angleTo) + transform.eulerAngles.y - transform.eulerAngles.z;
+        if (randomFlip)
+        {
+            if (Random.value < 0.5f) angle = -angle;
+        }
         Vector3 direction = new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), Mathf.Cos(angle * Mathf.Deg2Rad), 0);
         bullet = Instantiate(bulletPrefab).GetComponent<Bullet>();
+        bullet.transform.SetParent(transform);
         bullet.transform.position = fireRoot.position;
         bullet.Init(direction * speed, Player.Instance?.transform);
-        bullet.noDamage = true;
         bullet.enabled = false;
 
         loaded = true;
     }
 
-    public void Fire()
+    protected virtual void Fire()
     {
         if (!loaded)
             LoadBullet();
 
         if (bullet)
         {
+            bullet.transform.SetParent(null);
             bullet.enabled = true;
-            bullet.noDamage = false;
         }
 
         loaded = false;

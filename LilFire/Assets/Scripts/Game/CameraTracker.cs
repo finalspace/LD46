@@ -43,15 +43,17 @@ public class CameraTracker : SingletonBehaviour<CameraTracker>
         //this.gameObject.transform.position.y = ourHero.transform.position.y;
     }
 
-    public void ChangeCameraTarget(GameObject newTarget, float time, float dampingTime = -1)
+    public void ChangeCameraTarget(GameObject newTarget, float time = -1, float dampingTime = -1)
     {
         target = newTarget.transform;
         if (dampingTime > 0)
             dampTimeCurrent = dampingTime;
-        Invoke("TrackPlayer", time);
+
+        if (time > 0)
+            Invoke("TrackPlayer", time);
     }
 
-    private void TrackPlayer()
+    public void TrackPlayer()
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
         dampTimeCurrent = dampTime;

@@ -6,9 +6,10 @@ public class Floating : MonoBehaviour
 {
     // User Inputs
     public Transform root;
-    public float degreesPerSecond = 15.0f;
     public float amplitude_updown = 0.5f;
     public float frequency_updown = 1f;
+    public float amplitude_leftright = 0.5f;
+    public float frequency_leftright = 1f;
     public float amplitude_rotate = 0.5f;
     public float frequency_rotate = 1f;
     public float rotateOffset = 1;
@@ -19,7 +20,8 @@ public class Floating : MonoBehaviour
     Vector3 tempPos = new Vector3();
     Vector3 baseRotate = new Vector3();
     Vector3 tempRotate = new Vector3();
-    float offsetHeight;
+    float offsetUpdown;
+    float offsetLeftright;
     float ratio = 0.2f;
 
     private bool floating = true;
@@ -44,9 +46,12 @@ public class Floating : MonoBehaviour
             return;
 
         tempPos = posOffset;
-        offsetHeight = Mathf.Sin(Time.fixedTime * Mathf.PI * frequency_updown + generalOffset) * amplitude_updown;
-        tempPos.y += offsetHeight;
-        tempPos.x += offsetHeight * ratio;
+        offsetUpdown = Mathf.Sin(Time.fixedTime * Mathf.PI * frequency_updown + generalOffset) * amplitude_updown;
+        tempPos.y += offsetUpdown;
+        //tempPos.x += offsetHeight * ratio;
+
+        offsetLeftright = Mathf.Sin(Time.fixedTime * Mathf.PI * frequency_leftright + generalOffset) * amplitude_leftright;
+        tempPos.x += offsetLeftright;
 
 
         tempRotate = baseRotate + new Vector3(0, 0, Mathf.Sin(Time.fixedTime * Mathf.PI * frequency_rotate + generalOffset + rotateOffset) * amplitude_rotate);

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spike : SimpleTrigger
+public class Item_Dash : SimpleTrigger
 {
 	public override void Trigger()
     {
-		Player.Instance.Damage();
+		Player.Instance.GrantDash();
     }
 }

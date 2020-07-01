@@ -15,7 +15,6 @@ public class SimpleMovement : MonoBehaviour
 	[Header ("Moving and Jumping")]
     public PlayerCollision characterCollision;
 	public float gravity;
-    public Vector2 startVelocity;
 
 	public Vector2 velocity;
     public float targetVelocityX;  //don't set x velocity directly
@@ -40,7 +39,6 @@ public class SimpleMovement : MonoBehaviour
 
     void Start() {
         characterCollision = GetComponent<PlayerCollision> ();
-        velocity = startVelocity;
     }
 
     private void FixedUpdate()

@@ -4878,6 +4878,7 @@ GameObject:
   - component: {fileID: 8911759861059520758}
   - component: {fileID: 8911759861059520759}
   - component: {fileID: 8725690197476790670}
+  - component: {fileID: 1399762250121478240}
   m_Layer: 12
   m_Name: Fireball_Homing
   m_TagString: Untagged
@@ -4915,8 +4916,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visualRoot: {fileID: 837327022035448967}
   velocity: {x: 3, y: 0, z: 0}
-  destroyAfterHit: 1
-  noDamage: 0
   homing: 1
   target: {fileID: 0}
   power: 0.05
@@ -4953,3 +4952,16 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.25
+--- !u!114 &1399762250121478240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8911759861059520756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7cb1f6eb575646f5a1c35a6b8707c0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyAfterHit: 1

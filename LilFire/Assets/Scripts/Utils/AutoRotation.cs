@@ -25,4 +25,9 @@ public class AutoRotation : MonoBehaviour
     {
         transform.Rotate(0, 0, speed * Time.deltaTime);
     }
+
+    public void SetSpeed(float value)
+    {
+		spinSpeedMin = spinSpeedMax = speed = value;
+    }
 }

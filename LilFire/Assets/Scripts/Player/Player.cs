@@ -175,9 +175,9 @@ public class Player : SingletonBehaviour<Player>
 
             /*
             //slow motion aiming?
-            if (superDash)
+            if (playerMovement.dashReady)
                 TimeManager.Instance.SlowMotion();
-            */
+                */
         }
 
         if (Input.GetMouseButton(0))
@@ -192,11 +192,16 @@ public class Player : SingletonBehaviour<Player>
             if (!aiming) return;
 
             SetAiming(false);
-            //TimeManager.Instance.Reset();
+            TimeManager.Instance.Reset();
 
             if (Vector2.Distance(mousePosition, mouseFirstPos) > 0.01f)
                 playerMovement.Launch(ComputeInitialVelocity());
             else playerMovement.LaunchFailed();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            TimeManager.Instance.TogglePauseGame();
         }
     }
 
@@ -312,6 +317,12 @@ public class Player : SingletonBehaviour<Player>
         //move.SetAiming(false);
         // go to the vector
         //move.GoToHighestWaypoint();
+    }
+
+    public void GrantDash()
+    {
+        playerMovement.dashReady = true;
+        TimeManager.Instance.SlowMotion();
     }
 
     /*****************************************

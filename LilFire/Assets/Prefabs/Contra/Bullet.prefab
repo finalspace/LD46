@@ -4768,6 +4768,7 @@ GameObject:
   - component: {fileID: 3762072646170118861}
   - component: {fileID: 3762072646170118860}
   - component: {fileID: 3931253531659522997}
+  - component: {fileID: 1680801512340653106}
   m_Layer: 12
   m_Name: Bullet
   m_TagString: Untagged
@@ -4805,12 +4806,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visualRoot: {fileID: 4902088197831702204}
   velocity: {x: 5, y: 0, z: 0}
-  destroyAfterHit: 1
-  noDamage: 0
   homing: 0
   target: {fileID: 0}
   power: 0.05
   trackingTime: -1
+  trigger: {fileID: 1680801512340653106}
 --- !u!114 &3762072646170118860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4843,6 +4843,25 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.12
+--- !u!114 &1680801512340653106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3762072646170118863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7cb1f6eb575646f5a1c35a6b8707c0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  destroyAfterHit: 1
+  active: 0
 --- !u!1 &6482412663434419175
 GameObject:
   m_ObjectHideFlags: 0

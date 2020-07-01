@@ -8,6 +8,7 @@ public class TimeManager : SingletonBehaviour<TimeManager>
     private float slowdownLength = 0.5f;
 
     private bool slowMode = false;
+    private bool pause = false;
 
     // Update is called once per frame
     void Update()
@@ -32,5 +33,13 @@ public class TimeManager : SingletonBehaviour<TimeManager>
         slowMode = false;
         Time.timeScale = 1;
         Time.fixedDeltaTime = Time.timeScale * 0.02f;
+    }
+
+    public void TogglePauseGame()
+    {
+        pause = !pause;
+        if (pause)
+            Time.timeScale = 0;
+        else Time.timeScale = 1;
     }
 }

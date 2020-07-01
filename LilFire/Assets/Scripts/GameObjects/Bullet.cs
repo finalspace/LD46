@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Loadable attribute: show sprite but no movement nor damage
+/// </summary>
 public class Bullet : MonoBehaviour
 {
     public Transform visualRoot;
     public Vector3 velocity;
-    public bool destroyAfterHit = false;
-    public bool noDamage = false;
 
     [Header("Homing")]
     public bool homing = false;
@@ -15,7 +16,25 @@ public class Bullet : MonoBehaviour
     public float power = 0.05f;
     public float trackingTime = -1;
 
+    public SimpleTrigger trigger;
     private float speed;
+    protected bool isDefaultMovement = true;
+
+    protected virtual void OnEnable()
+    {
+		trigger.active = true;
+    }
+
+    protected virtual void OnDisable()
+    {
+		trigger.active = false;
+    }
+
+    private void Awake()
+	{
+		if (trigger == null)
+			trigger = GetComponent<SimpleTrigger>();
+	}
 
     private void Start()
     {
@@ -23,13 +42,13 @@ public class Bullet : MonoBehaviour
             trackingTime = float.MaxValue;
     }
 
-    public void Init(Vector3 vel)
+    public virtual void Init(Vector3 vel)
 	{
 		velocity = vel;
         speed = velocity.magnitude;
-    }
+	}
 
-    public void Init(Vector3 vel, Transform t)
+    public virtual void Init(Vector3 vel, Transform t)
     {
         target = t;
         Init(vel);
@@ -37,6 +56,8 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
+        if (!isDefaultMovement) return;
+
         if (homing && target != null)
         {
             velocity += (target.position - transform.position).normalized * power;
@@ -49,22 +70,5 @@ public class Bullet : MonoBehaviour
                 homing = false;
         }
         transform.Translate(velocity * Time.deltaTime);
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (noDamage) return;
-
-        if (other.tag != "Player")
-            return;
-
-        Damage();
-    }
-
-    public void Damage()
-    {
-        Player.Instance.Damage();
-        if (destroyAfterHit)
-            Destroy(gameObject);
     }
 }

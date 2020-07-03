@@ -46,10 +46,12 @@ MonoBehaviour:
   fireRoot: {fileID: 353377051}
   bulletPrefab: {fileID: 3762072646170118863, guid: 6db2d016dbf39498095d003b34005ae7,
     type: 3}
-  angleFrom: -30
-  angleTo: 30
+  local: 0
   speedFrom: 5
   speedTo: 6
+  angleFrom: -30
+  angleTo: 30
+  randomFlip: 0
   coolDownMin: 4
   coolDownMax: 10
   startCooldown: -1
@@ -101,10 +103,12 @@ MonoBehaviour:
   fireRoot: {fileID: 497896599}
   bulletPrefab: {fileID: 3762072646170118863, guid: 6db2d016dbf39498095d003b34005ae7,
     type: 3}
-  angleFrom: -45
-  angleTo: 5
+  local: 0
   speedFrom: 5
   speedTo: 6
+  angleFrom: -45
+  angleTo: 5
+  randomFlip: 0
   coolDownMin: 4
   coolDownMax: 10
   startCooldown: -1
@@ -156,10 +160,12 @@ MonoBehaviour:
   fireRoot: {fileID: 2129902838}
   bulletPrefab: {fileID: 3762072646170118863, guid: 6db2d016dbf39498095d003b34005ae7,
     type: 3}
-  angleFrom: -5
-  angleTo: 45
+  local: 0
   speedFrom: 5
   speedTo: 6
+  angleFrom: -5
+  angleTo: 45
+  randomFlip: 0
   coolDownMin: 4
   coolDownMax: 10
   startCooldown: -1
@@ -967,6 +973,7 @@ GameObject:
   - component: {fileID: 6614339614646398945}
   - component: {fileID: 6258174751376607442}
   - component: {fileID: 2729717654745639658}
+  - component: {fileID: 1265417954451022619}
   m_Layer: 0
   m_Name: Beam
   m_TagString: Untagged
@@ -1049,9 +1056,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   root: {fileID: 0}
-  degreesPerSecond: 0
   amplitude_updown: 0.1
   frequency_updown: 30
+  amplitude_leftright: 0.5
+  frequency_leftright: 1
   amplitude_rotate: 0.2
   frequency_rotate: 10
   rotateOffset: 0
@@ -1089,19 +1097,37 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6614339614646398944}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 55347f48bb4ea4d968216464e45b7311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   visualRoot: {fileID: 0}
   velocity: {x: 0, y: 0, z: 0}
-  destroyAfterHit: 0
-  noDamage: 0
   homing: 0
   target: {fileID: 0}
   power: 0
   trackingTime: -1
+  trigger: {fileID: 0}
+--- !u!114 &1265417954451022619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6614339614646398944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7cb1f6eb575646f5a1c35a6b8707c0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  active: 1
+  destroyAfterHit: 0
 --- !u!1 &8802419801504374350
 GameObject:
   m_ObjectHideFlags: 0
@@ -1149,10 +1175,12 @@ MonoBehaviour:
   fireRoot: {fileID: 7669914715669859729}
   bulletPrefab: {fileID: 8911759861059520756, guid: a248d8bb149e8489eb502c1ee4da83b3,
     type: 3}
-  angleFrom: -45
-  angleTo: 5
+  local: 0
   speedFrom: 5
   speedTo: 6
+  angleFrom: -45
+  angleTo: 5
+  randomFlip: 0
   coolDownMin: 6
   coolDownMax: 12
   startCooldown: -1

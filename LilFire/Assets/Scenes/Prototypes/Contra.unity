@@ -656,6 +656,37 @@ MonoBehaviour:
   dampTime: 0.15
   target: {fileID: 0}
   neverFall: 1
+--- !u!1 &162542277
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 162542278}
+  m_Layer: 0
+  m_Name: root
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &162542278
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162542277}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 6417434959829998564}
+  m_Father: {fileID: 1033327166764268496}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &165411704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12145,7 +12176,7 @@ Transform:
   m_LocalPosition: {x: 0, y: -0.569, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 6417434959829998564}
+  - {fileID: 162542278}
   m_Father: {fileID: 4472603484946024652}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -22868,6 +22899,7 @@ MonoBehaviour:
   aimingDotsCount: 7
   fullTrajctory: 0
   aimingPosOffset: {x: 0, y: 0, z: 0}
+  respawnPosOffset: {x: 0, y: 0, z: 0}
   debugNoDie: 0
 --- !u!4 &4472603484946024652
 Transform:
@@ -28236,7 +28268,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.125, y: 0.125, z: 1}
   m_Children: []
-  m_Father: {fileID: 1033327166764268496}
+  m_Father: {fileID: 162542278}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6417434959829998565

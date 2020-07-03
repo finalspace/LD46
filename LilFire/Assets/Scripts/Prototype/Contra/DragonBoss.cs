@@ -17,6 +17,8 @@ namespace Contra
         public GameObject centerNormal;
         public GameObject centerHoming;
 
+        public Animator dragonAnimator;
+
         public bool coreAvailable = false;
 
         private int life = 3;
@@ -34,11 +36,9 @@ namespace Contra
             CameraTracker.Instance.TrackPlayer();
         }
 
-        public void DamageWing(int wingId)
+        public void DamageWing0()
         {
-            if (wingId == 0)
-                bulletWingLeft.SetActive(false);
-            else bulletWingRight.SetActive(false);
+            bulletWingLeft.SetActive(false);
 
             if (!bulletWingLeft.activeSelf && !bulletWingRight.activeSelf)
             {
@@ -47,6 +47,20 @@ namespace Contra
                 rockWingRight.SetActive(true);
             }
         }
+
+        public void DamageWing1()
+        {
+            bulletWingRight.SetActive(false);
+
+            if (!bulletWingLeft.activeSelf && !bulletWingRight.activeSelf)
+            {
+                coreAvailable = true;
+                rockWingLeft.SetActive(true);
+                rockWingRight.SetActive(true);
+            }
+        }
+
+
 
         public void DamageBoss()
         {

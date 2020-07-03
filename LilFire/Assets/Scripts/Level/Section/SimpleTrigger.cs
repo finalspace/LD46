@@ -7,10 +7,22 @@ public class SimpleTrigger : MonoBehaviour
 {
     public UnityEvent triggerEvent;
 
+    public bool active = true;
     public bool destroyAfterHit = false;
-    public bool active;
 
     protected virtual void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!active) return;
+
+        if (other.tag != "Player")
+            return;
+
+        triggerEvent.Invoke();
+        Trigger();
+        PostTrigger();
+    }
+
+    protected virtual void OnTriggerStay2D(Collider2D other)
     {
         if (!active) return;
 
@@ -30,6 +42,8 @@ public class SimpleTrigger : MonoBehaviour
     public virtual void PostTrigger()
     {
         if (destroyAfterHit)
+        {
             Destroy(gameObject);
+        }
     }
 }

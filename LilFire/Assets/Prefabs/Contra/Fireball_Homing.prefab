@@ -4769,6 +4769,7 @@ GameObject:
   - component: {fileID: 2418846562166217422}
   - component: {fileID: 2533968859034567607}
   - component: {fileID: 8680095223181281074}
+  - component: {fileID: 7094403808181028875}
   m_Layer: 12
   m_Name: Fireball_Homing
   m_TagString: Untagged
@@ -4860,8 +4861,23 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  destroyAfterHit: 0
   active: 0
+  destroyAfterHit: 0
+--- !u!114 &7094403808181028875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2418846562166217421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cea38907b5e23417ab18a48ea351a656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyFX: {fileID: 1508210277340606, guid: 1d1647b4463694e7f9b364dce84507e8, type: 3}
+  modifyColor: 1
+  color: {r: 0.06666667, g: 0.06666667, b: 0.06666667, a: 1}
 --- !u!1 &5499685670487591909
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,6 +27,9 @@ public class Player : SingletonBehaviour<Player>
     public Vector3 aimingPosOffset = new Vector3(0, 0.5f, 0);  //offset so you already aiming up at start
     private bool buttonPressed = false;
 
+    [Header("Respawn")]
+    public Vector3 respawnPosOffset;
+
     [Header("Debug")]
     public bool debugNoDie = false;
 
@@ -217,7 +220,7 @@ public class Player : SingletonBehaviour<Player>
     /// <param name="damage"></param>
     public void Damage(int damage = 0)
     {
-        if (!isSimulating || playerStats.IsInvulnerable) return;
+        if (!isSimulating || playerStats.IsInvulnerable || playerMovement.isDashing) return;
 
         MusicManager.Instance?.PlayDamage();
         animator.PlayHurt();
@@ -297,7 +300,8 @@ public class Player : SingletonBehaviour<Player>
         }
         else
         {
-            respawnPos = CameraManager.Instance.transform.position + 2f * Vector3.up;
+            //respawnPos = CameraManager.Instance.transform.position + 2f * Vector3.up;
+            respawnPos = CameraManager.Instance.transform.position + respawnPosOffset;
             respawnPos.z = 0;
         }
 
@@ -321,6 +325,8 @@ public class Player : SingletonBehaviour<Player>
 
     public void GrantDash()
     {
+        if (!isSimulating) return;
+
         playerMovement.dashReady = true;
         TimeManager.Instance.SlowMotion();
     }

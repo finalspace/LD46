@@ -159,6 +159,7 @@ GameObject:
   - component: {fileID: 5689274850494024523}
   - component: {fileID: 5498704056958145074}
   - component: {fileID: 6443086497743631744}
+  - component: {fileID: 3511268582815059948}
   m_Layer: 12
   m_Name: Moth
   m_TagString: Untagged
@@ -250,8 +251,23 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  destroyAfterHit: 1
   active: 0
+  destroyAfterHit: 1
+--- !u!114 &3511268582815059948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5689274850494024520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cea38907b5e23417ab18a48ea351a656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyFX: {fileID: 1508210277340606, guid: 1d1647b4463694e7f9b364dce84507e8, type: 3}
+  modifyColor: 1
+  color: {r: 0.41176474, g: 0.10588236, b: 0.72156864, a: 1}
 --- !u!1 &8561146876910424974
 GameObject:
   m_ObjectHideFlags: 0

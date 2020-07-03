@@ -43,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Visual Effects")]
 	public GameObject damageEffect;
 	public GameObject footEffect;
+    public GameObject jumpFX;
 	public Animator hurtPanel;
     public GameObject trailEffect;
     public float startTrailEffectTime;
@@ -83,9 +84,12 @@ public class PlayerMovement : MonoBehaviour
         if (isDashing)
         {
             //no gravity
-            velocity *= 0.88f;
+            velocity *= 0.9f;
             if (velocity.magnitude < 5.0f)
+            {
+                targetVelocityX = velocity.x;
                 isDashing = false;
+            }
         }
         else if (isWalling)
         {
@@ -341,6 +345,10 @@ public class PlayerMovement : MonoBehaviour
         targetVelocityX = velocity.x / 2;
 
         EventManager.Event_PlayerJump(velocity);
+
+        Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
+        if (jumpFX != null)
+            Instantiate(jumpFX, pos, Quaternion.identity);
     }
 
     public void LaunchFailed()

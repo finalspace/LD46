@@ -44,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
 	public GameObject damageEffect;
 	public GameObject footEffect;
     public GameObject jumpFX;
+    public GameObject dashFX;
 	public Animator hurtPanel;
     public GameObject trailEffect;
     public float startTrailEffectTime;
@@ -99,6 +100,8 @@ public class PlayerMovement : MonoBehaviour
         {
             //apply gravity
             velocity.y += gravity * Time.fixedDeltaTime;
+            if (velocity.y < 0)
+                velocity.y += gravity * Time.fixedDeltaTime;
         }
 
         //------------------------ Update Position ---------------------------------------
@@ -347,8 +350,11 @@ public class PlayerMovement : MonoBehaviour
         EventManager.Event_PlayerJump(velocity);
 
         Vector2 pos = new Vector2(transform.position.x, transform.position.y - 0.6f);
-        if (jumpFX != null)
-            Instantiate(jumpFX, pos, Quaternion.identity);
+        if (dashFX != null)
+        {
+            GameObject dashfx = Instantiate(dashFX, pos, Quaternion.identity);
+            dashfx.transform.SetParent(transform, true);
+        }
     }
 
     public void LaunchFailed()

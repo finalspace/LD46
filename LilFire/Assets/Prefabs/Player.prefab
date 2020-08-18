@@ -1144,6 +1144,8 @@ MonoBehaviour:
   dashReady: 0
   damageEffect: {fileID: 0}
   footEffect: {fileID: 1462327970484030, guid: a1186a29444d943da90ec6df463b5c36, type: 3}
+  jumpFX: {fileID: 0}
+  dashFX: {fileID: 3108409017293555229, guid: 96a83ee2e12bf4a4bb692b1c4c69c804, type: 3}
   hurtPanel: {fileID: 0}
   trailEffect: {fileID: 0}
   startTrailEffectTime: 0

@@ -133,8 +133,8 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  destroyAfterHit: 0
   active: 0
+  destroyAfterHit: 0
 --- !u!1 &2719603562572840357
 GameObject:
   m_ObjectHideFlags: 0

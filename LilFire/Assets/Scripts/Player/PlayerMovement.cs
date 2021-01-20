@@ -298,7 +298,6 @@ public class PlayerMovement : MonoBehaviour
         isDashing = false;
         dashReady = false;
         isWalling = false;
-        tiltSliding = false;
     }
 
     private void OnGround()
@@ -315,11 +314,11 @@ public class PlayerMovement : MonoBehaviour
         float ang = Mathf.Tan(surfaceAngle) * Mathf.Rad2Deg;
 
         //angle critical point to start sliding
-        float val = Mathf.InverseLerp(20f, 90f, Mathf.Abs(ang));
+        float val = Mathf.InverseLerp(10f, 80f, Mathf.Abs(ang));
         val = Mathf.Sin(val * Mathf.PI / 2);  //modify curve
 
         Vector2 dir = new Vector2(Mathf.Cos(ang * Mathf.Deg2Rad) * Mathf.Sign(ang), -Mathf.Sin(Mathf.Abs(ang * Mathf.Deg2Rad)));
-        velocity = dir.normalized * val * 20.0f;
+        velocity = dir.normalized * val * 5.0f;
 
         //Debug
         //float ang1 = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90;
